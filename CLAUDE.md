@@ -80,7 +80,9 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
 - `render.yaml` now describes service `salamat-ai` + database `salamat-db`. It replaced the old `smartpos-nlp` service, which the user has not confirmed is unused.
 - No public test server yet: the user will deploy on Render or their own Linux server (`docs/DEPLOY_LINUX.md`).
 - The LLM path (`llama-cpp-python` + Qwen GGUF) has never been run because Hugging Face is blocked here.
-- Ideas: fine-tune the food model on Food-101 + Iranian food photos; add DB migrations (Alembic) before schema changes on real data; web push for reminders.
+- Schema changes: new **nullable** columns are added automatically by `add_missing_columns()`. Anything else (NOT NULL, renames, type changes) needs Alembic, which is not set up yet.
+- Sleep recording still stops if the phone kills the app or (on web) the screen turns off; an Android foreground service would fix that.
+- Ideas: fine-tune the food model on Food-101 + Iranian food photos; web push for reminders.
 
 ## Work history (newest first)
 
@@ -101,3 +103,10 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     cycle tracking, weekly report + PDF, then Jalali calendar, Persian voice logging, camera heart rate, symptom checker. The user hasn't chosen yet.
     VPS advice: 2 vCPU / 4 GB / 40 GB, Ubuntu 24.04. An Iranian cloud (Arvan, ParsPack) if users are in Iran; Hetzner for testing or users abroad.
 11. Explained the app architecture to the user (no code changes).
+12. **Sleep data no longer lost when the app closes.** `app/src/lib/sleepStore.ts`: the monitor checkpoints stats to localStorage
+    every 60 s, on `visibilitychange`, and on `pagehide` (pagehide fires *before* visibilitychange, so the "interrupted" mark is kept on the instance).
+    Unsent nights are uploaded on app start, every 5 min, on `online`, and on foreground. A failed "wake up" upload stays on the phone.
+    Server: `SleepSession.client_id` (idempotent POST) + `recovered` flag + tip. Added `db.add_missing_columns()`, a mini migration that adds new
+    nullable columns to existing tables on startup (tested on SQLite and Postgres). Browser tests passed for app closed, offline at wake-up, OS-killed app,
+    and a duplicate resend. 16 pytest tests.
+    Note: `pkill -f "<pattern>"` inside a Bash call can kill the calling shell (exit 144); use `pgrep` + `kill`.

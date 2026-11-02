@@ -23,6 +23,8 @@ class SleepIn(BaseModel):
     breath_events: int = Field(default=0, ge=0)
     noise_seconds: int = Field(default=0, ge=0)
     timeline: list[dict] = Field(default_factory=list, max_length=5000)
+    client_id: str | None = Field(default=None, min_length=8, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
+    recovered: bool = False
 
     @model_validator(mode="after")
     def check(self):
@@ -48,6 +50,12 @@ def sleep_score(s: SleepIn) -> int:
 
 @router.post("/sleep")
 def add_sleep(body: SleepIn, user: User = Depends(current_user), session: Session = Depends(get_session)):
+    if body.client_id:
+        # Idempotent: the app may resend a night if the first response was lost.
+        existing = session.exec(select(SleepSession).where(SleepSession.user_id == user.id,
+                                                           SleepSession.client_id == body.client_id)).first()
+        if existing:
+            return _sleep_out(existing)
     data = body.model_dump()
     data["started_at"] = as_utc(body.started_at)
     data["ended_at"] = as_utc(body.ended_at)
@@ -70,9 +78,11 @@ def _sleep_out(s: SleepSession) -> dict:
         tips.append("چند بار صدای قطع یا سختی تنفس ثبت شد. اگر روزها خواب‌آلودی، درباره آپنه خواب با پزشک صحبت کن.")
     if s.cough_count >= 10:
         tips.append("سرفه شبانه زیاد بود. اگر ادامه داشت با پزشک مشورت کن.")
+    if s.recovered:
+        tips.append("اپ قبل از زدن «بیدار شدم» بسته شد؛ این شب تا آخرین ذخیره خودکار ثبت شد.")
     return {"id": s.id, "started_at": s.started_at, "ended_at": s.ended_at, "hours": round(hours, 2),
             "snore_seconds": s.snore_seconds, "cough_count": s.cough_count, "breath_events": s.breath_events,
-            "noise_seconds": s.noise_seconds, "score": s.score, "tips": tips}
+            "noise_seconds": s.noise_seconds, "score": s.score, "recovered": bool(s.recovered), "tips": tips}
 
 
 @router.get("/sleep")

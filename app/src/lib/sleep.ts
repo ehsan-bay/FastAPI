@@ -1,6 +1,7 @@
 // On-device sleep sound analysis: MediaPipe Audio Classifier (YAMNet, 521 sound classes).
 import { AudioClassifier, FilesetResolver } from "@mediapipe/tasks-audio";
 import { modelUrl } from "./api";
+import { newSessionId, savePending, setRecording } from "./sleepStore";
 
 export type SleepEvent = { t: number; label: string; score: number };
 export type SleepStats = { snoreSeconds: number; coughCount: number; breathEvents: number; noiseSeconds: number; events: SleepEvent[] };
@@ -19,11 +20,29 @@ const WATCH: Record<string, { fa: string; kind: "snore" | "cough" | "breath" | "
   Dog: { fa: "پارس سگ", kind: "noise" },
   Alarm: { fa: "زنگ", kind: "noise" },
 };
-export const labelFa = (l: string) => WATCH[l]?.fa ?? l;
+// Persian names for common background classes that are shown live but not counted.
+const OTHER_FA: Record<string, string> = {
+  Silence: "سکوت", "Inside, small room": "محیط آرام", "White noise": "نویز", "Pink noise": "نویز",
+  Static: "نویز", Hum: "وزوز", "Mechanical fan": "پنکه", "Air conditioning": "کولر", Tick: "تیک‌تاک",
+  Rain: "باران", Wind: "باد", Animal: "حیوان", Cat: "گربه", Television: "تلویزیون", Telephone: "تلفن",
+};
+export const labelFa = (l: string) => WATCH[l]?.fa ?? OTHER_FA[l] ?? "صدای محیط";
+
+const CHECKPOINT_MS = 60_000;
 
 export class SleepMonitor {
   stats: SleepStats = { snoreSeconds: 0, coughCount: 0, breathEvents: 0, noiseSeconds: 0, events: [] };
   startedAt = new Date();
+  readonly id = newSessionId();
+  private checkpointTimer?: number;
+  private interruptedAt?: Date;
+  private onHide = () => this.checkpoint();
+  // The page is being unloaded (app closed / reloaded): recording ends here, so mark it for upload.
+  // Browsers fire "visibilitychange" right after "pagehide", so the mark is kept on the instance.
+  private onPageHide = (e: PageTransitionEvent) => {
+    if (!e.persisted) this.interruptedAt = new Date();
+    this.checkpoint();
+  };
   private ctx?: AudioContext;
   private stream?: MediaStream;
   private node?: ScriptProcessorNode;
@@ -53,6 +72,13 @@ export class SleepMonitor {
     mute.gain.value = 0;
     this.node.connect(mute).connect(this.ctx.destination);
     this.startedAt = new Date();
+    // Save progress on the phone every minute and whenever the app is hidden or closed,
+    // so a night is not lost if the app dies before "wake up".
+    setRecording(true);
+    this.checkpoint();
+    this.checkpointTimer = window.setInterval(() => this.checkpoint(), CHECKPOINT_MS);
+    document.addEventListener("visibilitychange", this.onHide);
+    window.addEventListener("pagehide", this.onPageHide);
     try {
       this.wakeLock = await (navigator as any).wakeLock?.request("screen");
     } catch {
@@ -105,12 +131,27 @@ export class SleepMonitor {
     this.onUpdate(this.stats, { label: top ? labelFa(top.categoryName) : "—", score: top?.score ?? 0, level });
   }
 
+  checkpoint() {
+    const at = (this.interruptedAt ?? new Date()).toISOString();
+    savePending({
+      id: this.id, startedAt: this.startedAt.toISOString(), lastAt: at,
+      interruptedAt: this.interruptedAt ? at : undefined, stats: this.stats,
+    });
+  }
+
+  /** Stops recording. The stats stay saved on the phone until the upload succeeds. */
   async stop() {
+    window.clearInterval(this.checkpointTimer);
+    document.removeEventListener("visibilitychange", this.onHide);
+    window.removeEventListener("pagehide", this.onPageHide);
+    const endedAt = new Date();
+    savePending({ id: this.id, startedAt: this.startedAt.toISOString(), lastAt: endedAt.toISOString(), endedAt: endedAt.toISOString(), stats: this.stats });
+    setRecording(false);
     this.node?.disconnect();
     this.stream?.getTracks().forEach((t) => t.stop());
     await this.ctx?.close().catch(() => {});
     this.classifier?.close();
     try { await this.wakeLock?.release(); } catch { /* ignore */ }
-    return { startedAt: this.startedAt, endedAt: new Date(), stats: this.stats };
+    return { id: this.id, startedAt: this.startedAt, endedAt, stats: this.stats };
   }
 }

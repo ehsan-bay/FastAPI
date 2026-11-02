@@ -4,7 +4,7 @@ import time
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 from sqlalchemy.exc import OperationalError
 from sqlmodel import Field, Session, SQLModel, create_engine
 
@@ -97,6 +97,10 @@ class SleepSession(SQLModel, table=True):
     noise_seconds: int = 0
     timeline: str = "[]"  # json list of {t, label, score}
     score: int = 0
+    # Set by the app so a retried upload of the same night is not saved twice.
+    client_id: Optional[str] = Field(default=None, index=True, max_length=64)
+    # True when the night was rebuilt from the phone's checkpoint (app closed before "wake up").
+    recovered: Optional[bool] = None
     created_at: datetime = Field(default_factory=now)
 
 
@@ -140,11 +144,43 @@ else:
                            pool_recycle=1800)
 
 
+def add_missing_columns(eng) -> list[str]:
+    """Tiny migration step: add new *nullable* model columns to tables that already exist.
+
+    create_all() only creates missing tables, so without this an existing database would
+    break when a model gains a field. Larger schema changes should use Alembic.
+    """
+    insp = inspect(eng)
+    existing_tables = set(insp.get_table_names())
+    added = []
+    for table in SQLModel.metadata.sorted_tables:
+        if table.name not in existing_tables:
+            continue
+        have = {c["name"] for c in insp.get_columns(table.name)}
+        for col in table.columns:
+            if col.name in have:
+                continue
+            if not col.nullable:
+                log.warning("cannot auto-add NOT NULL column %s.%s", table.name, col.name)
+                continue
+            ddl = col.type.compile(dialect=eng.dialect)
+            prep = eng.dialect.identifier_preparer
+            with eng.begin() as conn:
+                conn.execute(text(f"ALTER TABLE {prep.quote(table.name)} ADD COLUMN {prep.quote(col.name)} {ddl}"))
+                for idx in table.indexes:
+                    if [c.name for c in idx.columns] == [col.name]:
+                        idx.create(conn, checkfirst=True)
+            added.append(f"{table.name}.{col.name}")
+            log.info("added column %s.%s", table.name, col.name)
+    return added
+
+
 def init_db(retries: int = 30, delay: float = 2.0) -> None:
-    """Create tables. Waits for the database to come up (useful with docker compose)."""
+    """Create tables and new columns. Waits for the database to come up (docker compose)."""
     for attempt in range(1, retries + 1):
         try:
             SQLModel.metadata.create_all(engine)
+            add_missing_columns(engine)
             return
         except OperationalError as exc:
             if attempt == retries:

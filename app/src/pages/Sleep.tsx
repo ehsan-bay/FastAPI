@@ -3,9 +3,10 @@ import { Card, Empty, ErrorBox, Page, Spinner } from "../components/ui";
 import { api } from "../lib/api";
 import { dateOnly, duration, num } from "../lib/format";
 import { SleepMonitor, labelFa, type SleepStats } from "../lib/sleep";
+import { clearPending, flushPendingSleep, loadPending, toPayload } from "../lib/sleepStore";
 import { useApi } from "../lib/useApi";
 
-type Session = { id: number; started_at: string; hours: number; score: number; snore_seconds: number; cough_count: number; breath_events: number; tips: string[] };
+type Session = { id: number; started_at: string; hours: number; score: number; snore_seconds: number; cough_count: number; breath_events: number; recovered: boolean; tips: string[] };
 
 export default function Sleep() {
   const history = useApi<Session[]>("/api/sleep", { days: 30 });
@@ -16,13 +17,34 @@ export default function Sleep() {
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState("");
   const [last, setLast] = useState<Session | null>(null);
+  const [notice, setNotice] = useState("");
 
   useEffect(() => {
     if (state !== "recording") return;
     const t = setInterval(() => setElapsed((Date.now() - monitor.current!.startedAt.getTime()) / 1000), 1000);
     return () => clearInterval(t);
   }, [state]);
-  useEffect(() => () => { monitor.current?.stop(); }, []);
+  useEffect(() => {
+    // Leaving the page stops recording; the night stays saved on the phone and is sent right away.
+    return () => {
+      const m = monitor.current;
+      if (m) m.stop().then(() => flushPendingSleep());
+    };
+  }, []);
+
+  // Send a night left over from an earlier run (app closed before "wake up", or no internet).
+  useEffect(() => {
+    flushPendingSleep().then((saved) => {
+      if (saved) {
+        setLast(saved as Session);
+        setNotice("خواب ناتمام قبلی که روی گوشی ذخیره شده بود، ارسال و ثبت شد.");
+      }
+    });
+    const onSaved = () => history.reload();
+    window.addEventListener("salamat:sleep-saved", onSaved);
+    return () => window.removeEventListener("salamat:sleep-saved", onSaved);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const start = async () => {
     setError("");
@@ -48,22 +70,21 @@ export default function Sleep() {
     const r = await monitor.current.stop();
     monitor.current = null;
     if ((r.endedAt.getTime() - r.startedAt.getTime()) / 1000 < 60) {
+      clearPending(r.id);
       setError("جلسه کوتاه‌تر از یک دقیقه بود و ذخیره نشد.");
       setState("idle");
       return;
     }
+    const pending = loadPending();
     try {
-      const s = await api<Session>("/api/sleep", {
-        body: {
-          started_at: r.startedAt.toISOString(), ended_at: r.endedAt.toISOString(),
-          snore_seconds: Math.round(r.stats.snoreSeconds), cough_count: r.stats.coughCount,
-          breath_events: r.stats.breathEvents, noise_seconds: Math.round(r.stats.noiseSeconds), timeline: r.stats.events,
-        },
-      });
+      if (!pending || pending.id !== r.id) throw new Error("داده جلسه پیدا نشد");
+      const s = await api<Session>("/api/sleep", { body: toPayload(pending) });
+      clearPending(r.id);
       setLast(s);
       history.reload();
     } catch (e) {
-      setError((e as Error).message);
+      // Stats stay on the phone and are sent automatically next time the app is opened or online.
+      setNotice(`ارسال به سرور ناموفق بود (${(e as Error).message}). آمار روی گوشی ذخیره شد و بعداً خودکار ارسال می‌شود.`);
     }
     setState("idle");
   };
@@ -74,7 +95,7 @@ export default function Sleep() {
         <Card title="🌙 شروع ضبط خواب">
           <p className="muted small">
             گوشی را به شارژ بزن، کنار تخت (رو به پایین) بگذار و اپ را باز نگه دار. صداها روی خود گوشی تحلیل می‌شوند و هیچ صدایی ضبط یا ارسال نمی‌شود؛
-            فقط تعداد رویدادها (خروپف، سرفه، تنفس) ذخیره می‌شود.
+            فقط تعداد رویدادها (خروپف، سرفه، تنفس) ذخیره می‌شود. آمار هر دقیقه روی گوشی ذخیره می‌شود تا اگر اپ بسته شد از دست نرود.
           </p>
           <button className="btn primary" style={{ width: "100%" }} onClick={start} disabled={state === "loading"}>
             {state === "loading" ? "در حال آماده‌سازی…" : "شروع"}
@@ -99,6 +120,7 @@ export default function Sleep() {
         </Card>
       )}
       <ErrorBox error={error} />
+      {notice && <div className="alert info small">{notice}</div>}
       {last && (
         <Card title={`امتیاز خواب: ${num(last.score)} از ۱۰۰`}>
           <p className="small">مدت خواب: {num(last.hours)} ساعت</p>
@@ -111,7 +133,7 @@ export default function Sleep() {
         <ul className="list">
           {history.data?.map((s) => (
             <li key={s.id}>
-              <span className="grow">{dateOnly(s.started_at)}<div className="muted small">{num(s.hours)} ساعت · خروپف {num(Math.round(s.snore_seconds / 60))} دقیقه</div></span>
+              <span className="grow">{dateOnly(s.started_at)}{s.recovered && <span className="badge medium" style={{ marginInlineStart: 6 }}>بازیابی‌شده</span>}<div className="muted small">{num(s.hours)} ساعت · خروپف {num(Math.round(s.snore_seconds / 60))} دقیقه</div></span>
               <span className={`badge ${s.score >= 75 ? "ok" : s.score >= 50 ? "warn" : "danger"}`}>{num(s.score)}</span>
             </li>
           ))}

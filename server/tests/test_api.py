@@ -154,3 +154,38 @@ def test_sleep_and_workout(client, auth):
 def test_models_status(client):
     s = client.get("/api/models").json()["server"]
     assert s["mood"] and s["lab_ocr"]
+
+
+def test_sleep_upload_is_idempotent_and_recovered(client, auth):
+    start = datetime(2026, 2, 1, 23, 0)
+    body = {"started_at": start.isoformat(), "ended_at": (start + timedelta(hours=5)).isoformat(),
+            "snore_seconds": 60, "client_id": "night-abc12345", "recovered": True}
+    first = client.post("/api/sleep", headers=auth, json=body).json()
+    again = client.post("/api/sleep", headers=auth, json=body).json()
+    assert first["id"] == again["id"] and first["recovered"] is True
+    assert any("بیدار شدم" in t for t in first["tips"])
+    nights = [s for s in client.get("/api/sleep", headers=auth, params={"days": 365}).json() if s["id"] == first["id"]]
+    assert len(nights) == 1
+    bad = dict(body, client_id="bad id with spaces")
+    assert client.post("/api/sleep", headers=auth, json=bad).status_code == 422
+
+
+def test_add_missing_columns_upgrades_old_table(tmp_path):
+    """An existing database from an older version gains the new columns on startup."""
+    from sqlalchemy import create_engine, inspect, text
+
+    from app.db import add_missing_columns
+
+    eng = create_engine(f"sqlite:///{tmp_path / 'old.db'}")
+    with eng.begin() as conn:  # sleepsession as it was before client_id/recovered existed
+        conn.execute(text("CREATE TABLE sleepsession (id INTEGER PRIMARY KEY, user_id INTEGER, started_at DATETIME, "
+                          "ended_at DATETIME, snore_seconds INTEGER, cough_count INTEGER, breath_events INTEGER, "
+                          "noise_seconds INTEGER, timeline VARCHAR, score INTEGER, created_at DATETIME)"))
+        conn.execute(text("INSERT INTO sleepsession (id, user_id, score) VALUES (1, 1, 80)"))
+    added = add_missing_columns(eng)
+    assert {"sleepsession.client_id", "sleepsession.recovered"} <= set(added)
+    cols = {c["name"] for c in inspect(eng).get_columns("sleepsession")}
+    assert {"client_id", "recovered"} <= cols
+    assert add_missing_columns(eng) == []  # second run is a no-op
+    with eng.connect() as conn:
+        assert conn.execute(text("SELECT score, recovered FROM sleepsession")).one() == (80, None)
