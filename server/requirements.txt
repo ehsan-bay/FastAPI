@@ -1,0 +1,12 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+sqlmodel>=0.0.22
+pyjwt>=2.9
+bcrypt>=4.2
+python-multipart>=0.0.9
+pillow>=10.4
+numpy>=1.26
+ai-edge-litert>=1.2
+onnxruntime>=1.19
+rapidocr-onnxruntime>=1.2
+psycopg[binary]>=3.2

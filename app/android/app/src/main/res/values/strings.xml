@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">سلامت‌یار</string>
+    <string name="title_activity_main">سلامت‌یار</string>
+    <string name="package_name">ir.salamatyar.app</string>
+    <string name="custom_url_scheme">ir.salamatyar.app</string>
+</resources>

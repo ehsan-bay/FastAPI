@@ -1,0 +1,11 @@
+services:
+  salamat:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-please-change-this-to-a-long-random-string}
+    volumes:
+      - salamat-data:/srv/data
+    restart: unless-stopped
+volumes:
+  salamat-data:

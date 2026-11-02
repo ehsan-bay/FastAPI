@@ -1,0 +1,37 @@
+{
+  "name": "salamat-ai",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "postinstall": "node scripts/copy-wasm.mjs",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "cap:sync": "npm run build && cap sync",
+    "android": "npm run build && cap sync android && cap open android",
+    "ios": "npm run build && cap sync ios && cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/ios": "^8.6.0",
+    "@capacitor/local-notifications": "^8.3.1",
+    "@fontsource/vazirmatn": "^5.3.0",
+    "@mediapipe/tasks-audio": "^1.2.0",
+    "@mediapipe/tasks-vision": "^1.2.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.5"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vite-plugin-pwa": "^2.0.0"
+  }
+}

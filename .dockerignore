@@ -1,0 +1,10 @@
+.git
+.venv
+**/node_modules
+**/__pycache__
+app/dist
+app/android
+app/ios
+app/public/mediapipe
+server/models
+server/data/*.db
