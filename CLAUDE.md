@@ -97,3 +97,7 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
    Added `deploy/backup.sh` / `deploy/restore.sh` (tested), `deploy/nginx.conf`, `deploy/salamat.service`, `.env.example`, and a Postgres database in `render.yaml`.
 8. Wrote `docs/DEPLOY_LINUX.md` (Docker + Caddy, Nginx + certbot, no-Docker systemd, backups, updates, offline image transfer, security checklist, troubleshooting).
 9. Created this `CLAUDE.md` as persistent context.
+10. Reviewed popular health apps and suggested next features. Top picks: barcode scan (Open Food Facts), Health Connect/HealthKit sync,
+    cycle tracking, weekly report + PDF, then Jalali calendar, Persian voice logging, camera heart rate, symptom checker. The user hasn't chosen yet.
+    VPS advice: 2 vCPU / 4 GB / 40 GB, Ubuntu 24.04. An Iranian cloud (Arvan, ParsPack) if users are in Iran; Hetzner for testing or users abroad.
+11. Explained the app architecture to the user (no code changes).
