@@ -9,7 +9,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .config import settings
-from .db import init_db
+from .db import db_kind, db_ok, init_db
 from .routers import activity, auth, dashboard, food, lab, meds, mood, skin, vitals
 
 
@@ -43,7 +43,9 @@ async def validation_handler(_: Request, exc: RequestValidationError):
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "app": settings.app_name}
+    ok = db_ok()
+    body = {"status": "ok" if ok else "degraded", "app": settings.app_name, "database": db_kind(), "database_ok": ok}
+    return JSONResponse(body, status_code=200 if ok else 503)
 
 
 # Model files the client runs on the device (pose, sleep sounds). Served from our own

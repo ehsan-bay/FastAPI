@@ -10,5 +10,13 @@ services:
         generateValue: true
       - key: PORT
         value: "10000"
-      # Free plan disk is wiped on redeploy; attach a disk (paid) or use Postgres
-      # via DATABASE_URL to keep user data permanently.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: salamat-db
+          property: connectionString
+
+databases:
+  - name: salamat-db
+    plan: free          # Render's free Postgres expires after 30 days; upgrade for real use
+    databaseName: salamat
+    user: salamat

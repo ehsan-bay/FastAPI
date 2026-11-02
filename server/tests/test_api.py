@@ -12,7 +12,8 @@ FIX = Path(__file__).parent / "fixtures"
 
 
 def test_health(client):
-    assert client.get("/api/health").json()["status"] == "ok"
+    body = client.get("/api/health").json()
+    assert body["status"] == "ok" and body["database_ok"]
 
 
 def test_auth_flow(client, auth):

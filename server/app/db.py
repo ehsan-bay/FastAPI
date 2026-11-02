@@ -1,10 +1,16 @@
 """Database tables and session helper (SQLite by default, any SQLAlchemy URL works)."""
+import logging
+import time
 from datetime import datetime, timezone
 from typing import Optional
 
+from sqlalchemy import text
+from sqlalchemy.exc import OperationalError
 from sqlmodel import Field, Session, SQLModel, create_engine
 
 from .config import settings
+
+log = logging.getLogger("salamat.db")
 
 
 def now() -> datetime:
@@ -124,12 +130,40 @@ class SkinCheck(SQLModel, table=True):
     created_at: datetime = Field(default_factory=now, index=True)
 
 
-_connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
-engine = create_engine(settings.database_url, connect_args=_connect_args)
+_is_sqlite = settings.database_url.startswith("sqlite")
+if _is_sqlite:
+    engine = create_engine(settings.database_url, connect_args={"check_same_thread": False})
+else:
+    # Postgres (or any server DB): check connections before use so restarts of the
+    # database don't break the app, and keep a small pool for small servers.
+    engine = create_engine(settings.database_url, pool_pre_ping=True, pool_size=5, max_overflow=10,
+                           pool_recycle=1800)
 
 
-def init_db() -> None:
-    SQLModel.metadata.create_all(engine)
+def init_db(retries: int = 30, delay: float = 2.0) -> None:
+    """Create tables. Waits for the database to come up (useful with docker compose)."""
+    for attempt in range(1, retries + 1):
+        try:
+            SQLModel.metadata.create_all(engine)
+            return
+        except OperationalError as exc:
+            if attempt == retries:
+                raise
+            log.warning("database not ready (%s), retry %d/%d", exc.__class__.__name__, attempt, retries)
+            time.sleep(delay)
+
+
+def db_ok() -> bool:
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        return True
+    except Exception:
+        return False
+
+
+def db_kind() -> str:
+    return engine.dialect.name
 
 
 def get_session():

@@ -1,0 +1,24 @@
+# systemd unit for running Salamat AI WITHOUT Docker.
+# /etc/systemd/system/salamat.service  ->  sudo systemctl enable --now salamat
+[Unit]
+Description=Salamat AI (FastAPI)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+User=salamat
+Group=salamat
+WorkingDirectory=/opt/salamat/server
+EnvironmentFile=/opt/salamat/.env
+Environment=STATIC_DIR=/opt/salamat/app/dist
+Environment=MODELS_DIR=/opt/salamat/server/models
+Environment=DATA_DIR=/opt/salamat/server/data
+ExecStart=/opt/salamat/server/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 2 --proxy-headers
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

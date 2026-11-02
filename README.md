@@ -52,21 +52,24 @@ npm run dev                                # http://localhost:5173
 
 ## دیپلوی (هاست)
 
-**Docker (هر سروری):**
+📘 **راهنمای کامل سرور لینوکس:** [`docs/DEPLOY_LINUX.md`](docs/DEPLOY_LINUX.md)
+(Docker + PostgreSQL + HTTPS خودکار، یا بدون Docker با systemd، به‌همراه بکاپ و به‌روزرسانی)
+
+**Docker Compose (اپ + PostgreSQL + HTTPS):**
 ```bash
-docker compose up -d --build               # http://SERVER:8000
+cp .env.example .env && nano .env          # SECRET_KEY، POSTGRES_PASSWORD، DOMAIN
+docker compose --profile https up -d --build
 ```
 
-**Render:** ریپو را در Render به‌عنوان Blueprint وصل کنید؛ `render.yaml` همه‌چیز را می‌سازد
-(PWA، API و دانلود مدل‌ها). روی پلن رایگان دیسک با هر دیپلوی پاک می‌شود؛ برای نگه‌داشتن داده‌ها
-یک Postgres بسازید و آدرسش را در `DATABASE_URL` بگذارید.
+**Render:** ریپو را در Render به‌عنوان Blueprint وصل کنید. `render.yaml` سرویس وب و یک دیتابیس
+PostgreSQL را با هم می‌سازد و به هم وصل می‌کند. Postgres رایگان Render بعد از ۳۰ روز منقضی می‌شود.
 
 متغیرهای محیطی:
 
 | نام | توضیح |
 |---|---|
 | `SECRET_KEY` | کلید امضای توکن (حتماً طولانی و تصادفی) |
-| `DATABASE_URL` | پیش‌فرض SQLite؛ آدرس `postgres://…` هم پشتیبانی می‌شود |
+| `DATABASE_URL` | پیش‌فرض SQLite. برای PostgreSQL: `postgresql://user:pass@host:5432/db` (در Docker Compose خودکار تنظیم می‌شود) |
 | `CORS_ORIGINS` | پیش‌فرض `*` |
 | `LLM_MODEL_PATH` | مسیر فایل GGUF برای گفتگوی هوشمندتر (اختیاری) |
 

@@ -7,6 +7,9 @@ _tmp = tempfile.mkdtemp()
 os.environ["DATA_DIR"] = _tmp
 os.environ["SECRET_KEY"] = "test"
 os.environ["STATIC_DIR"] = os.path.join(_tmp, "no-static")
+# Run the suite against Postgres with: TEST_DATABASE_URL=postgresql://user:pw@host/db pytest
+if os.environ.get("TEST_DATABASE_URL"):
+    os.environ["DATABASE_URL"] = os.environ["TEST_DATABASE_URL"]
 
 from fastapi.testclient import TestClient  # noqa: E402
 
@@ -15,6 +18,11 @@ from app.main import app  # noqa: E402
 
 @pytest.fixture(scope="session")
 def client():
+    from sqlmodel import SQLModel
+
+    from app.db import engine
+
+    SQLModel.metadata.drop_all(engine)  # clean slate (matters for a reused Postgres DB)
     with TestClient(app) as c:
         yield c
 
