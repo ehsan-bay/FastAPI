@@ -109,4 +109,10 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     Server: `SleepSession.client_id` (idempotent POST) + `recovered` flag + tip. Added `db.add_missing_columns()`, a mini migration that adds new
     nullable columns to existing tables on startup (tested on SQLite and Postgres). Browser tests passed for app closed, offline at wake-up, OS-killed app,
     and a duplicate resend. 16 pytest tests.
-    Note: `pkill -f "<pattern>"` inside a Bash call can kill the calling shell (exit 144); use `pgrep` + `kill`.
+    Note: `pkill -f "<pattern>"` / `pgrep -f "<pattern>"` inside a Bash call can match the calling shell itself and kill it (exit 144);
+    use a bracket pattern like `pgrep -f "[u]vicorn app[.]main"`.
+13. Answered: why some models run on the phone (real-time video/audio, privacy, offline, zero server cost), how on-device inference works
+    (model file + WASM/native runtime such as MediaPipe/LiteRT, no API), and why Python for the server (AI ecosystem). No code changes.
+14. Built a **17-page Persian sales catalog PDF** (`docs/catalog/Salamatyar-Catalog.pdf`): cover, executive summary, problem/opportunity,
+    8 modules, real screenshots (seeded demo data), architecture, trust & safety, comparison, business model & packages (prices left
+    "by agreement"), 6-month launch plan, roadmap, buyer FAQ, back cover. Contact fields on the last page are placeholders. How to rebuild: `docs/catalog/README.md`.

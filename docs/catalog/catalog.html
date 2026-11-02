@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>سلامت‌یار هوشمند — کاتالوگ محصول</title>
+<style>
+@font-face { font-family: "Vazirmatn"; font-weight: 400; src: url("fonts/vazirmatn-arabic-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Vazirmatn"; font-weight: 500; src: url("fonts/vazirmatn-arabic-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Vazirmatn"; font-weight: 600; src: url("fonts/vazirmatn-arabic-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Vazirmatn"; font-weight: 700; src: url("fonts/vazirmatn-arabic-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Vazirmatn"; font-weight: 800; src: url("fonts/vazirmatn-arabic-800-normal.woff2") format("woff2"); }
+@font-face { font-family: "Vazirmatn"; font-weight: 900; src: url("fonts/vazirmatn-arabic-900-normal.woff2") format("woff2"); }
+@font-face { font-family: "VazirLatin"; font-weight: 400; src: url("fonts/vazirmatn-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "VazirLatin"; font-weight: 700; src: url("fonts/vazirmatn-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "VazirLatin"; font-weight: 800; src: url("fonts/vazirmatn-latin-800-normal.woff2") format("woff2"); }
+
+@page { size: A4; margin: 0; }
+:root {
+  --g: #0f9d76; --g2: #12b886; --deep: #052e25; --ink: #10201b; --muted: #5b6f68;
+  --mint: #e3f6ef; --mint2: #f2fbf7; --line: #d8e7e1; --sand: #fbf7f0; --gold: #e9a23b; --rose: #e05d5d;
+}
+* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+html, body { margin: 0; padding: 0; }
+body { font-family: "VazirLatin", "Vazirmatn", sans-serif; color: var(--ink); font-size: 10.4pt; line-height: 1.85; }
+.page { width: 210mm; height: 297mm; position: relative; overflow: hidden; page-break-after: always; background: #fff; padding: 20mm 18mm 18mm; }
+.page:last-child { page-break-after: auto; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.35; font-weight: 900; }
+p { margin: 0 0 3mm; }
+.ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+
+/* running header / footer */
+.hdr { position: absolute; top: 9mm; right: 18mm; left: 18mm; display: flex; justify-content: space-between; font-size: 8pt; color: var(--muted); }
+.hdr b { color: var(--g); font-weight: 800; }
+.ftr { position: absolute; bottom: 8mm; right: 18mm; left: 18mm; display: flex; justify-content: space-between; font-size: 7.6pt; color: #8aa098; border-top: 1px solid var(--line); padding-top: 2.5mm; }
+
+.kicker { font-size: 9pt; font-weight: 800; color: var(--g); letter-spacing: .3px; margin-bottom: 2mm; display: flex; align-items: center; gap: 2mm; }
+.kicker::before { content: ""; width: 7mm; height: 1.2mm; background: var(--g); border-radius: 2mm; display: inline-block; }
+.title { font-size: 25pt; margin-bottom: 4mm; }
+.lead { font-size: 11.6pt; color: #33463f; line-height: 1.95; }
+.muted { color: var(--muted); }
+.small { font-size: 8.6pt; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3.5mm; }
+.card { border: 1px solid var(--line); border-radius: 4mm; padding: 4.5mm 5mm; background: #fff; }
+.compact .card { padding: 3.6mm 4.5mm; }
+.compact .icon { width: 8.5mm; height: 8.5mm; font-size: 12.5pt; margin-bottom: 1.5mm; }
+.card.tint { background: var(--mint2); border-color: #cfeadf; }
+.card h3 { font-size: 11.5pt; margin-bottom: 1.5mm; }
+.card p { font-size: 9.3pt; color: #3f524b; margin: 0; line-height: 1.8; }
+.icon { width: 10mm; height: 10mm; border-radius: 3mm; background: var(--mint); display: grid; place-items: center; font-size: 15pt; margin-bottom: 2.5mm; }
+.pill { display: inline-block; padding: .3mm 3mm; border-radius: 10mm; font-size: 7.8pt; font-weight: 700; background: var(--mint); color: #0b6e53; margin: 0 0 1mm 1mm; }
+.pill.dev { background: #e8f0ff; color: #2f55b5; }
+.pill.srv { background: #fff3e0; color: #a2620b; }
+ul.check { list-style: none; padding: 0; margin: 0; }
+ul.check li { position: relative; padding-right: 6mm; margin-bottom: 1.6mm; font-size: 9.6pt; }
+ul.check li::before { content: "✓"; position: absolute; right: 0; top: 0; color: var(--g); font-weight: 900; }
+
+/* phones */
+.phone { width: 58mm; aspect-ratio: 412 / 915; border-radius: 8.5mm; background: #0d1512; padding: 1.8mm; box-shadow: 0 6mm 14mm rgba(5, 46, 37, .22), 0 1mm 2mm rgba(0,0,0,.2); position: relative; flex-shrink: 0; }
+.phone::before { content: ""; position: absolute; top: 3.2mm; left: 50%; transform: translateX(-50%); width: 3mm; height: 3mm; border-radius: 50%; background: #0d1512; z-index: 2; box-shadow: 0 0 0 .6mm #1d2a26; }
+.phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 7mm; display: block; }
+.phone.sm { width: 48mm; border-radius: 7mm; }
+.phone.sm img { border-radius: 5.8mm; }
+.phone.xs { width: 41mm; border-radius: 6.2mm; padding: 1.4mm; }
+.phone.xs img { border-radius: 5mm; }
+.cap { text-align: center; font-size: 8.2pt; color: var(--muted); margin-top: 3mm; font-weight: 600; }
+
+/* feature page layout */
+.feature { display: grid; grid-template-columns: 1fr 108mm; gap: 7mm; align-items: start; }
+.feature .phones { display: flex; gap: 5mm; justify-content: center; padding-top: 4mm; }
+.feature .phones .phone { width: 51mm; }
+.howbox { background: var(--sand); border-radius: 4mm; padding: 4mm 5mm; margin-top: 4mm; border: 1px solid #efe5d3; }
+.howbox h4 { font-size: 10pt; margin-bottom: 1.5mm; color: #7a5310; }
+.howbox p { font-size: 9pt; margin: 0; color: #5a4a2c; }
+.stat { text-align: center; padding: 4mm 2mm; border-radius: 4mm; background: var(--mint2); border: 1px solid #cfeadf; }
+.stat b { display: block; font-size: 21pt; font-weight: 900; color: var(--g); line-height: 1.25; }
+.stat span { font-size: 8.4pt; color: var(--muted); font-weight: 600; }
+
+table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 9pt; }
+th, td { padding: 2.4mm 3mm; text-align: right; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { background: var(--deep); color: #fff; font-weight: 800; }
+th:first-child { border-top-right-radius: 3mm; } th:last-child { border-top-left-radius: 3mm; }
+tr:nth-child(even) td { background: #f7fbf9; }
+td.yes { color: var(--g); font-weight: 900; text-align: center; }
+td.no { color: #b8c4bf; text-align: center; }
+td.mid { color: var(--gold); text-align: center; font-weight: 800; }
+
+/* cover */
+.cover { background: radial-gradient(120% 80% at 85% 0%, #17c08f 0%, #0f9d76 35%, #06513e 70%, #04271f 100%); color: #fff; padding: 0; }
+.cover .inner { position: absolute; inset: 0; padding: 22mm 18mm; }
+.cover .brand { display: flex; align-items: center; gap: 3.5mm; font-weight: 800; font-size: 12pt; }
+.cover .brand img { width: 13mm; height: 13mm; border-radius: 3.5mm; box-shadow: 0 2mm 6mm rgba(0,0,0,.25); }
+.cover h1 { font-size: 40pt; margin-top: 20mm; line-height: 1.25; }
+.cover h1 span { color: #b9f5df; }
+.cover .sub { font-size: 13.5pt; margin-top: 5mm; max-width: 120mm; color: #e3fbf2; line-height: 1.9; }
+.cover .tags { margin-top: 7mm; display: flex; flex-wrap: wrap; gap: 2mm; max-width: 130mm; }
+.cover .tags span { border: 1px solid rgba(255,255,255,.35); border-radius: 10mm; padding: .6mm 3.5mm; font-size: 8.8pt; background: rgba(255,255,255,.08); }
+.cover .phones { position: absolute; bottom: 0; left: 0; right: 0; height: 118mm; overflow: hidden; display: flex; justify-content: center; align-items: flex-start; gap: 7mm; padding-top: 4mm; }
+.cover .phones .phone { box-shadow: 0 6mm 18mm rgba(0,0,0,.45); }
+.cover .phones .sm { margin-top: 20mm; }
+.cover .phones .mid { width: 66mm; }
+.cover .meta { position: absolute; top: 22mm; left: 18mm; font-size: 8.5pt; text-align: left; color: #c6f2e3; }
+
+.band { background: var(--deep); color: #fff; border-radius: 5mm; padding: 6mm 7mm; }
+.band h3 { color: #b9f5df; font-size: 12pt; margin-bottom: 2mm; }
+.band p { color: #d7ede5; font-size: 9.6pt; margin: 0; }
+.quote { font-size: 13pt; font-weight: 800; line-height: 1.8; color: var(--deep); border-right: 1.6mm solid var(--g); padding: 1mm 5mm 1mm 0; margin: 5mm 0; }
+
+/* architecture diagram */
+.arch { display: grid; grid-template-columns: 1fr 14mm 1fr 14mm .8fr; align-items: center; margin-top: 3mm; }
+.arch .box { border-radius: 4mm; padding: 4mm; border: 1.3px solid var(--line); background: #fff; min-height: 64mm; }
+.arch .box h4 { font-size: 10.5pt; margin-bottom: 2mm; }
+.arch .box.dev { border-color: #b9cdfa; background: #f5f8ff; }
+.arch .box.srv { border-color: #f1d3a3; background: #fffaf2; }
+.arch .box.db { border-color: #cfeadf; background: var(--mint2); }
+.arch .arrow { text-align: center; color: var(--g); font-size: 18pt; font-weight: 900; line-height: 1; }
+.arch .arrow small { display: block; font-size: 6.8pt; color: var(--muted); font-weight: 600; margin-top: 1mm; }
+.arch ul { margin: 0; padding-right: 4mm; font-size: 8.8pt; }
+.arch li { margin-bottom: 1mm; }
+
+/* timeline */
+.tl { position: relative; margin-top: 4mm; }
+.tl .step { display: grid; grid-template-columns: 30mm 1fr; gap: 5mm; margin-bottom: 4mm; position: relative; }
+.tl .when { background: var(--deep); color: #fff; border-radius: 3mm; padding: 2.5mm 3mm; text-align: center; font-weight: 800; font-size: 9pt; height: fit-content; }
+.tl .when small { display: block; font-weight: 500; color: #a9d9c8; font-size: 7.6pt; }
+.tl .what { border: 1px solid var(--line); border-radius: 3.5mm; padding: 3mm 4.5mm; }
+.tl .what h4 { font-size: 10.5pt; margin-bottom: 1mm; }
+.tl .what p { font-size: 8.9pt; margin: 0; color: #3f524b; }
+.tl .what .out { font-size: 8.4pt; color: var(--g); font-weight: 700; margin-top: 1mm; }
+
+.rows { display: grid; gap: 5mm; margin-top: 2mm; }
+.rows .phone.xs { width: 35mm; border-radius: 5.4mm; padding: 1.2mm; }
+.rows .phone.xs img { border-radius: 4.4mm; }
+.rows > div > div { display: flex; gap: 7mm !important; align-items: center !important; background: var(--mint2); border: 1px solid #cfeadf; border-radius: 5mm; padding: 3mm 6mm; }
+.rows ul.check { columns: 2; column-gap: 6mm; }
+.rows ul.check li { break-inside: avoid; }
+.rows h3 { font-size: 14pt !important; margin-bottom: 3mm !important; }
+.faq { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+.faq .q { border: 1px solid var(--line); border-radius: 4mm; padding: 4mm 4.5mm; }
+.faq .q h4 { font-size: 10pt; margin-bottom: 1.5mm; color: var(--deep); }
+.faq .q h4::before { content: "؟ "; color: var(--g); }
+.faq .q p { font-size: 8.8pt; margin: 0; color: #3f524b; line-height: 1.8; }
+
+.tier { border: 1.3px solid var(--line); border-radius: 5mm; padding: 5mm; position: relative; }
+.tier.hot { border-color: var(--g); box-shadow: 0 3mm 9mm rgba(15,157,118,.15); }
+.tier .badge { position: absolute; top: -3.2mm; left: 5mm; background: var(--g); color: #fff; font-size: 7.6pt; font-weight: 800; border-radius: 10mm; padding: .3mm 3mm; }
+.tier h3 { font-size: 13pt; }
+.tier .for { font-size: 8.6pt; color: var(--muted); margin-bottom: 2.5mm; }
+.tier ul.check li { font-size: 8.8pt; }
+
+.back { background: linear-gradient(160deg, #052e25 0%, #06513e 60%, #0f9d76 100%); color: #fff; }
+.back h2 { font-size: 30pt; margin-top: 40mm; }
+.back p { color: #d7ede5; font-size: 12pt; max-width: 140mm; }
+.cta { display: inline-block; margin-top: 8mm; background: #fff; color: var(--deep); font-weight: 900; padding: 3.5mm 8mm; border-radius: 10mm; font-size: 12pt; }
+.contact { margin-top: 12mm; border-top: 1px solid rgba(255,255,255,.25); padding-top: 6mm; display: grid; grid-template-columns: 1fr 1fr; gap: 4mm 10mm; font-size: 10pt; color: #e3fbf2; max-width: 150mm; }
+.contact b { color: #b9f5df; display: block; font-size: 8.4pt; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- 1. COVER -->
+<section class="page cover">
+  <div class="inner">
+    <div class="brand"><img src="icon.png" alt="">سلامت‌یار هوشمند</div>
+    <div class="meta">کاتالوگ محصول · نسخه ۱٫۰<br><span class="ltr">Salamat AI — Product Catalog</span></div>
+    <h1>یک اپ، <span>هشت دستیار سلامت</span><br>با هوش مصنوعی</h1>
+    <p class="sub">تغذیه، ورزش، خواب، پوست، آزمایش، سلامت روان، علائم حیاتی و دارو؛ همه در یک محصول فارسی، آماده استقرار روی سرور شما و قابل عرضه با برند شما.</p>
+    <div class="tags"><span>اندروید</span><span>iOS</span><span>وب و PWA</span><span>هوش مصنوعی روی گوشی</span><span>میزبانی داخلی</span><span>White-label</span></div>
+  </div>
+  <div class="phones">
+    <div class="phone sm"><img src="shots/food-ai.png" alt=""></div>
+    <div class="phone mid"><img src="shots/home.png" alt=""></div>
+    <div class="phone sm"><img src="shots/home-dark.png" alt=""></div>
+  </div>
+</section>
+
+<!-- 2. EXECUTIVE SUMMARY -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>خلاصه مدیریتی</span></div>
+  <div class="kicker">خلاصه مدیریتی</div>
+  <h2 class="title">مراقبت روزانه از سلامت، ساده و هوشمند</h2>
+  <p class="lead">سلامت‌یار یک پلتفرم کامل سلامت دیجیتال است که با چند مدل هوش مصنوعی کوچک و کارآمد، کارهای روزمره مراقبت از سلامت را برای کاربر ساده می‌کند: با یک عکس کالری غذا را می‌شمارد، حرکات ورزشی را با دوربین تصحیح می‌کند، خواب را از روی صدا تحلیل می‌کند و برگه آزمایش را به زبان ساده توضیح می‌دهد.</p>
+  <div class="quote">محصول آماده است، نه یک ایده: نسخه عملیاتی با سرور، اپ موبایل و نسخه وب، تست‌شده و قابل استقرار در یک روز.</div>
+
+  <div class="grid4" style="margin: 6mm 0;">
+    <div class="stat"><b>۸</b><span>ماژول سلامت</span></div>
+    <div class="stat"><b>۴</b><span>پلتفرم از یک کد</span></div>
+    <div class="stat"><b>۵+۱</b><span>مدل هوش مصنوعی<br>(+ مدل زبانی اختیاری)</span></div>
+    <div class="stat"><b>۱۰۰٪</b><span>فارسی و راست‌به‌چپ</span></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card tint">
+      <div class="icon">🎯</div>
+      <h3>برای چه کسانی؟</h3>
+      <p>بیمه‌ها، کلینیک‌ها و بیمارستان‌ها، داروخانه‌های زنجیره‌ای، سازمان‌ها (برنامه سلامت کارکنان)، اپراتورها و سوپراپ‌ها، و استارتاپ‌هایی که می‌خواهند سریع وارد بازار سلامت دیجیتال شوند.</p>
+    </div>
+    <div class="card tint">
+      <div class="icon">💎</div>
+      <h3>چه چیزی خریداری می‌کنید؟</h3>
+      <p>کد کامل و مالکیت استقرار، اپ اندروید و iOS و وب با برند شما، سرور قابل نصب روی زیرساخت داخلی، مستندات استقرار، و نقشه راه توسعه.</p>
+    </div>
+    <div class="card">
+      <div class="icon">⚡</div>
+      <h3>چرا الان؟</h3>
+      <p>مدل‌های هوش مصنوعی آن‌قدر کوچک شده‌اند که روی گوشی و سرورهای ارزان اجرا می‌شوند؛ هزینه‌ای که چند سال پیش فقط برای غول‌های فناوری ممکن بود، امروز برای یک کسب‌وکار متوسط در دسترس است.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🛡️</div>
+      <h3>چرا سلامت‌یار؟</h3>
+      <p>فارسیِ کامل با جدول غذاهای ایرانی، حریم خصوصی واقعی (تصویر و صدا ذخیره نمی‌شود)، اجرای کامل روی سرور داخل کشور و ادامه کار حتی در اختلال اینترنت بین‌الملل.</p>
+    </div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · کاتالوگ محصول</span><span>۲</span></div>
+</section>
+
+<!-- 3. PROBLEM / OPPORTUNITY -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>مسئله و فرصت</span></div>
+  <div class="kicker">مسئله و فرصت</div>
+  <h2 class="title">مراقبت از سلامت، در فاصله دو ویزیت پزشک اتفاق می‌افتد</h2>
+  <p class="lead">بیشتر تصمیم‌های مؤثر بر سلامت (چه بخوریم، چقدر بخوابیم، دارو را به‌موقع بخوریم یا نه) بیرون از مطب گرفته می‌شود. بیماری‌های غیرواگیر مانند دیابت، فشار خون و بیماری‌های قلبی، به گزارش سازمان جهانی بهداشت، عامل حدود ۷۴٪ مرگ‌ها در جهان هستند و بخش بزرگی از آن‌ها به سبک زندگی وابسته است.</p>
+
+  <div class="grid3" style="margin-top:6mm;">
+    <div class="card"><div class="icon">🧩</div><h3>اپ‌های پراکنده</h3><p>کاربر برای کالری، ورزش، خواب و دارو چند اپ جدا نصب می‌کند و هیچ‌کدام تصویر کامل را نمی‌بینند.</p></div>
+    <div class="card"><div class="icon">🌐</div><h3>اپ‌های خارجی</h3><p>فارسی نیستند، غذای ایرانی را نمی‌شناسند، پرداخت و دسترسی دشوار است و داده‌ها خارج از کشور ذخیره می‌شود.</p></div>
+    <div class="card"><div class="icon">⏱️</div><h3>ثبت دستی خسته‌کننده</h3><p>تایپ کردن هر وعده و هر عدد باعث می‌شود کاربر بعد از چند روز رها کند. هوش مصنوعی این اصطکاک را حذف می‌کند.</p></div>
+  </div>
+
+  <div class="band" style="margin-top:7mm;">
+    <h3>فرصت</h3>
+    <p>سازمان‌هایی که با سلامت مردم سروکار دارند (بیمه، کلینیک، داروخانه، کارفرما) به یک ابزار دیجیتال نیاز دارند که مشتری را بین مراجعه‌ها همراهی کند، داده قابل‌اعتماد بسازد و هزینه‌های درمان را با پیشگیری کاهش دهد. سلامت‌یار همین ابزار است، آماده و فارسی.</p>
+  </div>
+
+  <div class="grid2" style="margin-top:7mm;">
+    <div>
+      <h3 style="font-size:12pt;margin-bottom:2mm;">آنچه کاربر به دست می‌آورد</h3>
+      <ul class="check">
+        <li>یک دستیار همیشه همراه به زبان خودش</li>
+        <li>ثبت سریع با عکس به‌جای تایپ</li>
+        <li>هشدار به‌موقع برای فشار، قند و اکسیژن خون</li>
+        <li>یادآور دارو و گزارش مصرف به‌موقع</li>
+        <li>حمایت در لحظات سخت روانی، با ارجاع به خطوط کمک</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="font-size:12pt;margin-bottom:2mm;">آنچه سازمان شما به دست می‌آورد</h3>
+      <ul class="check">
+        <li>ارتباط روزانه با مشتری، نه سالی یک بار</li>
+        <li>برند خودتان روی اپ (White-label)</li>
+        <li>داده‌های سلامت روی سرور خودتان</li>
+        <li>زمینه برنامه‌های پیشگیری و تشویقی</li>
+        <li>ورود سریع به بازار، بدون ماه‌ها توسعه</li>
+      </ul>
+    </div>
+  </div>
+  <div class="ftr"><span>منبع آمار: سازمان جهانی بهداشت (WHO)، برگه اطلاعات بیماری‌های غیرواگیر</span><span>۳</span></div>
+</section>
+
+<!-- 4. PRODUCT OVERVIEW -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>محصول در یک نگاه</span></div>
+  <div class="kicker">محصول در یک نگاه</div>
+  <h2 class="title">هشت ماژول، یک تجربه یکپارچه</h2>
+  <p class="lead" style="margin-bottom:3mm;">همه ماژول‌ها داده‌هایشان را در یک داشبورد مشترک جمع می‌کنند، پس کاربر یک تصویر کامل از سلامتش دارد.</p>
+  <div class="grid2 compact" style="gap:3.2mm;">
+    <div class="card"><div class="icon">🍽️</div><h3>تغذیه با عکس</h3><p>عکس غذا ← تشخیص و کالری و درشت‌مغذی‌ها. جدول غذا شامل غذاهای ایرانی مثل قورمه‌سبزی و چلوکباب.</p><div style="margin-top:2mm"><span class="pill srv">هوش مصنوعی سرور</span></div></div>
+    <div class="card"><div class="icon">🏋️</div><h3>مربی ورزش با دوربین</h3><p>شمارش خودکار تکرار و تذکر فرم حرکت برای اسکوات، شنا، لانج، جامپینگ جک و دراز و نشست.</p><div style="margin-top:2mm"><span class="pill dev">هوش مصنوعی روی گوشی</span></div></div>
+    <div class="card"><div class="icon">😴</div><h3>پایش خواب</h3><p>تشخیص خروپف، سرفه و رویدادهای تنفسی از روی صدا، امتیاز خواب و توصیه. آمار حتی با بسته شدن اپ از دست نمی‌رود.</p><div style="margin-top:2mm"><span class="pill dev">هوش مصنوعی روی گوشی</span></div></div>
+    <div class="card"><div class="icon">🩺</div><h3>غربالگری پوست و خال</h3><p>بررسی تصویر ضایعه در ۹ دسته و تعیین سطح ریسک با توصیه مراجعه. ابزار غربالگری، نه تشخیص.</p><div style="margin-top:2mm"><span class="pill srv">هوش مصنوعی سرور</span></div></div>
+    <div class="card"><div class="icon">🧪</div><h3>تفسیر برگه آزمایش</h3><p>خواندن برگه با OCR و توضیح بیش از ۲۰ شاخص رایج (قند، چربی، CBC، تیروئید، ویتامین‌ها) به فارسی ساده.</p><div style="margin-top:2mm"><span class="pill srv">هوش مصنوعی سرور</span></div></div>
+    <div class="card"><div class="icon">🧠</div><h3>سلامت روان</h3><p>یادداشت روزانه با تحلیل احساس، گفتگو با دستیار، تمرین تنفس و تشخیص خودکار جملات بحرانی با ارجاع به ۱۲۳ و ۱۴۸۰.</p><div style="margin-top:2mm"><span class="pill srv">هوش مصنوعی سرور</span></div></div>
+    <div class="card"><div class="icon">❤️</div><h3>علائم حیاتی</h3><p>فشار، قند، وزن، ضربان و اکسیژن خون؛ هشدار بالینی، تشخیص مقدار غیرعادی و تحلیل روند هفتگی.</p><div style="margin-top:2mm"><span class="pill srv">تحلیل آماری</span></div></div>
+    <div class="card"><div class="icon">💊</div><h3>دارو و یادآور</h3><p>یادآور ساعت مصرف (با اعلان، حتی با اپ بسته روی موبایل) و درصد مصرف به‌موقع در هفته.</p><div style="margin-top:2mm"><span class="pill">روی گوشی + سرور</span></div></div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · کاتالوگ محصول</span><span>۴</span></div>
+</section>
+
+<!-- 5. DASHBOARD -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>تجربه کاربری</span></div>
+  <div class="feature">
+    <div>
+      <div class="kicker">داشبورد</div>
+      <h2 class="title">همه‌چیز در یک صفحه</h2>
+      <p class="lead">کاربر با باز کردن اپ می‌بیند امروز چقدر خورده، دیشب چطور خوابیده، فشارش چند بوده و داروهایش را به‌موقع خورده یا نه. هر کارت او را مستقیم به ماژول مربوط می‌برد.</p>
+      <ul class="check" style="margin-top:4mm;">
+        <li>طراحی بومی فارسی، راست‌به‌چپ و اعداد فارسی</li>
+        <li>حالت روشن و تیره، خودکار مطابق گوشی</li>
+        <li>هشدار قرمز بالای صفحه در وضعیت‌های خطرناک (مثل بحران فشار خون)</li>
+        <li>قابل نصب روی صفحه اصلی گوشی حتی بدون مارکت (PWA)</li>
+        <li>رنگ، لوگو و نام اپ قابل تغییر به برند شما</li>
+      </ul>
+      <div class="howbox">
+        <h4>یک کد، چهار پلتفرم</h4>
+        <p>اپ اندروید، اپ iOS، نسخه وب و نسخه نصب‌شدنی (PWA) همه از یک کد ساخته می‌شوند؛ هر قابلیت جدید یک بار نوشته می‌شود و همه‌جا می‌رسد.</p>
+      </div>
+    </div>
+    <div>
+      <div class="phones">
+        <div><div class="phone"><img src="shots/home.png" alt=""></div><div class="cap">داشبورد روزانه</div></div>
+        <div><div class="phone"><img src="shots/home-dark.png" alt=""></div><div class="cap">حالت تیره</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span>تصاویر از نسخه واقعی محصول با داده نمایشی</span><span>۵</span></div>
+</section>
+
+<!-- 6. NUTRITION -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>ماژول تغذیه</span></div>
+  <div class="feature">
+    <div>
+      <div class="kicker">تغذیه هوشمند</div>
+      <h2 class="title">یک عکس، به‌جای ده دقیقه تایپ</h2>
+      <p class="lead">کاربر از بشقابش عکس می‌گیرد؛ هوش مصنوعی غذا را تشخیص می‌دهد و چند پیشنهاد با درصد اطمینان نشان می‌دهد. کاربر با یک لمس تأیید می‌کند و مقدار را تنظیم می‌کند.</p>
+      <ul class="check" style="margin-top:3mm;">
+        <li>کالری، پروتئین، کربوهیدرات و چربی هر وعده</li>
+        <li>جدول غذای ایرانی: چلوکباب، قورمه‌سبزی، قیمه، فسنجان، آش، نان سنگک و بربری و…</li>
+        <li>هدف کالری روزانه شخصی و نوار پیشرفت</li>
+        <li>جستجوی سریع وقتی عکس در دسترس نیست</li>
+        <li>عکس فقط پردازش می‌شود و هرگز ذخیره نمی‌شود</li>
+      </ul>
+      <div class="howbox">
+        <h4>چطور کار می‌کند؟</h4>
+        <p>یک شبکه عصبی EfficientNet-Lite عکس را روی سرور تحلیل می‌کند و نتیجه به جدول تغذیه نگاشت می‌شود. در نمونه بالا، همبرگر با اطمینان ۷۸٪ تشخیص داده شده است.</p>
+      </div>
+    </div>
+    <div class="phones">
+      <div><div class="phone"><img src="shots/food-ai.png" alt=""></div><div class="cap">تشخیص غذا از عکس</div></div>
+      <div><div class="phone"><img src="shots/food-log.png" alt=""></div><div class="cap">وعده‌های امروز</div></div>
+    </div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · کاتالوگ محصول</span><span>۶</span></div>
+</section>
+
+<!-- 7. COACH + SLEEP -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>ورزش و خواب</span></div>
+  <div class="kicker">ورزش و خواب، با هوش مصنوعی روی گوشی</div>
+  <h2 class="title">مربی و پایشگر شخصی، بدون ارسال حتی یک فریم</h2>
+  <div class="rows">
+    <div>
+      <div style="display:flex; gap:5mm; align-items:flex-start;">
+        <div class="phone xs"><img src="shots/coach.png" alt=""></div>
+        <div>
+          <h3 style="font-size:13pt;margin-bottom:2mm;">🏋️ مربی ورزش</h3>
+          <ul class="check">
+            <li>۳۳ نقطه بدن در هر فریم</li>
+            <li>شمارش خودکار تکرار</li>
+            <li>تذکر لحظه‌ای فرم: «سینه را بالا نگه دار»</li>
+            <li>امتیاز فرم و کالری هر جلسه</li>
+            <li>۵ حرکت پایه، قابل افزایش</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="display:flex; gap:5mm; align-items:flex-start;">
+        <div class="phone xs"><img src="shots/sleep.png" alt=""></div>
+        <div>
+          <h3 style="font-size:13pt;margin-bottom:2mm;">😴 پایش خواب</h3>
+          <ul class="check">
+            <li>تشخیص خروپف، سرفه و تنفس نامنظم</li>
+            <li>امتیاز خواب ۰ تا ۱۰۰</li>
+            <li>توصیه، از جمله هشدار احتمال آپنه</li>
+            <li>ذخیره خودکار هر دقیقه؛ بدون از دست رفتن داده</li>
+            <li>صدا ضبط یا ارسال نمی‌شود</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="band" style="margin-top:6mm;">
+    <h3>چرا روی گوشی؟</h3>
+    <p>ویدیو و صدای زنده، حجم و حساسیت بالایی دارند. مدل‌های MediaPipe (تشخیص حرکات بدن) و YAMNet (تشخیص ۵۲۱ نوع صدا) مستقیم روی گوشی اجرا می‌شوند. نتیجه: پاسخ لحظه‌ای، کار بدون اینترنت، هزینه سرور نزدیک به صفر و حریم خصوصی کامل. فقط آمار نهایی (تعداد تکرار، دقیقه خروپف) به سرور می‌رود.</p>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · کاتالوگ محصول</span><span>۷</span></div>
+</section>
+
+<!-- 8. SKIN + LAB -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>پوست و آزمایش</span></div>
+  <div class="kicker">غربالگری و تفسیر</div>
+  <h2 class="title">از خال مشکوک تا برگه آزمایش</h2>
+  <div class="rows">
+    <div>
+      <div style="display:flex; gap:5mm; align-items:flex-start;">
+        <div class="phone xs"><img src="shots/skin.png" alt=""></div>
+        <div>
+          <h3 style="font-size:13pt;margin-bottom:2mm;">🩺 غربالگری پوست</h3>
+          <ul class="check">
+            <li>تحلیل در ۹ دسته ضایعه پوستی (دیتاست بین‌المللی ISIC)</li>
+            <li>سه سطح: ریسک پایین، نیاز به بررسی، مراجعه به پزشک</li>
+            <li>رویکرد محتاطانه؛ اولویت با ارجاع</li>
+            <li>سابقه بررسی‌ها برای پایش تغییرات</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="display:flex; gap:5mm; align-items:flex-start;">
+        <div class="phone xs"><img src="shots/lab.png" alt=""></div>
+        <div>
+          <h3 style="font-size:13pt;margin-bottom:2mm;">🧪 تفسیر برگه آزمایش</h3>
+          <ul class="check">
+            <li>عکس برگه ← خواندن خودکار با OCR</li>
+            <li>بیش از ۲۰ شاخص: قند، HbA1c، چربی‌ها، CBC، TSH، ویتامین D و B12، کبد، کلیه</li>
+            <li>وضعیت بالا/پایین/طبیعی و توضیح فارسی</li>
+            <li>امکان تایپ دستی نتایج</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid3" style="margin-top:6mm;">
+    <div class="card tint"><h3>ارزش برای کلینیک</h3><p>بیمار قبل از ویزیت، نتایج و پرسش‌هایش را آماده دارد؛ زمان ویزیت مؤثرتر می‌شود.</p></div>
+    <div class="card tint"><h3>ارزش برای بیمه</h3><p>غربالگری زودهنگام یعنی تشخیص زودتر و درمان کم‌هزینه‌تر.</p></div>
+    <div class="card tint"><h3>ایمنی بالینی</h3><p>هر خروجی پزشکی با توضیح «غربالگری، نه تشخیص» همراه است و کاربر را به پزشک ارجاع می‌دهد.</p></div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · کاتالوگ محصول</span><span>۸</span></div>
+</section>
+
+<!-- 9. MIND -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>سلامت روان</span></div>
+  <div class="feature">
+    <div>
+      <div class="kicker">سلامت روان</div>
+      <h2 class="title">همدلی، هر وقت که لازم است</h2>
+      <p class="lead">کاربر حالش را با یک ایموجی و چند جمله ثبت می‌کند. سیستم احساسات غالب (اضطراب، خستگی، غم، شادی…) را تشخیص می‌دهد، بازخورد همدلانه و یک تمرین عملی پیشنهاد می‌کند.</p>
+      <ul class="check" style="margin-top:3mm;">
+        <li>تحلیل احساس فارسی و انگلیسی</li>
+        <li>نمودار حال در طول زمان</li>
+        <li>گفتگو با دستیار سلامت (خواب، تغذیه، استرس)</li>
+        <li>تمرین تنفس ۴-۷-۸ با راهنمای بصری</li>
+        <li><b>تشخیص خودکار جملات بحرانی</b> و نمایش فوری خطوط کمک ۱۲۳، ۱۴۸۰ و ۱۱۵</li>
+      </ul>
+      <div class="howbox">
+        <h4>قابل ارتقا با مدل زبانی</h4>
+        <p>دستیار به‌صورت پیش‌فرض با پاسخ‌های کنترل‌شده کار می‌کند و با فعال‌سازی یک مدل زبانی کوچک (Qwen2.5)، گفتگوی آزاد و طبیعی‌تر روی همان سرور فراهم می‌شود.</p>
+      </div>
+    </div>
+    <div class="phones">
+      <div><div class="phone"><img src="shots/mind-journal.png" alt=""></div><div class="cap">یادداشت و بازخورد</div></div>
+      <div><div class="phone"><img src="shots/mind-chat.png" alt=""></div><div class="cap">گفتگو با دستیار</div></div>
+    </div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · کاتالوگ محصول</span><span>۹</span></div>
+</section>
+
+<!-- 10. VITALS + MEDS -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>بیماری‌های مزمن</span></div>
+  <div class="feature">
+    <div>
+      <div class="kicker">مدیریت بیماری‌های مزمن</div>
+      <h2 class="title">همراه هر روز بیماران فشار خون و دیابت</h2>
+      <p class="lead">ثبت فشار، قند، وزن، ضربان و اکسیژن خون با هشدار بالینی فوری. سیستم الگوی شخصی هر کاربر را یاد می‌گیرد و مقدارهای غیرعادی را علامت می‌زند.</p>
+      <ul class="check" style="margin-top:3mm;">
+        <li>طبقه‌بندی فشار خون بر اساس راهنماهای بالینی</li>
+        <li>هشدار افت قند و بحران فشار با راهنمای اقدام</li>
+        <li>تشخیص مقدار غیرعادی نسبت به الگوی خود فرد</li>
+        <li>تحلیل روند: «روند کاهشی: حدود ۴٫۱ واحد در هفته»</li>
+        <li>یادآور دارو با درصد مصرف به‌موقع</li>
+      </ul>
+      <div class="howbox">
+        <h4>ارزش برای بیمه و کلینیک</h4>
+        <p>پایبندی به مصرف دارو و پایش منظم، دو عامل کلیدی کنترل دیابت و فشار خون هستند؛ سلامت‌یار هر دو را قابل‌اندازه‌گیری می‌کند.</p>
+      </div>
+    </div>
+    <div class="phones">
+      <div><div class="phone"><img src="shots/vitals-glucose.png" alt=""></div><div class="cap">تحلیل روند قند خون</div></div>
+      <div><div class="phone"><img src="shots/meds.png" alt=""></div><div class="cap">داروها و یادآور</div></div>
+    </div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · کاتالوگ محصول</span><span>۱۰</span></div>
+</section>
+
+<!-- 11. TECHNOLOGY -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>فناوری و معماری</span></div>
+  <div class="kicker">فناوری</div>
+  <h2 class="title">معماری هیبرید: هوش مصنوعی همان‌جا که بهترین است</h2>
+  <p class="lead">پردازش‌های لحظه‌ای و حساس روی گوشی، پردازش‌های سنگین‌تر روی سرور شما. نتیجه: سرعت، حریم خصوصی و هزینه پایین زیرساخت.</p>
+  <div class="arch">
+    <div class="box dev">
+      <h4>📱 گوشی / مرورگر</h4>
+      <ul>
+        <li>اپ React با Capacitor (اندروید و iOS) و PWA</li>
+        <li>مربی ورزش: MediaPipe Pose</li>
+        <li>پایش خواب: YAMNet</li>
+        <li>یادآور دارو با اعلان بومی</li>
+        <li>ذخیره آفلاین و ارسال خودکار</li>
+      </ul>
+    </div>
+    <div class="arrow">⇄<small>HTTPS<br>+ توکن امن</small></div>
+    <div class="box srv">
+      <h4>🖥️ سرور شما</h4>
+      <ul>
+        <li>FastAPI (پایتون)</li>
+        <li>تشخیص غذا: EfficientNet-Lite</li>
+        <li>پوست: EfficientNet-B3 (ONNX)</li>
+        <li>آزمایش: RapidOCR</li>
+        <li>تحلیل احساس و روند علائم</li>
+        <li>مدل زبانی Qwen (اختیاری)</li>
+      </ul>
+    </div>
+    <div class="arrow">⇄</div>
+    <div class="box db">
+      <h4>🗄️ پایگاه داده</h4>
+      <ul>
+        <li>PostgreSQL</li>
+        <li>بکاپ خودکار روزانه</li>
+        <li>بازیابی یک‌مرحله‌ای</li>
+      </ul>
+    </div>
+  </div>
+  <div class="grid3" style="margin-top:7mm;">
+    <div class="card"><h3>⚙️ بدون کارت گرافیک</h3><p>همه مدل‌ها روی CPU اجرا می‌شوند. یک سرور مجازی معمولی (۲ هسته، ۴ گیگابایت) کافی است.</p></div>
+    <div class="card"><h3>🐳 استقرار در یک دستور</h3><p>Docker Compose با HTTPS خودکار؛ یا نصب بدون Docker. راهنمای کامل فارسی همراه محصول است.</p></div>
+    <div class="card"><h3>🔁 تست و ساخت خودکار</h3><p>با هر تغییر، تست‌های خودکار روی دو پایگاه داده اجرا و فایل اپ اندروید ساخته می‌شود.</p></div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · کاتالوگ محصول</span><span>۱۱</span></div>
+</section>
+
+<!-- 12. TRUST -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>اعتماد و امنیت</span></div>
+  <div class="kicker">حریم خصوصی، امنیت و ایمنی</div>
+  <h2 class="title">طراحی‌شده برای داده‌ای به حساسیت سلامت</h2>
+  <div class="grid2" style="margin-top:4mm; gap:4mm;">
+    <div class="card"><div class="icon">🔒</div><h3>حداقل‌سازی داده</h3><p>عکس غذا و پوست فقط پردازش می‌شوند و ذخیره نمی‌شوند. ویدیوی ورزش و صدای خواب هرگز از گوشی خارج نمی‌شوند.</p></div>
+    <div class="card"><div class="icon">🏠</div><h3>میزبانی داخلی</h3><p>کل سامانه روی سرور شما و داخل کشور نصب می‌شود. وابستگی به سرویس خارجی ندارد و در اختلال اینترنت بین‌الملل کار می‌کند.</p></div>
+    <div class="card"><div class="icon">🔑</div><h3>امنیت دسترسی</h3><p>رمزها با bcrypt هش می‌شوند، ورود با توکن امضاشده است، ارتباط فقط HTTPS است و هر کاربر فقط به داده خودش دسترسی دارد.</p></div>
+    <div class="card"><div class="icon">⚕️</div><h3>ایمنی بالینی</h3><p>هیچ خروجی ادعای تشخیص نمی‌کند. همه نتایج پزشکی با توضیح محدودیت همراه‌اند و در موارد پرخطر کاربر به پزشک یا اورژانس ارجاع داده می‌شود.</p></div>
+    <div class="card"><div class="icon">🆘</div><h3>پروتکل بحران</h3><p>جملات مرتبط با آسیب به خود به‌صورت خودکار شناسایی می‌شوند و فوراً شماره‌های اورژانس اجتماعی و مشاوره نمایش داده می‌شود.</p></div>
+    <div class="card"><div class="icon">💾</div><h3>پایداری داده</h3><p>بکاپ خودکار روزانه با نگهداری ۱۴ نسخه، بازیابی تست‌شده و ذخیره آفلاین روی گوشی تا اتصال دوباره.</p></div>
+  </div>
+  <div class="band" style="margin-top:7mm;">
+    <h3>شفافیت درباره مدل‌ها</h3>
+    <p>مدل‌ها از منابع شناخته‌شده با مجوز تجاری‌پذیر (Apache-2.0 و MIT) هستند. دقت مدل پوست در حد غربالگری است و برای استفاده بالینی گسترده، اعتبارسنجی با داده محلی و نظارت پزشک پیشنهاد می‌شود (در پلن اجرایی آمده است).</p>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · کاتالوگ محصول</span><span>۱۲</span></div>
+</section>
+
+<!-- 13. COMPARISON -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>مزیت رقابتی</span></div>
+  <div class="kicker">مزیت رقابتی</div>
+  <h2 class="title">چرا سلامت‌یار، نه یک اپ خارجی یا توسعه از صفر؟</h2>
+  <table style="margin-top:4mm;">
+    <thead><tr><th style="width:40%">معیار</th><th style="text-align:center">سلامت‌یار</th><th style="text-align:center">اپ‌های خارجی رایج</th><th style="text-align:center">توسعه از صفر</th></tr></thead>
+    <tbody>
+      <tr><td>رابط کاملاً فارسی و راست‌به‌چپ</td><td class="yes">✓</td><td class="no">—</td><td class="mid">ماه‌ها کار</td></tr>
+      <tr><td>شناخت غذاهای ایرانی</td><td class="yes">✓</td><td class="no">—</td><td class="mid">ماه‌ها کار</td></tr>
+      <tr><td>۸ ماژول در یک اپ</td><td class="yes">✓</td><td class="mid">معمولاً ۱ تا ۲</td><td class="mid">۶ تا ۱۲ ماه</td></tr>
+      <tr><td>میزبانی داخل کشور و مالکیت داده</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
+      <tr><td>کار در اختلال اینترنت بین‌الملل</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
+      <tr><td>برند اختصاصی (White-label)</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
+      <tr><td>بدون نیاز به پرداخت ارزی</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
+      <tr><td>هوش مصنوعی روی گوشی (حریم خصوصی)</td><td class="yes">✓</td><td class="mid">بعضی</td><td class="mid">تخصص کمیاب</td></tr>
+      <tr><td>زمان تا عرضه</td><td class="yes">چند هفته</td><td class="no">—</td><td class="mid">۶ تا ۱۲ ماه</td></tr>
+    </tbody>
+  </table>
+  <div class="grid3" style="margin-top:8mm;">
+    <div class="stat"><b>هفته‌ها</b><span>به‌جای ماه‌ها تا عرضه</span></div>
+    <div class="stat"><b>CPU</b><span>بدون هزینه کارت گرافیک</span></div>
+    <div class="stat"><b>۱ کد</b><span>برای اندروید، iOS و وب</span></div>
+  </div>
+  <div class="ftr"><span>مقایسه کیفی بر اساس قابلیت‌های رایج؛ برای هر رقیب مشخص جداگانه بررسی شود</span><span>۱۳</span></div>
+</section>
+
+<!-- 14. BUSINESS MODEL -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>مدل کسب‌وکار</span></div>
+  <div class="kicker">مدل کسب‌وکار</div>
+  <h2 class="title">مشتریان هدف و مدل‌های همکاری</h2>
+  <div class="grid3" style="margin-top:3mm;">
+    <div class="card tint"><div class="icon">🏦</div><h3>بیمه‌ها</h3><p>برنامه پیشگیری برای بیمه‌شدگان؛ تشویق به سبک زندگی سالم و کاهش هزینه خسارت.</p></div>
+    <div class="card tint"><div class="icon">🏥</div><h3>کلینیک‌ها و بیمارستان‌ها</h3><p>همراهی بیمار بین ویزیت‌ها، پایش بیماران مزمن و بیماران پس از ترخیص.</p></div>
+    <div class="card tint"><div class="icon">💊</div><h3>داروخانه‌های زنجیره‌ای</h3><p>یادآور دارو با برند داروخانه و ارتباط مستمر با مشتری.</p></div>
+    <div class="card tint"><div class="icon">🏢</div><h3>سازمان‌ها و کارفرماها</h3><p>برنامه سلامت کارکنان: خواب، استرس، تحرک.</p></div>
+    <div class="card tint"><div class="icon">📶</div><h3>اپراتورها و سوپراپ‌ها</h3><p>افزودن سرویس سلامت به‌عنوان یک مینی‌اپ ارزش‌افزوده.</p></div>
+    <div class="card tint"><div class="icon">🚀</div><h3>استارتاپ‌ها و باشگاه‌ها</h3><p>ورود سریع به بازار با محصول آماده و برند خود.</p></div>
+  </div>
+  <h3 style="font-size:13pt; margin:7mm 0 3mm;">بسته‌های همکاری</h3>
+  <div class="grid3">
+    <div class="tier">
+      <h3>استاندارد</h3><div class="for">برای کلینیک، باشگاه و کسب‌وکار کوچک</div>
+      <ul class="check"><li>نصب روی سرور مشتری</li><li>برند و رنگ اختصاصی</li><li>اپ اندروید و PWA</li><li>آموزش و مستندات</li></ul>
+    </div>
+    <div class="tier hot"><span class="badge">پیشنهادی</span>
+      <h3>حرفه‌ای</h3><div class="for">برای داروخانه زنجیره‌ای، شرکت‌ها و سازمان‌ها</div>
+      <ul class="check"><li>همه موارد استاندارد</li><li>اپ iOS</li><li>فعال‌سازی مدل زبانی گفتگو</li><li>پشتیبانی و به‌روزرسانی سالانه</li></ul>
+    </div>
+    <div class="tier">
+      <h3>سازمانی</h3><div class="for">برای بیمه، بیمارستان و اپراتور</div>
+      <ul class="check"><li>همه موارد حرفه‌ای</li><li>اتصال به سامانه‌های داخلی</li><li>داشبورد مدیریتی و گزارش‌ها</li><li>آموزش مدل با داده اختصاصی</li></ul>
+    </div>
+  </div>
+  <p class="small muted" style="margin-top:5mm;">قیمت‌گذاری بر اساس مقیاس، تعداد کاربر و سطح سفارشی‌سازی به‌صورت توافقی تعیین می‌شود. امکان فروش لایسنس یکجا، اشتراک سالانه، یا مدل درآمد بر اساس کاربر فعال وجود دارد.</p>
+  <div class="ftr"><span>سلامت‌یار هوشمند · کاتالوگ محصول</span><span>۱۴</span></div>
+</section>
+
+<!-- 15. LAUNCH PLAN -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>پلن اجرایی</span></div>
+  <div class="kicker">پلن اجرایی راه‌اندازی</div>
+  <h2 class="title">از قرارداد تا عرضه عمومی در ۶ ماه</h2>
+  <div class="tl">
+    <div class="step"><div class="when">فاز ۰<small>هفته ۱ و ۲</small></div><div class="what"><h4>استقرار و برندسازی</h4><p>راه‌اندازی سرور (۲ هسته، ۴ گیگابایت)، دامنه و HTTPS، اعمال لوگو و رنگ برند، ساخت اپ اندروید و نسخه وب.</p><div class="out">خروجی: نسخه نمایشی با برند شما روی سرور شما</div></div></div>
+    <div class="step"><div class="when">فاز ۱<small>ماه ۱ و ۲</small></div><div class="what"><h4>پایلوت کنترل‌شده</h4><p>عرضه به ۱۰۰ تا ۵۰۰ کاربر منتخب (کارکنان، بیماران یک کلینیک یا بیمه‌شدگان داوطلب)، جمع‌آوری بازخورد و رفع اشکال.</p><div class="out">خروجی: گزارش استفاده، نرخ بازگشت کاربر و رضایت</div></div></div>
+    <div class="step"><div class="when">فاز ۲<small>ماه ۲ تا ۴</small></div><div class="what"><h4>بومی‌سازی بالینی و مجوزها</h4><p>بازبینی محتوا و آستانه‌ها توسط پزشک مشاور، اعتبارسنجی مدل پوست و غذا با داده محلی، تکمیل مستندات حریم خصوصی و اخذ مجوزهای لازم از مراجع ذی‌صلاح.</p><div class="out">خروجی: نسخه تأییدشده بالینی و آماده عرضه</div></div></div>
+    <div class="step"><div class="when">فاز ۳<small>ماه ۴ تا ۶</small></div><div class="what"><h4>عرضه عمومی</h4><p>انتشار در مارکت‌های اندروید (کافه‌بازار، مایکت، گوگل‌پلی) و App Store، کمپین معرفی به مشتریان سازمان، فعال‌سازی پشتیبانی.</p><div class="out">خروجی: محصول در دسترس عموم کاربران سازمان</div></div></div>
+    <div class="step"><div class="when">فاز ۴<small>از ماه ۶</small></div><div class="what"><h4>رشد و توسعه</h4><p>افزودن قابلیت‌های نقشه راه، اتصال به ساعت‌های هوشمند، داشبورد مدیریتی و آموزش مدل‌ها با داده بیشتر.</p><div class="out">خروجی: افزایش درگیری کاربر و ارزش داده</div></div></div>
+  </div>
+  <div class="grid2" style="margin-top:2mm;">
+    <div class="card"><h3>تیم پیشنهادی راه‌اندازی</h3><p>یک مدیر محصول، یک توسعه‌دهنده فول‌استک، یک پزشک مشاور (پاره‌وقت)، یک نفر پشتیبانی و بازاریابی.</p></div>
+    <div class="card"><h3>شاخص‌های موفقیت</h3><p>کاربر فعال روزانه، بازگشت کاربر در روز ۳۰، تعداد ثبت در هفته، درصد مصرف به‌موقع دارو، رضایت کاربر.</p></div>
+  </div>
+  <div class="ftr"><span>زمان‌بندی تخمینی است و به اندازه سازمان و فرایند مجوزها بستگی دارد</span><span>۱۵</span></div>
+</section>
+
+<!-- 16. ROADMAP + FAQ -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>نقشه راه و پرسش‌ها</span></div>
+  <div class="kicker">نقشه راه محصول</div>
+  <h2 class="title" style="font-size:20pt;">قابلیت‌های آماده توسعه</h2>
+  <div class="grid4" style="margin-bottom:6mm;">
+    <div class="card"><h3>📦 اسکن بارکد</h3><p>ثبت آنی خوراکی‌های بسته‌بندی</p></div>
+    <div class="card"><h3>⌚ ساعت هوشمند</h3><p>همگام‌سازی با Health Connect و HealthKit</p></div>
+    <div class="card"><h3>🌸 سلامت بانوان</h3><p>ردیابی چرخه و بارداری</p></div>
+    <div class="card"><h3>📄 گزارش هفتگی</h3><p>خروجی PDF برای پزشک</p></div>
+    <div class="card"><h3>🎙️ ثبت صوتی</h3><p>«ناهار قورمه‌سبزی خوردم»</p></div>
+    <div class="card"><h3>💓 ضربان با دوربین</h3><p>اندازه‌گیری با انگشت روی دوربین</p></div>
+    <div class="card"><h3>📅 تقویم شمسی</h3><p>تجربه کاملاً بومی</p></div>
+    <div class="card"><h3>👨‍👩‍👧 حالت خانواده</h3><p>مراقبت از والدین سالمند</p></div>
+  </div>
+  <div class="kicker">پرسش‌های رایج خریداران</div>
+  <div class="faq">
+    <div class="q"><h4>دقت هوش مصنوعی چقدر قابل اتکاست؟</h4><p>نقش ابزار، کمک و غربالگری است و همه خروجی‌ها با ارجاع به پزشک همراه‌اند. در فاز ۲، مدل‌ها با داده محلی اعتبارسنجی و در صورت نیاز بازآموزی می‌شوند.</p></div>
+    <div class="q"><h4>هزینه زیرساخت چقدر است؟</h4><p>برای شروع یک سرور مجازی معمولی کافی است. پردازش‌های سنگین ویدیو و صدا روی گوشی انجام می‌شود و هزینه سرور را پایین نگه می‌دارد.</p></div>
+    <div class="q"><h4>داده‌ها کجا ذخیره می‌شوند؟</h4><p>فقط روی سرور شما. محصول به هیچ سرویس خارجی وابسته نیست و تصاویر و صداها ذخیره نمی‌شوند.</p></div>
+    <div class="q"><h4>آیا قابل سفارشی‌سازی است؟</h4><p>بله؛ برند، ماژول‌ها، محتوا و اتصال به سامانه‌های داخلی. معماری ماژولار است و قابلیت جدید بدون تغییر بقیه اضافه می‌شود.</p></div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · کاتالوگ محصول</span><span>۱۶</span></div>
+</section>
+
+<!-- 17. BACK COVER -->
+<section class="page back">
+  <div class="brand" style="display:flex;align-items:center;gap:3.5mm;font-weight:800;font-size:12pt;"><img src="icon.png" alt="" style="width:13mm;height:13mm;border-radius:3.5mm;">سلامت‌یار هوشمند</div>
+  <h2>محصول را زنده ببینید</h2>
+  <p>در یک جلسه ۳۰ دقیقه‌ای، همه ماژول‌ها را روی گوشی و با سرور واقعی نمایش می‌دهیم و نسخه نمایشی با برند شما را در کمتر از دو هفته آماده می‌کنیم.</p>
+  <div class="cta">درخواست دموی زنده</div>
+  <div class="contact">
+    <div><b>تماس</b>[نام و شماره تماس]</div>
+    <div><b>ایمیل</b>[ایمیل]</div>
+    <div><b>وب‌سایت</b>[آدرس وب‌سایت]</div>
+    <div><b>نسخه نمایشی</b>[آدرس دمو]</div>
+  </div>
+  <div style="position:absolute;bottom:14mm;right:18mm;left:18mm;font-size:7.8pt;color:#9fd3c1;">سلامت‌یار ابزار کمکی سلامت و غربالگری است و جایگزین تشخیص و درمان پزشک نیست. تصاویر این کاتالوگ از نسخه واقعی محصول با داده نمایشی تهیه شده‌اند.</div>
+</section>
+
+</body>
+</html>
