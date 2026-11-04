@@ -20,10 +20,14 @@ echo "building web app"
 echo "packing"
 # Server code and deploy files (no docs, no native projects: not needed on the server).
 git archive --format=tar.gz -o "$U/source.tar.gz" HEAD -- . ':!docs' ':!app/android' ':!app/ios'
-tar -C app/dist -czf "$U/web.tar.gz" .
+# MediaPipe runtimes (~30 MB) are already in the image; they only change with a MediaPipe upgrade (checked via DEPS).
+tar -C app/dist --exclude=./mediapipe -czf "$U/web.tar.gz" .
 git rev-parse HEAD > "$U/VERSION"
 # Fingerprint of what lives in the base image (packages + models). Must match the server's image.
-cat server/requirements.txt server/scripts/download_models.py | sha256sum | cut -c1-16 > "$U/DEPS"
+{
+  cat server/requirements.txt server/scripts/download_models.py | sha256sum | cut -c1-16
+  (cd app/dist/mediapipe && find . -type f -printf '%p %s\n' | sort | sha256sum | cut -c1-16)
+} | tr '\n' ' ' | sed 's/ $//' > "$U/DEPS"
 cp deploy/update.sh "$U/update.sh"
 chmod +x "$U/update.sh"
 

@@ -35,7 +35,8 @@ IMAGE="salamat-ai:latest"
 docker image inspect "$IMAGE" >/dev/null 2>&1 || die "image $IMAGE not found; install with the full offline bundle first"
 
 # Packages and models must be the same as in the current image.
-have=$(docker run --rm --entrypoint sh -w /srv/server "$IMAGE" -c 'cat requirements.txt scripts/download_models.py | sha256sum | cut -c1-16')
+have=$(docker run --rm --entrypoint sh -w /srv/server "$IMAGE" -c \
+  "echo \$(cat requirements.txt scripts/download_models.py | sha256sum | cut -c1-16) \$(cd /srv/web/mediapipe && find . -type f -printf '%p %s\\n' | sort | sha256sum | cut -c1-16)")
 want=$(cat "$SRC/DEPS")
 if [ "$have" != "$want" ]; then
   die "this version changes Python packages or AI models, so the light update is not enough.
@@ -57,7 +58,7 @@ mkdir -p "$ctx/web" && tar -xzf "$SRC/web.tar.gz" -C "$ctx/web"
 cp "$SRC/VERSION" "$ctx/VERSION"
 cat > "$ctx/Dockerfile" <<'EOF'
 FROM salamat-ai:latest
-RUN rm -rf /srv/server/app /srv/web
+RUN rm -rf /srv/server/app && find /srv/web -mindepth 1 -maxdepth 1 ! -name mediapipe -exec rm -rf {} +
 COPY server/ /srv/server/
 COPY web/ /srv/web/
 COPY VERSION /srv/VERSION
