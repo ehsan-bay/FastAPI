@@ -7,8 +7,9 @@ android {
         applicationId "ir.salamatyar.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // CI passes its run number so every new APK installs as an update over the previous one.
+        versionCode((System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInteger())
+        versionName "1.0." + (System.getenv("GITHUB_RUN_NUMBER") ?: "0")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,10 +17,33 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        // Fixed test key (committed, NOT secret): every build gets the same signature, so a newer APK
+        // installs over an older one. Use it for demos and testing only.
+        test {
+            storeFile file("signing/test.keystore")
+            storePassword "android"
+            keyAlias "salamatyar"
+            keyPassword "android"
+        }
+        // Real key for store releases, given through environment variables (GitHub secrets in CI).
+        if (System.getenv("SALAMAT_KEYSTORE")) {
+            release {
+                storeFile file(System.getenv("SALAMAT_KEYSTORE"))
+                storePassword System.getenv("SALAMAT_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("SALAMAT_KEY_ALIAS")
+                keyPassword System.getenv("SALAMAT_KEY_PASSWORD")
+            }
+        }
+    }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.test
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig System.getenv("SALAMAT_KEYSTORE") ? signingConfigs.release : signingConfigs.test
         }
     }
 }

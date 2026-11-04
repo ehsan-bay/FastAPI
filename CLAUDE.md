@@ -71,7 +71,7 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
 - Reachable: PyPI, npm, `storage.googleapis.com` (MediaPipe models), `raw.githubusercontent.com`, `media.githubusercontent.com` (LFS).
 - `docker build` in the sandbox needs the proxy CA. Test with a temporary Dockerfile that copies `/root/.ccr/ca-bundle.crt`
   and sets `PIP_CERT`/`SSL_CERT_FILE`/`NODE_EXTRA_CA_CERTS`. **Never commit that.** Start the daemon with `dockerd &`.
-- The Android APK can't be built in the sandbox; the GitHub Actions `android` job builds it (artifact `salamat-ai-debug-apk`, works since item 20).
+- The Android APK can't be built in the sandbox; the GitHub Actions `android` job builds it (artifact `salamat-ai-apk`, release build signed with the test key, see item 21).
 - The GitHub MCP connector has failed to connect in past sessions; plain `git push` works.
 
 ## Open items / ideas
@@ -144,3 +144,8 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     (`$ANDROID_HOME`, accept licenses, write `local.properties`). **The APK now builds** and the user downloaded it. On the phone,
     Google Play Protect blocks it ("hasn't seen an app from this developer"), because it is a debug build from an unknown developer.
     Next: release signing (keystore in GitHub secrets) + publishing in Cafe Bazaar/Myket or Play to avoid the warning.
+21. "App not installed" on the phone: each CI run signed with a fresh random debug key, so an APK could not update another. Now
+    `app/android/app/signing/test.keystore` (committed, password `android`, alias `salamatyar`, **test only, not secret**) signs every build;
+    CI builds **assembleRelease**, versionCode = `GITHUB_RUN_NUMBER`, artifact `salamat-ai-apk` (`Salamatyar-1.0.<run>.apk`).
+    Optional real key via secrets `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
+    Gradle can't run in the sandbox (dl.google.com blocked), so this was reviewed but only CI can prove it.

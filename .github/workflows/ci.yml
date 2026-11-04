@@ -63,9 +63,36 @@ jobs:
       - run: npm run build
         env: { VITE_API_URL: "${{ vars.SERVER_URL || 'https://salamatyar.tosantechno.ir' }}" }
       - run: npx cap sync android
-      - run: ./gradlew assembleDebug --no-daemon --stacktrace
+      # Optional real signing key for store releases. Add these repository secrets to use it:
+      # ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD.
+      # Without them the APK is signed with the fixed test key in app/android/app/signing/.
+      - name: Release signing key (optional)
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            {
+              echo "SALAMAT_KEYSTORE=$RUNNER_TEMP/release.keystore"
+              echo "SALAMAT_KEYSTORE_PASSWORD=$KS_PASS"
+              echo "SALAMAT_KEY_ALIAS=$KEY_ALIAS"
+              echo "SALAMAT_KEY_PASSWORD=$KEY_PASS"
+            } >> "$GITHUB_ENV"
+            echo "signing with the release key"
+          else
+            echo "no release key secrets: signing with the fixed test key"
+          fi
+      - run: ./gradlew assembleRelease --no-daemon --stacktrace
         working-directory: app/android
+      - name: Rename APK
+        run: |
+          mkdir -p dist-apk
+          cp android/app/build/outputs/apk/release/app-release.apk "dist-apk/Salamatyar-1.0.${GITHUB_RUN_NUMBER}.apk"
+          ls -la dist-apk
       - uses: actions/upload-artifact@v4
         with:
-          name: salamat-ai-debug-apk
-          path: app/android/app/build/outputs/apk/debug/*.apk
+          name: salamat-ai-apk
+          path: app/dist-apk/*.apk
