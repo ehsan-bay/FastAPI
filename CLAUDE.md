@@ -194,3 +194,9 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     Client: IPG option on the pay page, `/pay/result/:id`, statuses in wallet/admin, IPG settings form. Capacitor: `allowNavigation: ["*"]`,
     `cleartext: true` (needs one new APK). Tests: 8 IPG tests against a fake REST gateway; browser test with a fake gateway page
     (`scratchpad/ipg/fakegw.py`): pay → gateway → OK → verified; cancel → failed. 33 pytest on SQLite + Postgres.
+28. iPhone Safari: sleep start failed with "undefined is not a constructor (evaluating 'new WebAssembly.Suspending(original)')".
+    `@mediapipe/tasks-audio` 1.2.x wasm needs JSPI (`WebAssembly.Suspending`), which Safari lacks. **Pinned tasks-audio to 1.1.1** (no JSPI)
+    and tasks-vision to exactly 1.2.0 (its wasm has no JSPI). Do not bump MediaPipe without checking `grep Suspending public/mediapipe/*/*.js`.
+    Verified in Chromium with JSPI deleted by an init script (Safari emulation): recording starts and classifies.
+    Light updates can now carry MediaPipe: `WITH_MEDIAPIPE=1 deploy/make-update-bundle.sh` (adds `MEDIAPIPE` marker; update.sh then checks
+    only the Python/model half of DEPS and replaces `/srv/web/mediapipe`).

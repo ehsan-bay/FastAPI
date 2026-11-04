@@ -4,6 +4,7 @@
 # AI models are not downloaded again. If those changed, the full offline bundle is needed.
 #
 #   deploy/make-update-bundle.sh [OUT_FILE]     # default: salamat-update.tar.gz
+#   WITH_MEDIAPIPE=1 deploy/make-update-bundle.sh   # also ship the MediaPipe runtimes (after a MediaPipe upgrade)
 # On the server:  sudo bash update.sh salamat-update.tar.gz
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -20,8 +21,14 @@ echo "building web app"
 echo "packing"
 # Server code and deploy files (no docs, no native projects: not needed on the server).
 git archive --format=tar.gz -o "$U/source.tar.gz" HEAD -- . ':!docs' ':!app/android' ':!app/ios'
-# MediaPipe runtimes (~30 MB) are already in the image; they only change with a MediaPipe upgrade (checked via DEPS).
-tar -C app/dist --exclude=./mediapipe -czf "$U/web.tar.gz" .
+# MediaPipe runtimes (~30 MB) are already in the image and rarely change. When they do (MediaPipe upgrade),
+# build with WITH_MEDIAPIPE=1 to ship them too; otherwise the server checks they are unchanged (DEPS).
+if [ "${WITH_MEDIAPIPE:-0}" = 1 ]; then
+  tar -C app/dist -czf "$U/web.tar.gz" .
+  touch "$U/MEDIAPIPE"
+else
+  tar -C app/dist --exclude=./mediapipe -czf "$U/web.tar.gz" .
+fi
 git rev-parse HEAD > "$U/VERSION"
 # Fingerprint of what lives in the base image (packages + models). Must match the server's image.
 {

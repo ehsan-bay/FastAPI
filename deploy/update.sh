@@ -41,6 +41,11 @@ docker image inspect "$IMAGE" >/dev/null 2>&1 || die "image $IMAGE not found; in
 have=$(docker run --rm --entrypoint sh -w /srv/server "$IMAGE" -c \
   "echo \$(cat requirements.txt scripts/download_models.py | sha256sum | cut -c1-16) \$(cd /srv/web/mediapipe && find . -type f -printf '%p %s\\n' | sort | sha256sum | cut -c1-16)")
 want=$(cat "$SRC/DEPS")
+if [ -f "$SRC/MEDIAPIPE" ]; then
+  # This bundle carries its own MediaPipe runtimes: only Python packages and models must match.
+  have=${have%% *}
+  want=${want%% *}
+fi
 if [ "$have" != "$want" ]; then
   die "this version changes Python packages or AI models, so the light update is not enough.
 Run the full bundle once instead:
@@ -59,9 +64,11 @@ ctx="$(mktemp -d)"
 cp -a "$DIR/server" "$ctx/server"
 mkdir -p "$ctx/web" && tar -xzf "$SRC/web.tar.gz" -C "$ctx/web"
 cp "$SRC/VERSION" "$ctx/VERSION"
-cat > "$ctx/Dockerfile" <<'EOF'
+keep_mp='! -name mediapipe'
+[ -f "$SRC/MEDIAPIPE" ] && keep_mp=''
+cat > "$ctx/Dockerfile" <<EOF
 FROM salamat-ai:latest
-RUN rm -rf /srv/server/app && find /srv/web -mindepth 1 -maxdepth 1 ! -name mediapipe -exec rm -rf {} +
+RUN rm -rf /srv/server/app && find /srv/web -mindepth 1 -maxdepth 1 $keep_mp -exec rm -rf {} +
 COPY server/ /srv/server/
 COPY web/ /srv/web/
 COPY VERSION /srv/VERSION
