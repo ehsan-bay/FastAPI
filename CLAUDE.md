@@ -71,7 +71,7 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
 - Reachable: PyPI, npm, `storage.googleapis.com` (MediaPipe models), `raw.githubusercontent.com`, `media.githubusercontent.com` (LFS).
 - `docker build` in the sandbox needs the proxy CA. Test with a temporary Dockerfile that copies `/root/.ccr/ca-bundle.crt`
   and sets `PIP_CERT`/`SSL_CERT_FILE`/`NODE_EXTRA_CA_CERTS`. **Never commit that.** Start the daemon with `dockerd &`.
-- The Android APK can't be built in the sandbox; the GitHub Actions `android` job builds it (artifact `salamat-ai-debug-apk`).
+- The Android APK can't be built in the sandbox; the GitHub Actions `android` job builds it (artifact `salamat-ai-debug-apk`, works since item 20).
 - The GitHub MCP connector has failed to connect in past sessions; plain `git push` works.
 
 ## Open items / ideas
@@ -140,3 +140,7 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     **Production URL: `https://salamatyar.tosantechno.ir`** (blocked by this sandbox's network policy, so untested from here).
     Set it as the default server for native apps only (`app/.env.production` + `serverUrl()` ignores it on web); the CI android job uses
     `vars.SERVER_URL` or that default. APK is still not built.
+20. CI android job failed in `android-actions/setup-android@v3` (SDK re-download/licenses). Replaced it with the runner's preinstalled SDK
+    (`$ANDROID_HOME`, accept licenses, write `local.properties`). **The APK now builds** and the user downloaded it. On the phone,
+    Google Play Protect blocks it ("hasn't seen an app from this developer"), because it is a debug build from an unknown developer.
+    Next: release signing (keystore in GitHub secrets) + publishing in Cafe Bazaar/Myket or Play to avoid the warning.
