@@ -172,3 +172,4 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     Catalog updated to **19 pages**: new pages "پرداخت ویزیت" (pay/receipt/wallet phones + 3-step strip) and "پنل مدیریت" (browser-framed admin
     screenshots + QR card), plus cover tags, comparison row, revenue model (transaction fee), roadmap IPG. Demo data: `docs/catalog/seed.py` then
     `seed_pay.py` (130 payments over 30 days) with the server running; shots via `shots.cjs`, `shots_pay.cjs`, `shot_qr.cjs`.
+    The catalog QR card is rendered by `qr_card.cjs` and encodes the public site (no link text under it). Offline bundle refreshed to 6c0f112.
