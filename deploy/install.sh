@@ -99,9 +99,14 @@ if [ ! -f .env ]; then
 fi
 chmod 600 .env
 set_env WITH_LLM "$WITH_LLM"
+# Re-running without --domain keeps the domain from an earlier install.
+if [ -z "$DOMAIN" ]; then
+  prev=$(grep -E '^DOMAIN=' .env | cut -d= -f2- || true)
+  case "$prev" in ""|localhost|health.example.com) ;; *) DOMAIN="$prev"; log "using existing domain $DOMAIN" ;; esac
+fi
 if [ -n "$DOMAIN" ]; then
   set_env DOMAIN "$DOMAIN"
-  set_env ACME_EMAIL "$EMAIL"
+  [ -n "$EMAIL" ] && set_env ACME_EMAIL "$EMAIL"
   set_env APP_BIND 127.0.0.1
   PROFILE=(--profile https)
   URL="https://$DOMAIN"
@@ -137,7 +142,7 @@ done
 if [ "$BACKUP" = 1 ]; then
   mkdir -p /var/backups/salamat
   line="30 3 * * * BACKUP_DIR=/var/backups/salamat $DIR/deploy/backup.sh >> /var/log/salamat-backup.log 2>&1"
-  ( crontab -l 2>/dev/null | grep -v 'deploy/backup.sh' ; echo "$line" ) | crontab -
+  { crontab -l 2>/dev/null | grep -v 'deploy/backup.sh' || true; echo "$line"; } | crontab -
   log "nightly backup scheduled (03:30) -> /var/backups/salamat"
 fi
 

@@ -116,3 +116,9 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
 14. Built a **17-page Persian sales catalog PDF** (`docs/catalog/Salamatyar-Catalog.pdf`): cover, executive summary, problem/opportunity,
     8 modules, real screenshots (seeded demo data), architecture, trust & safety, comparison, business model & packages (prices left
     "by agreement"), 6-month launch plan, roadmap, buyer FAQ, back cover. Contact fields on the last page are placeholders. How to rebuild: `docs/catalog/README.md`.
+15. Explained the models used; made a 2-page demo-server spec PDF for the user's DevOps team (scratchpad only, product name removed on request).
+16. The user wants Claude to deploy on their own server. **This cloud sandbox cannot SSH out** (port 22 blocked, no ssh client).
+    Added `deploy/install.sh`: a one-command installer (Docker, clone to /opt/salamat, .env with random secrets, ufw, compose up with optional
+    Caddy HTTPS via `--domain`, health wait, nightly backup cron; re-run = update, keeps secrets and domain; `GIT_TOKEN` for a private repo).
+    Tested here end to end with stubs for apt/crontab and `--no-build`. Two ways forward: the user/DevOps runs the one-liner, or the user runs
+    `claude remote-control` on the server (in e.g. /opt) so this session can attach via `request_computer_folder` and run it.
