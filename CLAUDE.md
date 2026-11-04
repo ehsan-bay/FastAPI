@@ -135,3 +135,8 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     (6 parts < 100 MB + `SHA256SUMS` + `run.sh`). Server install: `git clone --depth 1 -b offline-bundle https://github.com/ehsan-bay/FastAPI.git salamat-bundle && cd salamat-bundle && sudo bash run.sh`.
     Tested from a fresh clone with all images deleted first: healthy, all models on. To refresh it: rebuild image, `deploy/make-offline-bundle.sh`,
     split -b 90m, force-push the orphan branch (force push keeps the repo from growing with each version).
+19. GitHub Actions do run: "Docker image" is green (image on GHCR), but "CI" and "Offline bundle" fail in under a minute; cause unknown
+    (logs not reachable from here; server tests and web build pass on a clean clone with Python 3.12 / Node 22). Waiting for a screenshot of the error.
+    **Production URL: `https://salamatyar.tosantechno.ir`** (blocked by this sandbox's network policy, so untested from here).
+    Set it as the default server for native apps only (`app/.env.production` + `serverUrl()` ignores it on web); the CI android job uses
+    `vars.SERVER_URL` or that default. APK is still not built.

@@ -54,7 +54,7 @@ jobs:
       # Set the repository variable SERVER_URL (e.g. https://salamat-ai.onrender.com)
       # so the app connects to your server without asking.
       - run: npm run build
-        env: { VITE_API_URL: "${{ vars.SERVER_URL }}" }
+        env: { VITE_API_URL: "${{ vars.SERVER_URL || 'https://salamatyar.tosantechno.ir' }}" }
       - run: npx cap sync android
       - run: ./gradlew assembleDebug
         working-directory: app/android

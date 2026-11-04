@@ -18,9 +18,11 @@ function store(key: string, value?: string | null): string | null {
 export function serverUrl(): string {
   const saved = store(KEY_SERVER);
   if (saved) return saved.replace(/\/+$/, "");
+  // The web/PWA build talks to the server it was loaded from. Native apps have no such
+  // origin, so they use the build-time default (app/.env.production) unless changed in Settings.
+  if (!Capacitor.isNativePlatform()) return "";
   const env = import.meta.env.VITE_API_URL as string | undefined;
-  if (env) return env.replace(/\/+$/, "");
-  return "";
+  return env ? env.replace(/\/+$/, "") : "";
 }
 
 export function setServerUrl(url: string) {
