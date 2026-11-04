@@ -12,9 +12,12 @@ type Overview = {
   payments: { count: number; total: number }; today: { count: number; total: number };
   series: { date: string; count: number; total: number }[]; top_doctors: { doctor: string; count: number; total: number }[];
 };
-type PayRow = { id: number; ref: string; amount: number; method: string; status: string; created_at: string; doctor: string; specialty: string; user: string; email: string };
+type PayRow = { id: number; ref: string; amount: number; method: string; status: string; created_at: string; doctor: string; specialty: string; user: string; email: string;
+  gateway_ref: string | null; gateway_rrn: string | null; message: string | null; verified: boolean | null };
 type UserRow = { id: number; email: string; name: string; is_admin: boolean; wallet_balance: number; payments: number; created_at: string };
-type Settings = { default_fee: number; initial_wallet: number; max_payment: number; ipg_enabled: boolean };
+type Settings = { default_fee: number; initial_wallet: number; max_payment: number; ipg_enabled: boolean;
+  ipg_payment_url: string; ipg_mid: string; ipg_rest_url: string; ipg_username: string; ipg_has_password: boolean;
+  ipg_allow_unverified: boolean; ipg_amount_multiplier: number; ipg_language: string; public_url: string; ipg_can_verify: boolean };
 
 type Tab = "report" | "doctors" | "payments" | "users" | "settings";
 
@@ -205,9 +208,9 @@ function Doctors() {
 }
 
 function toCsv(rows: PayRow[]) {
-  const head = ["کد پیگیری", "تاریخ", "پزشک", "تخصص", "بیمار", "ایمیل", "مبلغ (تومان)", "روش", "وضعیت"];
+  const head = ["کد پیگیری", "تاریخ", "پزشک", "تخصص", "بیمار", "ایمیل", "مبلغ (تومان)", "روش", "وضعیت", "کد پیگیری بانک", "RRN"];
   const esc = (v: unknown) => `"${String(v).replace(/"/g, '""')}"`;
-  const lines = rows.map((r) => [r.ref, new Date(r.created_at.endsWith("Z") ? r.created_at : r.created_at + "Z").toLocaleString("fa-IR"), r.doctor, r.specialty, r.user, r.email, r.amount, r.method === "wallet" ? "کیف پول" : "درگاه", r.status].map(esc).join(","));
+  const lines = rows.map((r) => [r.ref, new Date(r.created_at.endsWith("Z") ? r.created_at : r.created_at + "Z").toLocaleString("fa-IR"), r.doctor, r.specialty, r.user, r.email, r.amount, r.method === "wallet" ? "کیف پول" : "درگاه", r.status, r.gateway_ref ?? "", r.gateway_rrn ?? ""].map(esc).join(","));
   return "﻿" + [head.map(esc).join(","), ...lines].join("\n");
 }
 
@@ -257,7 +260,7 @@ function Payments() {
         {pays.data?.items.length === 0 && <Empty>پرداختی پیدا نشد.</Empty>}
         <div style={{ overflowX: "auto" }}>
           <table>
-            <thead><tr><th>زمان</th><th>پزشک</th><th>بیمار</th><th>مبلغ</th><th>روش</th><th>کد پیگیری</th></tr></thead>
+            <thead><tr><th>زمان</th><th>پزشک</th><th>بیمار</th><th>مبلغ</th><th>روش</th><th>وضعیت</th><th>کد پیگیری</th></tr></thead>
             <tbody>
               {pays.data?.items.map((p) => (
                 <tr key={p.id}>
@@ -266,7 +269,17 @@ function Payments() {
                   <td>{p.user}<div className="muted small ltr">{p.email}</div></td>
                   <td><b>{toman(p.amount)}</b></td>
                   <td>{p.method === "wallet" ? "کیف پول" : "درگاه"}</td>
-                  <td className="ltr small">{p.ref}</td>
+                  <td>
+                    <span className={`badge ${p.status === "paid" ? "ok" : p.status === "pending" ? "medium" : "high"}`}>
+                      {p.status === "paid" ? "موفق" : p.status === "pending" ? "در انتظار" : "ناموفق"}
+                    </span>
+                    {p.method === "ipg" && p.status === "paid" && p.verified === false && <span className="badge medium" title="بدون Verify سمت سرور">تأییدنشده</span>}
+                    {p.message && p.status !== "paid" && <div className="muted small">{p.message}</div>}
+                    {p.method === "ipg" && p.status === "pending" && p.gateway_ref && (
+                      <button className="btn small ghost" onClick={() => api(`/api/admin/payments/${p.id}/recheck`, { body: {} }).then(() => pays.reload())}>🔄 استعلام مجدد</button>
+                    )}
+                  </td>
+                  <td className="ltr small">{p.ref}{p.gateway_ref && <div className="muted">{p.gateway_ref}</div>}</td>
                 </tr>
               ))}
             </tbody>
@@ -380,12 +393,67 @@ function SettingsTab() {
           {msg && <p className="small">{msg}</p>}
         </form>
       </Card>
-      <Card title="💳 درگاه پرداخت بانکی (IPG)">
-        <p className="small muted" style={{ marginTop: 0 }}>
-          گزینه درگاه بانکی در صفحه پرداخت نمایش داده می‌شود ولی تا ثبت مشخصات درگاه غیرفعال است.
-        </p>
-        <span className="badge medium">{s.data?.ipg_enabled ? "فعال" : "غیرفعال — در انتظار مشخصات درگاه"}</span>
-      </Card>
+      <IpgSettings data={s.data} onSaved={s.reload} />
     </>
+  );
+}
+
+function IpgSettings({ data, onSaved }: { data: Settings | null; onSaved: () => void }) {
+  const [f, setF] = useState({ ipg_enabled: false, ipg_payment_url: "", ipg_mid: "", ipg_rest_url: "", ipg_username: "", ipg_password: "",
+    ipg_allow_unverified: true, ipg_amount_multiplier: "10", ipg_language: "fa", public_url: "" });
+  const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
+  useEffect(() => {
+    if (data) setF({ ipg_enabled: data.ipg_enabled, ipg_payment_url: data.ipg_payment_url, ipg_mid: data.ipg_mid, ipg_rest_url: data.ipg_rest_url,
+      ipg_username: data.ipg_username, ipg_password: "", ipg_allow_unverified: data.ipg_allow_unverified,
+      ipg_amount_multiplier: String(data.ipg_amount_multiplier), ipg_language: data.ipg_language, public_url: data.public_url });
+  }, [data]);
+  const text = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setF({ ...f, [k]: e.target.value });
+  const check = (k: "ipg_enabled" | "ipg_allow_unverified") => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.checked });
+
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMsg("");
+    setError("");
+    try {
+      await api("/api/admin/settings", { method: "PUT", body: { ...f, ipg_amount_multiplier: Number(f.ipg_amount_multiplier) || 10 } });
+      setMsg("ذخیره شد ✅");
+      onSaved();
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  };
+
+  const cb = { width: "auto", minHeight: 0 } as const;
+  return (
+    <Card title="💳 درگاه پرداخت بانکی (IPG)">
+      <form className="col" onSubmit={save}>
+        <label className="row gap"><input type="checkbox" style={cb} checked={f.ipg_enabled} onChange={check("ipg_enabled")} /> <b>درگاه بانکی فعال باشد</b></label>
+        <div className="grid2 form-grid">
+          <label className="field">آدرس صفحه پرداخت درگاه<input dir="ltr" value={f.ipg_payment_url} onChange={text("ipg_payment_url")} placeholder="http://…/_ipgw_//payment/simple/" /></label>
+          <label className="field">کد پذیرنده (MID)<input dir="ltr" value={f.ipg_mid} onChange={text("ipg_mid")} /></label>
+          <label className="field">آدرس سرویس‌های REST (Verify)<input dir="ltr" value={f.ipg_rest_url} onChange={text("ipg_rest_url")} placeholder="http://…/RestServices/mts" /></label>
+          <label className="field">نام کاربری پذیرنده<input dir="ltr" value={f.ipg_username} onChange={text("ipg_username")} autoComplete="off" /></label>
+          <label className="field">رمز پذیرنده<input dir="ltr" type="password" value={f.ipg_password} onChange={text("ipg_password")} autoComplete="new-password"
+            placeholder={data?.ipg_has_password ? "•••••• (برای تغییر وارد کنید)" : ""} /></label>
+          <label className="field">ضریب مبلغ (تومان ← ریال)<input dir="ltr" inputMode="numeric" value={f.ipg_amount_multiplier} onChange={text("ipg_amount_multiplier")} /></label>
+          <label className="field">زبان صفحه درگاه
+            <select value={f.ipg_language} onChange={text("ipg_language")}><option value="fa">فارسی</option><option value="en">English</option></select>
+          </label>
+          <label className="field">آدرس عمومی سایت (برای بازگشت از درگاه)<input dir="ltr" value={f.public_url} onChange={text("public_url")} placeholder="خالی = خودکار" /></label>
+        </div>
+        <label className="row gap small"><input type="checkbox" style={cb} checked={f.ipg_allow_unverified} onChange={check("ipg_allow_unverified")} />
+          اگر سرویس Verify تنظیم نشده، پاسخ «OK» درگاه پذیرفته شود (فقط برای تست)</label>
+        {data && !data.ipg_can_verify && (
+          <div className="alert warn small">تأیید سمت سرور (MerchantLogin + VerifyMerchantTrans) تنظیم نشده است. برای استفاده واقعی آدرس REST، نام کاربری و رمز را وارد کنید.</div>
+        )}
+        <p className="small muted" style={{ margin: 0 }}>
+          آدرس بازگشت برای درگاه: <span className="ltr">{(f.public_url || window.location.origin) + "/api/ipg/callback"}</span>
+        </p>
+        <ErrorBox error={error} />
+        <button className="btn primary">ذخیره تنظیمات درگاه</button>
+        {msg && <p className="small">{msg}</p>}
+      </form>
+    </Card>
   );
 }

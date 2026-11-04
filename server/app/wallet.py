@@ -1,6 +1,7 @@
 """Wallet and doctor-balance operations. Balances change only through these functions,
 and every change is a single atomic UPDATE, so two payments at the same moment can never
 spend the same money twice (works the same on SQLite and PostgreSQL)."""
+import os
 import secrets
 
 from sqlalchemy import func, update
@@ -11,8 +12,21 @@ from .db import AppSetting, Doctor, Payment, User, WalletTxn
 DEFAULTS = {
     "default_fee": "50000",        # amount pre-filled on the payment page for new doctors (toman)
     "initial_wallet": "5000000",   # credit every new user gets (toman)
-    "ipg_enabled": "0",            # bank gateway: shown but disabled until configured
     "max_payment": "100000000",    # safety limit per payment (toman)
+    # --- bank gateway (IPG). Every value can be changed later in the admin panel (or via env at first start).
+    "ipg_enabled": os.environ.get("IPG_ENABLED", "1"),
+    "ipg_payment_url": os.environ.get("IPG_PAYMENT_URL", "http://192.168.141.45:1212/_ipgw_//payment/simple/"),
+    "ipg_mid": os.environ.get("IPG_MID", "41642444"),
+    # Base URL of the gateway's REST services (merchantLogin, verifyMerchantTrans, reverseTransaction).
+    "ipg_rest_url": os.environ.get("IPG_REST_URL", ""),
+    "ipg_username": os.environ.get("IPG_USERNAME", ""),
+    "ipg_password": os.environ.get("IPG_PASSWORD", ""),
+    # Without REST verify settings, accept a gateway "OK" as paid (test only; such payments are flagged "unverified").
+    "ipg_allow_unverified": os.environ.get("IPG_ALLOW_UNVERIFIED", "1"),
+    "ipg_amount_multiplier": os.environ.get("IPG_AMOUNT_MULTIPLIER", "10"),  # app amounts are toman, gateway wants rial
+    "ipg_language": os.environ.get("IPG_LANGUAGE", "fa"),
+    # Public address of this site for the gateway's redirectURL; empty = taken from the request.
+    "public_url": os.environ.get("PUBLIC_URL", ""),
 }
 
 

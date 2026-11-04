@@ -4,7 +4,8 @@ import { Card, Empty, Page, Spinner, Tabs } from "../components/ui";
 import { dateTime, num, toman } from "../lib/format";
 import { useApi } from "../lib/useApi";
 
-type Pay = { id: number; ref: string; amount: number; doctor: string; specialty: string; status: string; created_at: string };
+type Pay = { id: number; ref: string; amount: number; doctor: string; specialty: string; status: string; method: string; created_at: string };
+const STATUS_FA: Record<string, [string, string]> = { pending: ["در انتظار تأیید", "medium"], failed: ["ناموفق", "high"] };
 type Report = { items: Pay[]; count: number; total: number; by_doctor: { doctor: string; specialty: string; count: number; total: number }[]; wallet_balance: number };
 type Txn = { id: number; amount: number; kind: string; note: string; balance_after: number; created_at: string };
 const KIND = { initial: "شارژ اولیه", payment: "پرداخت ویزیت", admin: "تنظیم مدیر" } as Record<string, string>;
@@ -56,10 +57,10 @@ export default function Wallet() {
                 <ul className="list">
                   {rep.data.items.map((p) => (
                     <li key={p.id}>
-                      <span className="grow">
-                        {p.doctor}
-                        <div className="muted small">{dateTime(p.created_at)} · کد پیگیری <span className="ltr">{p.ref}</span></div>
-                      </span>
+                      <Link to={`/pay/result/${p.id}`} className="grow" style={{ color: "inherit" }}>
+                        {p.doctor} {STATUS_FA[p.status] && <span className={`badge ${STATUS_FA[p.status][1]}`}>{STATUS_FA[p.status][0]}</span>}
+                        <div className="muted small">{dateTime(p.created_at)} · {p.method === "ipg" ? "درگاه بانکی" : "کیف پول"} · <span className="ltr">{p.ref}</span></div>
+                      </Link>
                       <b>{toman(p.amount)}</b>
                     </li>
                   ))}

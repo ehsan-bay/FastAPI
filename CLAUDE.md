@@ -76,7 +76,9 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
 
 ## Open items / ideas
 
-- IPG (bank gateway) for visit payments: UI and API placeholders exist (`ipg_enabled` setting, `method: "ipg"`); waiting for the provider details.
+- IPG: implemented against IPG_Service v1.7 ("simple" method + REST verify). Still unknown: the real REST base URL and merchant
+  username/password (until set, gateway "OK" is accepted as paid but flagged `verified=False`; switch off "allow unverified" in production).
+  The exact JSON shape of the REST calls (`{"param": {...}}`) is inferred from the doc and must be confirmed against the real gateway.
 
 - Branch `claude/health-ai-app` is pushed but **not merged** into `main`, and no PR has been opened.
 - `render.yaml` now describes service `salamat-ai` + database `salamat-db`. It replaced the old `smartpos-nlp` service, which the user has not confirmed is unused.
@@ -180,3 +182,15 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     Tested: update (~50 s, data kept), DEPS mismatch rejected, broken code rolled back. Published as orphan branch **`update-bundle`**:
     `cd ~ && rm -rf salamat-update && git clone --depth 1 -b update-bundle https://github.com/ehsan-bay/FastAPI.git salamat-update && sudo bash salamat-update/update.sh`.
     Use the full `offline-bundle` only when Python packages, models or MediaPipe change. Sandbox disk is limited: delete old bundles/test dirs.
+27. **Bank gateway (IPG) per the user's IPG_Service v1.7 doc** (uploaded docx; "simple" method from their sample form).
+    `server/app/ipg.py`: `start_payment` creates a pending `Payment` (ref = resNum) and returns `{action, fields}`
+    (MID, resNum, Amount = toman × `ipg_amount_multiplier` (10 → rial), redirectURL = `<site>/api/ipg/callback`, language, …); the client posts it.
+    `/api/ipg/callback` (GET/POST) → `handle_callback`: State OK + RefNum → `merchantLogin` (SessionId cached, re-login on session error) +
+    `verifyMerchantTrans` (body `{"param": {WSContext, Token, RefNum}}`, result `erSucceed` compared case/underscore-insensitive), amount check,
+    `reverseTransaction` on mismatch; only then the doctor is credited (once; repeat posts ignored). Verify unreachable → stays pending →
+    admin "استعلام مجدد" (`POST /api/admin/payments/{id}/recheck`). Payment got nullable `gateway_*`, `verified`, `updated_at`.
+    Settings (admin panel + `IPG_*` env defaults): enabled (default on), payment URL (default `http://192.168.141.45:1212/_ipgw_//payment/simple/`),
+    MID (default 41642444), REST URL, username, password (write-only), allow-unverified, multiplier, language, public URL.
+    Client: IPG option on the pay page, `/pay/result/:id`, statuses in wallet/admin, IPG settings form. Capacitor: `allowNavigation: ["*"]`,
+    `cleartext: true` (needs one new APK). Tests: 8 IPG tests against a fake REST gateway; browser test with a fake gateway page
+    (`scratchpad/ipg/fakegw.py`): pay → gateway → OK → verified; cancel → failed. 33 pytest on SQLite + Postgres.

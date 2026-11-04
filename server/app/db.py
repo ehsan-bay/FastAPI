@@ -52,8 +52,16 @@ class Payment(SQLModel, table=True):
     amount: int
     method: str = "wallet"  # wallet | ipg
     status: str = "paid"  # paid | failed | pending
-    ref: str = Field(index=True, max_length=20)  # tracking code shown to the user
+    ref: str = Field(index=True, max_length=20)  # tracking code shown to the user (also the IPG resNum)
     created_at: datetime = Field(default_factory=now, index=True)
+    # Bank gateway (IPG) details; nullable so existing databases are migrated automatically.
+    gateway_state: Optional[str] = Field(default=None, max_length=50)    # State from the gateway (OK, Canceled By User…)
+    gateway_ref: Optional[str] = Field(default=None, max_length=60)      # RefNum (tracking number of the bank)
+    gateway_rrn: Optional[str] = Field(default=None, max_length=60)      # CustomerRefNum (RRN)
+    gateway_token: Optional[str] = Field(default=None, max_length=80)    # token (token-based method), kept for re-verify
+    gateway_message: Optional[str] = Field(default=None, max_length=300)  # verify result / error, for the admin
+    verified: Optional[bool] = None                                       # True = confirmed with VerifyMerchantTrans
+    updated_at: Optional[datetime] = None
 
 
 class WalletTxn(SQLModel, table=True):

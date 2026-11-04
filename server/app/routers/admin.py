@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import func, update
 from sqlmodel import Session, select
 
+from .. import ipg
 from ..auth import admin_user
 from ..db import Doctor, DoctorSettlement, Payment, User, WalletTxn, as_utc, get_session, now
 from ..wallet import DEFAULTS, WalletError, credit, get_int, get_setting, new_token, set_setting
@@ -170,7 +171,9 @@ def payments(doctor_id: int | None = None, user_id: int | None = None,
     rows = session.exec(q.order_by(Payment.created_at.desc()).limit(limit)).all()
     items = [{"id": p.id, "ref": p.ref, "amount": p.amount, "method": p.method, "status": p.status,
               "created_at": p.created_at, "doctor_id": d.id, "doctor": d.name, "specialty": d.specialty,
-              "user_id": u.id, "user": u.name or u.email, "email": u.email} for p, d, u in rows]
+              "user_id": u.id, "user": u.name or u.email, "email": u.email,
+              "gateway_ref": p.gateway_ref, "gateway_rrn": p.gateway_rrn, "message": p.gateway_message,
+              "verified": p.verified} for p, d, u in rows]
     paid = [i for i in items if i["status"] == "paid"]
     return {"items": items, "count": len(paid), "total": sum(i["amount"] for i in paid)}
 
@@ -235,30 +238,69 @@ def set_role(user_id: int, body: RoleIn, admin: User = Depends(admin_user), sess
 
 
 # --- settings ------------------------------------------------------------------
+IPG_TEXT_KEYS = ("ipg_payment_url", "ipg_mid", "ipg_rest_url", "ipg_username", "ipg_language", "public_url")
+
+
 class SettingsIn(BaseModel):
     default_fee: int | None = Field(default=None, ge=1000, le=1_000_000_000)
     initial_wallet: int | None = Field(default=None, ge=0, le=10_000_000_000)
     max_payment: int | None = Field(default=None, ge=1000, le=10_000_000_000)
     apply_fee_to_all: bool = False
+    # bank gateway
+    ipg_enabled: bool | None = None
+    ipg_payment_url: str | None = Field(default=None, max_length=300)
+    ipg_mid: str | None = Field(default=None, max_length=50)
+    ipg_rest_url: str | None = Field(default=None, max_length=300)
+    ipg_username: str | None = Field(default=None, max_length=100)
+    ipg_password: str | None = Field(default=None, max_length=200)  # empty = keep the current password
+    ipg_allow_unverified: bool | None = None
+    ipg_amount_multiplier: int | None = Field(default=None, ge=1, le=1000)
+    ipg_language: str | None = Field(default=None, pattern="^(fa|en)$")
+    public_url: str | None = Field(default=None, max_length=300)
 
 
 @router.get("/settings")
 def get_settings(session: Session = Depends(get_session)):
+    cfg = ipg.config(session)
     return {"default_fee": get_int(session, "default_fee"), "initial_wallet": get_int(session, "initial_wallet"),
-            "max_payment": get_int(session, "max_payment"), "ipg_enabled": get_setting(session, "ipg_enabled") == "1",
-            "ipg_configured": False}
+            "max_payment": get_int(session, "max_payment"),
+            "ipg_enabled": cfg.enabled, "ipg_payment_url": cfg.payment_url, "ipg_mid": cfg.mid,
+            "ipg_rest_url": cfg.rest_url, "ipg_username": cfg.username, "ipg_has_password": bool(cfg.password),
+            "ipg_allow_unverified": cfg.allow_unverified, "ipg_amount_multiplier": cfg.multiplier,
+            "ipg_language": cfg.language, "public_url": cfg.public_url, "ipg_can_verify": cfg.can_verify,
+            "ipg_configured": bool(cfg.payment_url and cfg.mid)}
 
 
 @router.put("/settings")
 def put_settings(body: SettingsIn, session: Session = Depends(get_session)):
-    for key in ("default_fee", "initial_wallet", "max_payment"):
+    for key in ("default_fee", "initial_wallet", "max_payment", "ipg_amount_multiplier"):
         value = getattr(body, key)
         if value is not None:
             set_setting(session, key, str(value))
+    for key in IPG_TEXT_KEYS:
+        value = getattr(body, key)
+        if value is not None:
+            set_setting(session, key, value.strip())
+    for key in ("ipg_enabled", "ipg_allow_unverified"):
+        value = getattr(body, key)
+        if value is not None:
+            set_setting(session, key, "1" if value else "0")
+    if body.ipg_password:
+        set_setting(session, "ipg_password", body.ipg_password)
     if body.apply_fee_to_all and body.default_fee:
         session.execute(update(Doctor).values(fee=body.default_fee))
     session.commit()
     return get_settings(session)
+
+
+@router.post("/payments/{payment_id}/recheck")
+def recheck_payment(payment_id: int, session: Session = Depends(get_session)):
+    """Try the gateway's verify service again for a payment that stayed pending."""
+    p = session.get(Payment, payment_id)
+    if not p:
+        raise HTTPException(404, "پرداخت یافت نشد")
+    p = ipg.recheck(session, p)
+    return {"id": p.id, "status": p.status, "message": p.gateway_message, "verified": p.verified}
 
 
 assert set(DEFAULTS) >= {"default_fee", "initial_wallet", "ipg_enabled", "max_payment"}

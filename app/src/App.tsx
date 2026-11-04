@@ -25,6 +25,7 @@ const Meds = lazy(() => import("./pages/Meds"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Scan = lazy(() => import("./pages/Scan"));
 const Pay = lazy(() => import("./pages/Pay"));
+const PayResult = lazy(() => import("./pages/PayResult"));
 const Wallet = lazy(() => import("./pages/Wallet"));
 const Admin = lazy(() => import("./pages/Admin"));
 
@@ -49,6 +50,7 @@ function Routed() {
           <Route path="meds" element={<Meds />} />
           <Route path="settings" element={<Settings />} />
           <Route path="scan" element={<Scan />} />
+          <Route path="pay/result/:id" element={<PayResult />} />
           <Route path="pay/:token" element={<Pay />} />
           <Route path="wallet" element={<Wallet />} />
           <Route path="admin" element={<Admin />} />

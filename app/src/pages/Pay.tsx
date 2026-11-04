@@ -9,6 +9,23 @@ import { useApi } from "../lib/useApi";
 type Info = { name: string; specialty: string; fee: number; wallet_balance: number; ipg_enabled: boolean; max_payment: number };
 type Receipt = { id: number; ref: string; amount: number; doctor: string; specialty: string; created_at: string; wallet_balance: number };
 
+/** Posts the gateway form (MID, resNum, Amount, redirectURL, …) by a normal page navigation. */
+function submitToGateway(action: string, fields: Record<string, string>) {
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = action;
+  form.style.display = "none";
+  for (const [name, value] of Object.entries(fields)) {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  }
+  document.body.appendChild(form);
+  form.submit();
+}
+
 export default function Pay() {
   const { token = "" } = useParams();
   const nav = useNavigate();
@@ -42,11 +59,18 @@ export default function Pay() {
   const balance = info.data?.wallet_balance ?? 0;
   const tooLow = amount < 1000;
   const noMoney = method === "wallet" && amount > balance;
+  const payLabel = busy ? (method === "ipg" ? "در حال انتقال به درگاه…" : "در حال پرداخت…") : method === "ipg" ? `پرداخت ${toman(amount)} با کارت بانکی` : `پرداخت ${toman(amount)}`;
 
   const pay = async () => {
     setBusy(true);
     setError("");
     try {
+      if (method === "ipg") {
+        // The server creates a pending payment and returns the form for the bank gateway page.
+        const g = await api<{ action: string; fields: Record<string, string> }>("/api/pay", { body: { token, amount, method } });
+        submitToGateway(g.action, g.fields);
+        return; // the page now leaves for the gateway
+      }
       const r = await api<Receipt>("/api/pay", { body: { token, amount, method } });
       setReceipt(r);
       refresh();
@@ -132,7 +156,7 @@ export default function Pay() {
           <ErrorBox error={error} />
           {noMoney && <div className="alert warn small">موجودی کیف پول برای این مبلغ کافی نیست.</div>}
           <button className="btn primary" style={{ minHeight: 54, fontSize: "1.05rem" }} disabled={busy || tooLow || noMoney} onClick={pay}>
-            {busy ? "در حال پرداخت…" : `پرداخت ${toman(amount)}`}
+            {payLabel}
           </button>
         </>
       )}

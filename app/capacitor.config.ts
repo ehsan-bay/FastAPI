@@ -28,7 +28,11 @@ const config: CapacitorConfig = {
         url,
         // Shown from inside the app when the site can't be reached (no internet).
         errorPath: "offline.html",
-        allowNavigation: [new URL(url).host],
+        // "*" keeps the bank gateway page (address set in the admin panel) inside the app, so the
+        // gateway's return to /api/ipg/callback lands back in the app instead of an external browser.
+        allowNavigation: ["*"],
+        // The test gateway uses plain http.
+        cleartext: true,
       }
     : undefined,
   plugins: {

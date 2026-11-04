@@ -8,6 +8,7 @@ os.environ["DATA_DIR"] = _tmp
 os.environ["SECRET_KEY"] = "test"
 os.environ["ADMIN_EMAIL"] = "admin@test.com"
 os.environ["ADMIN_PASSWORD"] = "admin-pass-123"
+os.environ["IPG_ENABLED"] = "0"  # gateway tests switch it on through the admin settings
 os.environ["STATIC_DIR"] = os.path.join(_tmp, "no-static")
 # Run the suite against Postgres with: TEST_DATABASE_URL=postgresql://user:pw@host/db pytest
 if os.environ.get("TEST_DATABASE_URL"):
