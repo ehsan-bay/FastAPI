@@ -49,14 +49,21 @@ jobs:
         with: { node-version: 22, cache: npm, cache-dependency-path: app/package-lock.json }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: "21" }
-      - uses: android-actions/setup-android@v3
+      # GitHub's Ubuntu runners already ship the Android SDK ($ANDROID_HOME); only accept the licenses
+      # so Gradle may install any missing platform/build-tools by itself.
+      - name: Accept Android SDK licenses
+        run: |
+          SDKMANAGER=$(ls "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | sort -V | tail -1)
+          echo "using $SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          echo "sdk.dir=$ANDROID_HOME" > android/local.properties
       - run: npm ci
       # Set the repository variable SERVER_URL (e.g. https://salamat-ai.onrender.com)
       # so the app connects to your server without asking.
       - run: npm run build
         env: { VITE_API_URL: "${{ vars.SERVER_URL || 'https://salamatyar.tosantechno.ir' }}" }
       - run: npx cap sync android
-      - run: ./gradlew assembleDebug
+      - run: ./gradlew assembleDebug --no-daemon --stacktrace
         working-directory: app/android
       - uses: actions/upload-artifact@v4
         with:
