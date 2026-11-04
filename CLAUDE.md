@@ -130,3 +130,8 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     `install.sh --offline <tar|dir>` was tested here with all images removed first: it loaded everything from the bundle and came up healthy.
     The CI workflows have not been seen running yet (no GitHub API access from this sandbox).
     Computer use / VNC control is not available in this session; the user runs commands in MobaXterm and pastes the output.
+18. The `offline` release never appeared (GitHub Actions apparently not running; can't check from here). Built a fresh image in the sandbox
+    instead (CA only bind-mounted during RUN, verified nothing left in the image) and pushed the bundle as **orphan branch `offline-bundle`**
+    (6 parts < 100 MB + `SHA256SUMS` + `run.sh`). Server install: `git clone --depth 1 -b offline-bundle https://github.com/ehsan-bay/FastAPI.git salamat-bundle && cd salamat-bundle && sudo bash run.sh`.
+    Tested from a fresh clone with all images deleted first: healthy, all models on. To refresh it: rebuild image, `deploy/make-offline-bundle.sh`,
+    split -b 90m, force-push the orphan branch (force push keeps the repo from growing with each version).
