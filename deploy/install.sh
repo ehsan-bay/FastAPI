@@ -15,6 +15,8 @@
 #                   (needs PyPI, npm and Google storage; see --pip-mirror)
 #   --image REF     prebuilt image to pull (default: ghcr.io/ehsan-bay/salamat-ai:latest)
 #   --pip-mirror URL  PyPI mirror for --build, e.g. https://mirror.example/simple
+#   --offline PATH  install from an offline bundle (salamat-offline.tar or its extracted folder):
+#                   images, source and models are all inside; no internet needed
 # Env: GIT_TOKEN=...  GitHub token for a private repository; also used to pull the private image
 #      (classic token with "repo" and "read:packages")
 # Re-running the script updates an existing install and keeps its data and secrets.
@@ -29,6 +31,7 @@ WITH_LLM=0
 BUILD=0
 IMAGE="ghcr.io/ehsan-bay/salamat-ai:latest"
 PIP_MIRROR=""
+OFFLINE=""
 BACKUP=1
 
 log() { printf '\033[1;32m==>\033[0m %s\n' "$*"; }
@@ -46,13 +49,29 @@ while [ $# -gt 0 ]; do
     --build) BUILD=1; shift ;;
     --image) IMAGE="${2:-}"; shift 2 ;;
     --pip-mirror) PIP_MIRROR="${2:-}"; shift 2 ;;
-    -h|--help) sed -n '2,18p' "$0"; exit 0 ;;
+    --offline) OFFLINE="${2:-}"; shift 2 ;;
+    -h|--help) sed -n '2,22p' "$0"; exit 0 ;;
     *) die "unknown option: $1" ;;
   esac
 done
 
 [ "$(id -u)" -eq 0 ] || die "run as root (use sudo)"
 command -v apt-get >/dev/null || die "this script supports Ubuntu/Debian (apt) only"
+
+# --- offline bundle -----------------------------------------------------
+if [ -n "$OFFLINE" ]; then
+  [ -e "$OFFLINE" ] || die "offline bundle not found: $OFFLINE"
+  if [ -f "$OFFLINE" ]; then  # the .tar file itself: unpack next to it
+    tmp_bundle="$(mktemp -d)"
+    log "unpacking $OFFLINE"
+    tar -xf "$OFFLINE" -C "$tmp_bundle"
+    OFFLINE="$tmp_bundle/salamat-offline"
+  fi
+  OFFLINE="$(cd "$OFFLINE" && pwd)"
+  for f in images.tar.gz source.tar.gz; do [ -f "$OFFLINE/$f" ] || die "bundle is incomplete: $f missing"; done
+  BUILD=0
+  [ "$WITH_LLM" = 1 ] && { warn "--llm is not included in the offline bundle; ignoring"; WITH_LLM=0; }
+fi
 
 # --- checks -------------------------------------------------------------
 mem_mb=$(awk '/MemTotal/ {print int($2/1024)}' /proc/meminfo)
@@ -69,19 +88,34 @@ if [ "$mem_mb" -lt 3000 ] && ! swapon --show | grep -q .; then
 fi
 
 # --- packages -----------------------------------------------------------
-log "installing base packages"
 export DEBIAN_FRONTEND=noninteractive
-apt-get update -qq
-apt-get install -y -qq git curl ca-certificates openssl >/dev/null
+if [ -n "$OFFLINE" ]; then
+  # Packages are optional offline: use them only if an apt mirror happens to be reachable.
+  apt-get update -qq >/dev/null 2>&1 || true
+  apt-get install -y -qq curl openssl >/dev/null 2>&1 || true
+else
+  log "installing base packages"
+  apt-get update -qq
+  apt-get install -y -qq git curl ca-certificates openssl >/dev/null
+fi
 
 if ! command -v docker >/dev/null; then
   log "installing Docker"
-  curl -fsSL https://get.docker.com | sh >/dev/null
+  # Ubuntu's own packages first (work with local apt mirrors), then Docker's script.
+  if ! apt-get install -y -qq docker.io docker-compose-v2 >/dev/null 2>&1; then
+    [ -n "$OFFLINE" ] && die "Docker is not installed and no apt mirror is reachable. Install docker.io and docker-compose-v2 first."
+    curl -fsSL https://get.docker.com | sh >/dev/null || die "could not install Docker"
+  fi
 fi
 systemctl enable --now docker >/dev/null 2>&1 || true
 docker compose version >/dev/null 2>&1 || die "docker compose v2 is missing (install docker-compose-plugin)"
 
 # --- code ---------------------------------------------------------------
+if [ -n "$OFFLINE" ]; then
+  log "installing code from the bundle (version $(cat "$OFFLINE/VERSION" 2>/dev/null || echo ?)) to $DIR"
+  mkdir -p "$DIR"
+  tar -xzf "$OFFLINE/source.tar.gz" -C "$DIR"   # .env and data are not in the archive, so they are kept
+else
 url="https://${REPO}"
 [ -n "${GIT_TOKEN:-}" ] && url="https://x-access-token:${GIT_TOKEN}@${REPO}"
 if [ -d "$DIR/.git" ]; then
@@ -96,6 +130,7 @@ else
 fi
 # never keep the token in the saved remote URL
 git -C "$DIR" remote set-url origin "https://${REPO}"
+fi
 cd "$DIR"
 
 # --- configuration ------------------------------------------------------
@@ -113,7 +148,7 @@ set_env WITH_LLM "$WITH_LLM"
 if [ "$WITH_LLM" = 1 ] && [ "$BUILD" = 0 ]; then
   warn "--llm needs a local build; switching to --build"; BUILD=1
 fi
-if [ "$BUILD" = 1 ]; then
+if [ "$BUILD" = 1 ] || [ -n "$OFFLINE" ]; then
   set_env APP_IMAGE "salamat-ai:latest"
 else
   set_env APP_IMAGE "$IMAGE"
@@ -132,7 +167,7 @@ if [ -n "$DOMAIN" ]; then
 else
   set_env APP_BIND 0.0.0.0
   PROFILE=()
-  URL="http://$(curl -fsS4 --max-time 5 https://api.ipify.org 2>/dev/null || hostname -I | awk '{print $1}'):8000"
+  URL="http://$(hostname -I | awk '{print $1}'):8000"
   warn "no --domain given: running on plain HTTP; camera, microphone and PWA install need HTTPS"
 fi
 
@@ -144,7 +179,10 @@ if command -v ufw >/dev/null && ufw status | grep -q "Status: active"; then
 fi
 
 # --- start --------------------------------------------------------------
-if [ "$BUILD" = 1 ]; then
+if [ -n "$OFFLINE" ]; then
+  log "loading Docker images from the bundle (a few minutes)"
+  gunzip -c "$OFFLINE/images.tar.gz" | docker load
+elif [ "$BUILD" = 1 ]; then
   log "building the image on this server (5-15 minutes)"
   BUILD_ARGS=()
   [ -n "$PIP_MIRROR" ] && BUILD_ARGS=(--build-arg "PIP_INDEX_URL=$PIP_MIRROR")
