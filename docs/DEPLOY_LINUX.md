@@ -27,6 +27,22 @@ curl -fsSL https://raw.githubusercontent.com/ehsan-bay/FastAPI/claude/health-ai-
 - اگر ریپو خصوصی است: `GIT_TOKEN=توکن_فقط_خواندنی` را قبل از `bash` بگذارید (`sudo GIT_TOKEN=... bash -s -- ...`).
 - اجرای دوباره همان دستور، نسخه را به‌روز می‌کند و داده‌ها و رمزها را نگه می‌دارد.
 
+### نصب آفلاین (سرور بدون اینترنت یا با دسترسی محدود)
+
+اگر سرور به PyPI، Google یا Docker Hub دسترسی ندارد، از **بسته آفلاین** استفاده کنید. همه ایمیج‌ها
+(اپ با همه مدل‌های هوش مصنوعی، PostgreSQL و Caddy)، کد و اسکریپت نصب در یک فایل حدود ۵۰۰ مگابایتی هستند:
+
+1. روی کامپیوتر خودتان این فایل را دانلود کنید (GitHub Actions با هر تغییر آن را به‌روز می‌کند):
+   `https://github.com/ehsan-bay/FastAPI/releases/download/offline/salamat-offline.tar`
+2. با MobaXterm (پنل SFTP، کشیدن و رها کردن) یا `scp` آن را به سرور ببرید.
+3. روی سرور:
+   ```bash
+   tar -xf salamat-offline.tar
+   sudo bash salamat-offline/install.sh --offline salamat-offline
+   ```
+Docker باید نصب باشد یا از mirror مخزن apt سرور قابل نصب باشد (`docker.io`). برای ساخت دستی بسته:
+`docker build -t salamat-ai:latest . && deploy/make-offline-bundle.sh`
+
 ادامه این راهنما همین مراحل را دستی و با جزئیات توضیح می‌دهد.
 
 ## ۰. پیش‌نیازها

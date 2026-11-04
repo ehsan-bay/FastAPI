@@ -122,3 +122,11 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     Caddy HTTPS via `--domain`, health wait, nightly backup cron; re-run = update, keeps secrets and domain; `GIT_TOKEN` for a private repo).
     Tested here end to end with stubs for apt/crontab and `--no-build`. Two ways forward: the user/DevOps runs the one-liner, or the user runs
     `claude remote-control` on the server (in e.g. /opt) so this session can attach via `request_computer_folder` and run it.
+17. The user's demo server is `192.168.8.190` (private LAN, Ubuntu 24.04, user `techno`, 37 GB disk). The first install run failed in
+    `docker build`: **pip cannot reach PyPI from that server** (npm and Docker Hub worked). Google storage is probably blocked too.
+    Fixes: CI publishes the image to GHCR (`.github/workflows/image.yml`, installer pulls it by default; `--build` and `--pip-mirror` remain),
+    and an **offline bundle** (`deploy/make-offline-bundle.sh` → `salamat-offline.tar` ≈ 460 MB: images for app + postgres + caddy,
+    source, installer). `.github/workflows/offline-bundle.yml` smoke-tests the image and uploads the bundle to release tag `offline`.
+    `install.sh --offline <tar|dir>` was tested here with all images removed first: it loaded everything from the bundle and came up healthy.
+    The CI workflows have not been seen running yet (no GitHub API access from this sandbox).
+    Computer use / VNC control is not available in this session; the user runs commands in MobaXterm and pastes the output.

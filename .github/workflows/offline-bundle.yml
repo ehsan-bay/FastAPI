@@ -1,0 +1,42 @@
+name: Offline bundle
+
+# Builds salamat-offline.tar (all Docker images incl. AI models + source + installer)
+# and attaches it to the "offline" release, for servers without internet access:
+#   https://github.com/ehsan-bay/FastAPI/releases/tag/offline
+on:
+  push:
+    branches: [main, claude/health-ai-app]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: offline-bundle
+  cancel-in-progress: true
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build app image
+        run: docker build -t salamat-ai:latest .
+      - name: Smoke test the image
+        run: |
+          docker run -d --name t -e SECRET_KEY=ci-secret-key-0123456789abcdef0123456789 -p 8000:8000 salamat-ai:latest
+          for i in $(seq 1 30); do curl -fs localhost:8000/api/health && break; sleep 2; done
+          curl -fs localhost:8000/api/models | tee /dev/stderr | grep -q '"food":true'
+          docker rm -f t
+      - name: Make bundle
+        run: deploy/make-offline-bundle.sh salamat-offline.tar
+      - name: Publish to the "offline" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes="Offline install bundle. Built from ${GITHUB_SHA::7} on ${GITHUB_REF_NAME} at $(date -u '+%Y-%m-%d %H:%M UTC').
+          On the server: tar -xf salamat-offline.tar && sudo bash salamat-offline/install.sh --offline salamat-offline"
+          gh release view offline >/dev/null 2>&1 || \
+            gh release create offline --title "Offline install bundle" --notes "$notes" --prerelease --target "$GITHUB_SHA"
+          gh release upload offline salamat-offline.tar --clobber
+          gh release edit offline --notes "$notes"
