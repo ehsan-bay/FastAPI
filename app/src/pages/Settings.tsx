@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, ErrorBox, Page } from "../components/ui";
 import ServerForm from "../components/ServerForm";
-import { api } from "../lib/api";
+import { api, isBundledApp } from "../lib/api";
 import { useAuth, type User } from "../lib/auth";
 import { useApi } from "../lib/useApi";
 
@@ -50,7 +50,7 @@ export default function Settings({ firstRun }: { firstRun?: boolean }) {
           {msg && <p className="small">{msg}</p>}
         </form>
       </Card>
-      <Card title="سرور"><ServerForm /></Card>
+      {isBundledApp() && <Card title="سرور"><ServerForm /></Card>}
       <Card title="مدل‌های هوش مصنوعی">
         <ul className="list">
           {models.data && Object.entries(models.data.server).map(([k, ok]) => (

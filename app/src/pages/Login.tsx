@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, ErrorBox, Tabs } from "../components/ui";
 import ServerForm from "../components/ServerForm";
+import { isBundledApp } from "../lib/api";
 import { useAuth } from "../lib/auth";
 
 export default function Login() {
@@ -56,7 +57,9 @@ export default function Login() {
           <button className="btn primary" disabled={busy}>
             {busy ? "…" : mode === "login" ? "ورود" : "ساخت حساب"}
           </button>
-          <button type="button" className="btn ghost small" onClick={() => setShowServer(!showServer)}>⚙️ تنظیم آدرس سرور</button>
+          {isBundledApp() && (
+            <button type="button" className="btn ghost small" onClick={() => setShowServer(!showServer)}>⚙️ تنظیم آدرس سرور</button>
+          )}
         </form>
         {showServer && <ServerForm onSaved={() => setShowServer(false)} />}
       </Card>

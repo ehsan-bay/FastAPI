@@ -162,3 +162,7 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     IPG shown disabled), `/wallet` (balance, reports, ledger), `/admin` (reports chart, doctors + printable QR cards, payments + CSV, users, settings).
     QR encodes `<site>/pay/<token>`. Browser test passed end to end, including scanning a QR through a fake camera (`--use-file-for-fake-video-capture`).
     IPG details still to come from the user.
+23. **The native app now loads the live site** (`capacitor.config.ts` → `server.url` from `VITE_API_URL` / `app/.env.production`), so web
+    changes reach the app without a new APK; only native changes (permissions, plugins, icon) need one. Offline → `public/offline.html`
+    (`server.errorPath`; the site URL is hardcoded there too). `CAP_BUNDLED=1` restores bundled files. `serverUrl()` returns "" (same origin)
+    unless `isBundledApp()` (native on `localhost`); the server form is shown only then. Note: Apple may reject "website wrapper" apps.

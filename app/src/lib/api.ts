@@ -14,13 +14,17 @@ function store(key: string, value?: string | null): string | null {
   return value ?? null;
 }
 
-/** Server base URL. Web/PWA build uses the same origin; native apps need a full URL. */
+/**
+ * True only when the native app runs its own bundled copy of the web files (capacitor://, https://localhost).
+ * The normal native build loads the live website instead (see capacitor.config.ts), so it behaves like the web.
+ */
+export const isBundledApp = () => Capacitor.isNativePlatform() && window.location.hostname === "localhost";
+
+/** Server base URL: same origin on the web, PWA and live app; a configured URL only for a bundled app. */
 export function serverUrl(): string {
+  if (!isBundledApp()) return "";
   const saved = store(KEY_SERVER);
   if (saved) return saved.replace(/\/+$/, "");
-  // The web/PWA build talks to the server it was loaded from. Native apps have no such
-  // origin, so they use the build-time default (app/.env.production) unless changed in Settings.
-  if (!Capacitor.isNativePlatform()) return "";
   const env = import.meta.env.VITE_API_URL as string | undefined;
   return env ? env.replace(/\/+$/, "") : "";
 }
@@ -29,7 +33,7 @@ export function setServerUrl(url: string) {
   store(KEY_SERVER, url.trim() ? url.trim() : null);
 }
 
-export const needsServerSetup = () => Capacitor.isNativePlatform() && !serverUrl();
+export const needsServerSetup = () => isBundledApp() && !serverUrl();
 export const modelUrl = (file: string) => `${serverUrl()}/models/${file}`;
 
 export const getToken = () => store(KEY_TOKEN);

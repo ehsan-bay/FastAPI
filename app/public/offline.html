@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>اتصال برقرار نیست</title>
+<style>
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; font-family: system-ui, Tahoma, sans-serif;
+         background: #f4f7f6; color: #13221d; text-align: center; padding: 24px; box-sizing: border-box; }
+  @media (prefers-color-scheme: dark) { body { background: #0d1513; color: #e6efec; } }
+  img { width: 84px; height: 84px; }
+  h1 { font-size: 1.3rem; margin: 16px 0 6px; }
+  p { color: #5f716b; margin: 0 0 22px; line-height: 1.8; }
+  button { background: #0f9d76; color: #fff; border: 0; border-radius: 12px; padding: 14px 28px; font-size: 1rem; font-weight: 700; }
+</style>
+</head>
+<body>
+  <div>
+    <img src="icon.svg" alt="">
+    <h1>اتصال به سلامت‌یار برقرار نشد</h1>
+    <p>اینترنت گوشی را بررسی کنید و دوباره تلاش کنید.</p>
+    <button onclick="retry()">تلاش دوباره</button>
+  </div>
+  <script>
+    // Address of the live app (same as VITE_API_URL in app/.env.production).
+    var SITE = "https://salamatyar.tosantechno.ir";
+    function retry() { window.location.replace(SITE); }
+    window.addEventListener("online", retry);
+  </script>
+</body>
+</html>

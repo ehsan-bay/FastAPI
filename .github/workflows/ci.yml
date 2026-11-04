@@ -60,9 +60,11 @@ jobs:
       - run: npm ci
       # Set the repository variable SERVER_URL (e.g. https://salamat-ai.onrender.com)
       # so the app connects to your server without asking.
+      # The app opens this site live (capacitor.config.ts), so later web changes need no new APK.
       - run: npm run build
         env: { VITE_API_URL: "${{ vars.SERVER_URL || 'https://salamatyar.tosantechno.ir' }}" }
       - run: npx cap sync android
+        env: { VITE_API_URL: "${{ vars.SERVER_URL || 'https://salamatyar.tosantechno.ir' }}" }
       # Optional real signing key for store releases. Add these repository secrets to use it:
       # ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD.
       # Without them the APK is signed with the fixed test key in app/android/app/signing/.
