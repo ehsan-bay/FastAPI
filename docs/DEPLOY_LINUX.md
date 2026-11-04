@@ -43,6 +43,16 @@ curl -fsSL https://raw.githubusercontent.com/ehsan-bay/FastAPI/claude/health-ai-
 Docker باید نصب باشد یا از mirror مخزن apt سرور قابل نصب باشد (`docker.io`). برای ساخت دستی بسته:
 `docker build -t salamat-ai:latest . && deploy/make-offline-bundle.sh`
 
+### به‌روزرسانی سبک (چند مگابایت)
+
+بعد از نصب اول، برای به‌روزرسانی‌های معمول لازم نیست بسته کامل دوباره دانلود شود. بسته سبک فقط کد و صفحه‌های وب را دارد
+و روی ایمیج نصب‌شده سوار می‌شود (بدون اینترنت آزاد، داده‌ها و تنظیمات حفظ می‌شوند، در صورت خطا خودکار به نسخه قبل برمی‌گردد):
+```bash
+cd ~ && rm -rf salamat-update && git clone --depth 1 -b update-bundle https://github.com/ehsan-bay/FastAPI.git salamat-update && sudo bash salamat-update/update.sh
+```
+اگر نسخه جدید کتابخانه یا مدل تازه‌ای داشته باشد، اسکریپت خودش خبر می‌دهد که این بار بسته کامل لازم است.
+ساخت بسته سبک: `deploy/make-update-bundle.sh`
+
 ادامه این راهنما همین مراحل را دستی و با جزئیات توضیح می‌دهد.
 
 ## ۰. پیش‌نیازها

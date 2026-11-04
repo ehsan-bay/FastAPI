@@ -173,3 +173,10 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     screenshots + QR card), plus cover tags, comparison row, revenue model (transaction fee), roadmap IPG. Demo data: `docs/catalog/seed.py` then
     `seed_pay.py` (130 payments over 30 days) with the server running; shots via `shots.cjs`, `shots_pay.cjs`, `shot_qr.cjs`.
     The catalog QR card is rendered by `qr_card.cjs` and encodes the public site (no link text under it). Offline bundle refreshed to 6c0f112.
+26. **Light updates (~1 MB instead of 460 MB).** `deploy/make-update-bundle.sh` → `salamat-update.tar.gz` (git archive without docs/android/ios,
+    built web without `mediapipe/`, `VERSION`, `DEPS` = hash of requirements.txt + download_models.py + hash of the mediapipe file list).
+    `deploy/update.sh` checks DEPS against the installed image (else asks for the full bundle), builds `FROM salamat-ai:latest` + new code/web
+    locally (keeps `/srv/web/mediapipe`, writes `/srv/VERSION`), tags the old image `salamat-ai:previous`, restarts and **rolls back** if unhealthy.
+    Tested: update (~50 s, data kept), DEPS mismatch rejected, broken code rolled back. Published as orphan branch **`update-bundle`**:
+    `cd ~ && rm -rf salamat-update && git clone --depth 1 -b update-bundle https://github.com/ehsan-bay/FastAPI.git salamat-update && sudo bash salamat-update/update.sh`.
+    Use the full `offline-bundle` only when Python packages, models or MediaPipe change. Sandbox disk is limited: delete old bundles/test dirs.
