@@ -102,7 +102,6 @@ function QrCard({ doctor, onClose }: { doctor: Doctor; onClose: () => void }) {
         <h2 style={{ margin: "6px 0 0" }}>{doctor.name}</h2>
         <p className="muted" style={{ margin: 0 }}>{doctor.specialty}</p>
         {img ? <img src={img} alt="QR" style={{ width: "100%", maxWidth: 260, margin: "12px auto", display: "block" }} /> : <Spinner />}
-        <p className="small ltr muted" style={{ wordBreak: "break-all" }}>{link}</p>
         <div className="row gap">
           <button className="btn primary grow" onClick={print} disabled={!img}>🖨️ چاپ کارت</button>
           <a className="btn grow" href={img} download={`QR-${doctor.name}.png`}>⬇️ دانلود</a>

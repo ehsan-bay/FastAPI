@@ -168,3 +168,7 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     unless `isBundledApp()` (native on `localhost`); the server form is shown only then. Note: Apple may reject "website wrapper" apps.
 24. Refreshed the `offline-bundle` branch to 1c9520d (payments, admin panel, live-app changes); upgrade over an old install tested.
     Server update command: `cd ~ && rm -rf salamat-bundle && git clone --depth 1 -b offline-bundle https://github.com/ehsan-bay/FastAPI.git salamat-bundle && cd salamat-bundle && sudo bash run.sh`.
+25. The user's production site works (admin panel seen on their phone). Removed the pay link text under the QR in the admin QR card (request).
+    Catalog updated to **19 pages**: new pages "پرداخت ویزیت" (pay/receipt/wallet phones + 3-step strip) and "پنل مدیریت" (browser-framed admin
+    screenshots + QR card), plus cover tags, comparison row, revenue model (transaction fee), roadmap IPG. Demo data: `docs/catalog/seed.py` then
+    `seed_pay.py` (130 payments over 30 days) with the server running; shots via `shots.cjs`, `shots_pay.cjs`, `shot_qr.cjs`.
