@@ -11,6 +11,8 @@ RUN npm run build
 
 # 2) Python server
 FROM python:3.12-slim
+# A PyPI mirror can be used where pypi.org is unreachable: --build-arg PIP_INDEX_URL=https://mirror/simple
+ARG PIP_INDEX_URL=https://pypi.org/simple
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
     MODELS_DIR=/srv/models DATA_DIR=/srv/data STATIC_DIR=/srv/web PORT=8000
 WORKDIR /srv/server

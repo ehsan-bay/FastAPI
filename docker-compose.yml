@@ -23,7 +23,8 @@ services:
       context: .
       args:
         WITH_LLM: ${WITH_LLM:-0}
-    image: salamat-ai:latest
+    # APP_IMAGE lets a server use the image GitHub builds (ghcr.io) instead of building locally.
+    image: ${APP_IMAGE:-salamat-ai:latest}
     restart: unless-stopped
     depends_on:
       db: { condition: service_healthy }

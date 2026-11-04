@@ -11,7 +11,12 @@
 #   --dir PATH      install directory (default: /opt/salamat)
 #   --llm           also install the optional chat LLM (needs ~8 GB RAM)
 #   --no-backup     do not add the nightly database backup
-# Env: GIT_TOKEN=...  for a private repository (read-only token)
+#   --build         build the image on this server instead of pulling the prebuilt one
+#                   (needs PyPI, npm and Google storage; see --pip-mirror)
+#   --image REF     prebuilt image to pull (default: ghcr.io/ehsan-bay/salamat-ai:latest)
+#   --pip-mirror URL  PyPI mirror for --build, e.g. https://mirror.example/simple
+# Env: GIT_TOKEN=...  GitHub token for a private repository; also used to pull the private image
+#      (classic token with "repo" and "read:packages")
 # Re-running the script updates an existing install and keeps its data and secrets.
 set -euo pipefail
 
@@ -21,6 +26,9 @@ DIR="/opt/salamat"
 DOMAIN=""
 EMAIL=""
 WITH_LLM=0
+BUILD=0
+IMAGE="ghcr.io/ehsan-bay/salamat-ai:latest"
+PIP_MIRROR=""
 BACKUP=1
 
 log() { printf '\033[1;32m==>\033[0m %s\n' "$*"; }
@@ -35,6 +43,9 @@ while [ $# -gt 0 ]; do
     --dir) DIR="${2:-}"; shift 2 ;;
     --llm) WITH_LLM=1; shift ;;
     --no-backup) BACKUP=0; shift ;;
+    --build) BUILD=1; shift ;;
+    --image) IMAGE="${2:-}"; shift 2 ;;
+    --pip-mirror) PIP_MIRROR="${2:-}"; shift 2 ;;
     -h|--help) sed -n '2,18p' "$0"; exit 0 ;;
     *) die "unknown option: $1" ;;
   esac
@@ -99,6 +110,14 @@ if [ ! -f .env ]; then
 fi
 chmod 600 .env
 set_env WITH_LLM "$WITH_LLM"
+if [ "$WITH_LLM" = 1 ] && [ "$BUILD" = 0 ]; then
+  warn "--llm needs a local build; switching to --build"; BUILD=1
+fi
+if [ "$BUILD" = 1 ]; then
+  set_env APP_IMAGE "salamat-ai:latest"
+else
+  set_env APP_IMAGE "$IMAGE"
+fi
 # Re-running without --domain keeps the domain from an earlier install.
 if [ -z "$DOMAIN" ]; then
   prev=$(grep -E '^DOMAIN=' .env | cut -d= -f2- || true)
@@ -125,8 +144,24 @@ if command -v ufw >/dev/null && ufw status | grep -q "Status: active"; then
 fi
 
 # --- start --------------------------------------------------------------
-log "building and starting (first run takes 5-15 minutes)"
-docker compose "${PROFILE[@]}" up -d --build
+if [ "$BUILD" = 1 ]; then
+  log "building the image on this server (5-15 minutes)"
+  BUILD_ARGS=()
+  [ -n "$PIP_MIRROR" ] && BUILD_ARGS=(--build-arg "PIP_INDEX_URL=$PIP_MIRROR")
+  docker compose build "${BUILD_ARGS[@]}" app
+else
+  log "downloading the prebuilt image $IMAGE"
+  token="${GHCR_TOKEN:-${GIT_TOKEN:-}}"
+  if [ -n "$token" ]; then
+    echo "$token" | docker login ghcr.io -u "${GHCR_USER:-token}" --password-stdin >/dev/null \
+      || die "login to ghcr.io failed (token needs read:packages)"
+  fi
+  docker compose pull app || die "could not pull $IMAGE.
+  - private image? run with GIT_TOKEN=<token with read:packages>
+  - ghcr.io blocked? use --build (with --pip-mirror if pypi.org is blocked)"
+fi
+log "starting"
+docker compose "${PROFILE[@]}" up -d --no-build
 
 log "waiting for the app to become healthy"
 ok=0

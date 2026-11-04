@@ -1,0 +1,34 @@
+name: Docker image
+
+# Builds the full app image (web app + API + AI models) and publishes it to
+# GitHub Container Registry, so servers without access to PyPI or Google storage
+# can just pull it:  ghcr.io/ehsan-bay/salamat-ai:latest
+on:
+  push:
+    branches: [main, claude/health-ai-app]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/ehsan-bay/salamat-ai:latest
+            ghcr.io/ehsan-bay/salamat-ai:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
