@@ -166,3 +166,5 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     changes reach the app without a new APK; only native changes (permissions, plugins, icon) need one. Offline → `public/offline.html`
     (`server.errorPath`; the site URL is hardcoded there too). `CAP_BUNDLED=1` restores bundled files. `serverUrl()` returns "" (same origin)
     unless `isBundledApp()` (native on `localhost`); the server form is shown only then. Note: Apple may reject "website wrapper" apps.
+24. Refreshed the `offline-bundle` branch to 1c9520d (payments, admin panel, live-app changes); upgrade over an old install tested.
+    Server update command: `cd ~ && rm -rf salamat-bundle && git clone --depth 1 -b offline-bundle https://github.com/ehsan-bay/FastAPI.git salamat-bundle && cd salamat-bundle && sudo bash run.sh`.
