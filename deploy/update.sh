@@ -20,7 +20,10 @@ log() { printf '\033[1;32m==>\033[0m %s\n' "$*"; }
 die() { printf '\033[1;31mERROR:\033[0m %s\n' "$*" >&2; exit 1; }
 
 [ "$(id -u)" -eq 0 ] || die "run as root (use sudo)"
-[ -n "$SRC" ] || SRC="$(cd "$(dirname "$0")" && pwd)"
+if [ -z "$SRC" ]; then
+  here="$(cd "$(dirname "$0")" && pwd)"
+  if [ -f "$here/salamat-update.tar.gz" ]; then SRC="$here/salamat-update.tar.gz"; else SRC="$here"; fi
+fi
 if [ -f "$SRC" ]; then
   tmp="$(mktemp -d)"
   tar -xzf "$SRC" -C "$tmp"
