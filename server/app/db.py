@@ -29,6 +29,56 @@ class User(SQLModel, table=True):
     password_hash: str
     calorie_goal: int = 2000
     created_at: datetime = Field(default_factory=now)
+    # Nullable so existing databases get these columns automatically (add_missing_columns).
+    is_admin: Optional[bool] = None
+    wallet_balance: Optional[int] = None  # toman; filled with the initial credit on registration
+
+
+class Doctor(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str
+    specialty: str = ""
+    fee: int = 50_000  # default visit fee shown on the payment page (toman)
+    qr_token: str = Field(index=True, unique=True, max_length=40)
+    active: bool = True
+    balance: int = 0  # what the clinic owes the doctor (toman)
+    created_at: datetime = Field(default_factory=now)
+
+
+class Payment(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(index=True, foreign_key="user.id")
+    doctor_id: int = Field(index=True, foreign_key="doctor.id")
+    amount: int
+    method: str = "wallet"  # wallet | ipg
+    status: str = "paid"  # paid | failed | pending
+    ref: str = Field(index=True, max_length=20)  # tracking code shown to the user
+    created_at: datetime = Field(default_factory=now, index=True)
+
+
+class WalletTxn(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(index=True, foreign_key="user.id")
+    amount: int  # + credit, - debit (toman)
+    kind: str  # initial | payment | admin
+    balance_after: int
+    payment_id: Optional[int] = Field(default=None, foreign_key="payment.id")
+    note: str = ""
+    created_at: datetime = Field(default_factory=now, index=True)
+
+
+class DoctorSettlement(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    doctor_id: int = Field(index=True, foreign_key="doctor.id")
+    amount: int
+    note: str = ""
+    admin_id: Optional[int] = Field(default=None, foreign_key="user.id")
+    created_at: datetime = Field(default_factory=now, index=True)
+
+
+class AppSetting(SQLModel, table=True):
+    key: str = Field(primary_key=True, max_length=50)
+    value: str
 
 
 class Meal(SQLModel, table=True):

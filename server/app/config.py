@@ -23,6 +23,9 @@ class Settings:
     llm_model_path = _env("LLM_MODEL_PATH", "")
     llm_threads = int(_env("LLM_THREADS", "2"))
     max_upload_mb = int(_env("MAX_UPLOAD_MB", "8"))
+    # First admin account, created on startup if there is no admin yet.
+    admin_email = _env("ADMIN_EMAIL", "admin@salamatyar.ir").strip().lower()
+    admin_password = _env("ADMIN_PASSWORD", "")
 
     def __init__(self) -> None:
         self.data_dir.mkdir(parents=True, exist_ok=True)

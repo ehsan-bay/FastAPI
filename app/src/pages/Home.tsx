@@ -1,6 +1,7 @@
 import { Bar, Card, Page, Spinner, Tile } from "../components/ui";
+import { Link } from "react-router-dom";
 import { useAuth } from "../lib/auth";
-import { num } from "../lib/format";
+import { num, toman } from "../lib/format";
 import { useApi } from "../lib/useApi";
 
 type Dash = {
@@ -24,6 +25,15 @@ export default function Home() {
     <Page title={`${hello}${user?.name ? "، " + user.name : ""} 👋`}>
       {loading && <Spinner />}
       {error && <div className="alert danger">{error}</div>}
+      <Link to="/scan" className="card pay-banner">
+        <span style={{ fontSize: "2rem" }}>📷</span>
+        <span className="grow">
+          <b>پرداخت ویزیت پزشک</b>
+          <div className="small">QR مطب را اسکن کنید · موجودی کیف پول: {toman(user?.wallet_balance)}</div>
+        </span>
+        <span>←</span>
+      </Link>
+      {user?.is_admin && <Link to="/admin" className="btn">🛠️ پنل مدیریت</Link>}
       {data && (
         <>
           <Card title="کالری امروز">

@@ -76,6 +76,8 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
 
 ## Open items / ideas
 
+- IPG (bank gateway) for visit payments: UI and API placeholders exist (`ipg_enabled` setting, `method: "ipg"`); waiting for the provider details.
+
 - Branch `claude/health-ai-app` is pushed but **not merged** into `main`, and no PR has been opened.
 - `render.yaml` now describes service `salamat-ai` + database `salamat-db`. It replaced the old `smartpos-nlp` service, which the user has not confirmed is unused.
 - No public test server yet: the user will deploy on Render or their own Linux server (`docs/DEPLOY_LINUX.md`).
@@ -149,3 +151,14 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     CI builds **assembleRelease**, versionCode = `GITHUB_RUN_NUMBER`, artifact `salamat-ai-apk` (`Salamatyar-1.0.<run>.apk`).
     Optional real key via secrets `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
     Gradle can't run in the sandbox (dl.google.com blocked), so this was reviewed but only CI can prove it.
+22. **Doctor visit payments (QR + wallet) and admin panel.** Server: tables `Doctor` (fee, `qr_token`, `balance` = owed to doctor),
+    `Payment` (ref `SY…`), `WalletTxn` (ledger), `DoctorSettlement`, `AppSetting`; `User.is_admin`, `User.wallet_balance` (nullable → auto-migrated).
+    `app/wallet.py` does every balance change as one conditional UPDATE (no double spend; tested with 6 parallel payments).
+    `app/bootstrap.py` on startup: 5 sample doctors, admin from `ADMIN_EMAIL`/`ADMIN_PASSWORD` (env is authoritative; without a password a random one
+    is printed and written to `DATA_DIR/admin-credentials.txt`), initial credit for users without a wallet (default 5,000,000 toman).
+    API: `/api/pay/doctors/{token}`, `POST /api/pay` (wallet; `ipg` returns 400 until a gateway is configured), `/api/wallet`, `/api/payments`,
+    `/api/admin/*` (overview, doctors CRUD + new-qr + settle, payments, users + wallet adjust + role, settings). 25 pytest (SQLite + Postgres).
+    Client: `/scan` (camera, BarcodeDetector or jsQR), `/pay/:token` (shows only name + specialty, default fee clears on first keystroke,
+    IPG shown disabled), `/wallet` (balance, reports, ledger), `/admin` (reports chart, doctors + printable QR cards, payments + CSV, users, settings).
+    QR encodes `<site>/pay/<token>`. Browser test passed end to end, including scanning a QR through a fake camera (`--use-file-for-fake-video-capture`).
+    IPG details still to come from the user.

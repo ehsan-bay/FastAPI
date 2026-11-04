@@ -9,13 +9,15 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .config import settings
+from .bootstrap import bootstrap
 from .db import db_kind, db_ok, init_db
-from .routers import activity, auth, dashboard, food, lab, meds, mood, skin, vitals
+from .routers import activity, admin, auth, dashboard, food, lab, meds, mood, payments, skin, vitals
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     init_db()
+    bootstrap()
     yield
 
 
@@ -29,7 +31,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-for r in (auth, food, skin, lab, mood, vitals, meds, activity, dashboard):
+for r in (auth, food, skin, lab, mood, vitals, meds, activity, dashboard, payments, admin):
     app.include_router(r.router)
 
 

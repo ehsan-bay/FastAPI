@@ -1,10 +1,10 @@
 import { useRef, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-export function Page({ title, back, children, action }: { title: string; back?: boolean; children: ReactNode; action?: ReactNode }) {
+export function Page({ title, back, children, action, wide }: { title: string; back?: boolean; children: ReactNode; action?: ReactNode; wide?: boolean }) {
   const nav = useNavigate();
   return (
-    <div className="page">
+    <div className={`page ${wide ? "wide" : ""}`}>
       <header className="topbar">
         {back && (
           <button className="icon-btn" aria-label="بازگشت" onClick={() => nav(-1)}>

@@ -23,3 +23,10 @@ export function duration(sec: number) {
 /** Accept Persian/Arabic digits in number inputs. */
 export const toLatinDigits = (s: string) =>
   s.replace(/[۰-۹]/g, (c) => String(c.charCodeAt(0) - 0x06f0)).replace(/[٠-٩]/g, (c) => String(c.charCodeAt(0) - 0x0660)).replace("٫", ".");
+
+const faInt = new Intl.NumberFormat("fa-IR", { maximumFractionDigits: 0 });
+/** Money in toman, e.g. "۵۰٬۰۰۰ تومان". */
+export const toman = (n: number | null | undefined) => (n === null || n === undefined ? "—" : `${faInt.format(n)} تومان`);
+/** Digits only (accepts Persian/Arabic digits and separators). */
+export const parseAmount = (s: string) => Number(toLatinDigits(s).replace(/[^0-9]/g, "")) || 0;
+export const groupDigits = (n: number) => (n ? faInt.format(n) : "");

@@ -180,3 +180,25 @@ th { color: var(--muted); font-weight: 600; }
 .auth-page { min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px; }
 .auth-card { width: 100%; max-width: 400px; }
 .logo { width: 72px; height: 72px; margin: 0 auto 8px; display: block; }
+
+/* payments & admin */
+.page.wide { max-width: 1100px; }
+.pay-banner { display: flex; align-items: center; gap: 12px; color: var(--primary-ink); background: linear-gradient(135deg, #0f9d76, #06513e); border: 0; }
+.pay-banner .small { opacity: 0.9; }
+.wallet-card { background: linear-gradient(135deg, #0f9d76, #052e25); color: #fff; border: 0; }
+.doc-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--primary-soft); display: grid; place-items: center; font-size: 2.2rem; margin: 0 auto 8px; }
+.amount-input { font-size: 1.8rem; font-weight: 800; text-align: center; min-height: 64px; letter-spacing: 1px; }
+.pay-method { display: flex; align-items: center; gap: 10px; padding: 12px; border: 2px solid var(--border); border-radius: 14px; margin-bottom: 8px; cursor: pointer; }
+.pay-method input { width: 20px; min-height: 0; }
+.pay-method.active { border-color: var(--primary); background: var(--primary-soft); }
+.pay-method.disabled { opacity: 0.55; cursor: not-allowed; }
+.scan-frame { position: absolute; inset: 18%; border: 4px solid rgba(255,255,255,0.9); border-radius: 22px; box-shadow: 0 0 0 999px rgba(0,0,0,0.35); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.stats .big { font-size: 1.35rem; }
+.bars { display: flex; align-items: flex-end; gap: 3px; height: 160px; direction: ltr; }
+.bar-col { flex: 1; height: 100%; display: flex; align-items: flex-end; background: var(--surface-2); border-radius: 4px; }
+.bar-v { width: 100%; background: var(--primary); border-radius: 4px; min-height: 2px; }
+.doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.card.inactive { opacity: 0.6; }
+.form-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); align-items: end; }
+.modal { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.55); display: grid; place-items: center; padding: 16px; }

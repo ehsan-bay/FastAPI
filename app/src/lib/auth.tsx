@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { api, getToken, setToken } from "./api";
 
-export type User = { id: number; email: string; name: string; calorie_goal: number };
+export type User = { id: number; email: string; name: string; calorie_goal: number; is_admin: boolean; wallet_balance: number };
 type Ctx = {
   user: User | null;
   loading: boolean;
@@ -9,6 +9,7 @@ type Ctx = {
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => void;
   setUser: (u: User) => void;
+  refresh: () => Promise<void>;
 };
 
 const AuthContext = createContext<Ctx>(null!);
@@ -46,5 +47,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
-  return <AuthContext.Provider value={{ user, loading, login, register, logout, setUser }}>{children}</AuthContext.Provider>;
+  const refresh = useCallback(async () => {
+    try {
+      setUser(await api<User>("/api/auth/me"));
+    } catch {
+      /* keep the current user on network errors */
+    }
+  }, []);
+
+  return <AuthContext.Provider value={{ user, loading, login, register, logout, setUser, refresh }}>{children}</AuthContext.Provider>;
 }

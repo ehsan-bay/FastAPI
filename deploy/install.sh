@@ -144,6 +144,11 @@ if [ ! -f .env ]; then
   set_env POSTGRES_PASSWORD "$(openssl rand -hex 24)"
 fi
 chmod 600 .env
+# Admin panel login: generated once, kept on later runs.
+if ! grep -qE '^ADMIN_PASSWORD=.+' .env || grep -q '^ADMIN_PASSWORD=CHANGE-me' .env; then
+  set_env ADMIN_PASSWORD "$(openssl rand -hex 6)"
+fi
+grep -q '^ADMIN_EMAIL=' .env || set_env ADMIN_EMAIL "admin@salamatyar.ir"
 set_env WITH_LLM "$WITH_LLM"
 if [ "$WITH_LLM" = 1 ] && [ "$BUILD" = 0 ]; then
   warn "--llm needs a local build; switching to --build"; BUILD=1
@@ -223,5 +228,6 @@ models=$(docker compose exec -T app python -c "import urllib.request,json; print
 echo
 log "Salamat AI is running: $URL"
 log "AI models on the server: $models"
+log "admin panel: $URL/admin   email: $(grep '^ADMIN_EMAIL=' .env | cut -d= -f2-)   password: $(grep '^ADMIN_PASSWORD=' .env | cut -d= -f2-)"
 [ -n "$DOMAIN" ] && log "if HTTPS does not work yet: check the DNS A record and that ports 80/443 are open (docker compose logs caddy)"
 log "update later by running this script again; logs: cd $DIR && docker compose logs -f app"

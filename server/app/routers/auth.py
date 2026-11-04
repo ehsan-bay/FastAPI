@@ -4,6 +4,7 @@ from sqlmodel import Session, select
 
 from ..auth import create_token, current_user, hash_password, verify_password
 from ..db import User, get_session
+from ..wallet import credit, get_int
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -25,7 +26,8 @@ class ProfileIn(BaseModel):
 
 
 def user_out(u: User) -> dict:
-    return {"id": u.id, "email": u.email, "name": u.name, "calorie_goal": u.calorie_goal}
+    return {"id": u.id, "email": u.email, "name": u.name, "calorie_goal": u.calorie_goal,
+            "is_admin": bool(u.is_admin), "wallet_balance": u.wallet_balance or 0}
 
 
 @router.post("/register")
@@ -37,6 +39,9 @@ def register(body: RegisterIn, session: Session = Depends(get_session)):
         raise HTTPException(409, "این ایمیل قبلاً ثبت شده است")
     user = User(email=email, name=body.name.strip(), password_hash=hash_password(body.password))
     session.add(user)
+    session.commit()
+    session.refresh(user)
+    credit(session, user.id, get_int(session, "initial_wallet"), "initial", "شارژ اولیه کیف پول")
     session.commit()
     session.refresh(user)
     return {"token": create_token(user.id), "user": user_out(user)}

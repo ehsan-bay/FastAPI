@@ -44,3 +44,9 @@ def current_user(
     if user is None:
         raise unauthorized
     return user
+
+
+def admin_user(user: User = Depends(current_user)) -> User:
+    if not user.is_admin:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "دسترسی فقط برای مدیر سامانه")
+    return user

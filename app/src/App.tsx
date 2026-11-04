@@ -23,6 +23,10 @@ const Sleep = lazy(() => import("./pages/Sleep"));
 const Vitals = lazy(() => import("./pages/Vitals"));
 const Meds = lazy(() => import("./pages/Meds"));
 const Settings = lazy(() => import("./pages/Settings"));
+const Scan = lazy(() => import("./pages/Scan"));
+const Pay = lazy(() => import("./pages/Pay"));
+const Wallet = lazy(() => import("./pages/Wallet"));
+const Admin = lazy(() => import("./pages/Admin"));
 
 function Routed() {
   const { user, loading } = useAuth();
@@ -44,6 +48,10 @@ function Routed() {
           <Route path="vitals" element={<Vitals />} />
           <Route path="meds" element={<Meds />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="scan" element={<Scan />} />
+          <Route path="pay/:token" element={<Pay />} />
+          <Route path="wallet" element={<Wallet />} />
+          <Route path="admin" element={<Admin />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
