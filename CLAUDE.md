@@ -200,3 +200,7 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     Verified in Chromium with JSPI deleted by an init script (Safari emulation): recording starts and classifies.
     Light updates can now carry MediaPipe: `WITH_MEDIAPIPE=1 deploy/make-update-bundle.sh` (adds `MEDIAPIPE` marker; update.sh then checks
     only the Python/model half of DEPS and replaces `/srv/web/mediapipe`).
+29. Suggested more small health AI models (no code): Persian speech-to-text (Whisper small / Vosk fa) for voice logging, CLIP/SigLIP
+    zero-shot for Iranian dishes, ParsBERT sentiment for the journal, camera heart rate (MediaPipe Face + rPPG signal processing),
+    Persian TTS (Piper fa_IR) for elderly users, multilingual-e5-small embeddings for a grounded health FAQ, accelerometer fall detection
+    (needs a native plugin), clinic-only imaging (TorchXRayVision) with regulatory caveats. Note: HF models must ship in the offline bundle.
