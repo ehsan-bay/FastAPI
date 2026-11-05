@@ -42,7 +42,7 @@ const css = `::-webkit-scrollbar{display:none} *{scrollbar-width:none}`;
   await p.getByRole('tab', { name: /تایپ/ }).click();
   await p.locator('textarea').fill('FBS 112\nHbA1c 5.9\nCholesterol 214\nHDL 38\nLDL 138\nTG 165\nHb 13.2\nTSH 2.1\nVitamin D 18\nFerritin 22');
   await p.getByRole('button', { name: 'تحلیل', exact: true }).click();
-  await p.getByText('خارج از محدوده').first().waitFor();
+  await p.locator('.card-title', { hasText: /^نتیجه$/ }).waitFor();
   await p.evaluate(() => { const el = [...document.querySelectorAll('.card-title')].find(e => e.textContent.trim() === 'نتیجه'); el.scrollIntoView({ block: 'start' }); window.scrollBy(0, -70); });
   await p.waitForTimeout(400); await snap(p, 'lab');
 
