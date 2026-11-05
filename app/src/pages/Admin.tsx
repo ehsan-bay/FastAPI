@@ -5,6 +5,7 @@ import { useAuth } from "../lib/auth";
 import { dateTime, groupDigits, num, parseAmount, toman } from "../lib/format";
 import { payLink, qrDataUrl } from "../lib/qr";
 import { useApi } from "../lib/useApi";
+import JalaliDate from "../components/JalaliDate";
 
 type Doctor = { id: number; name: string; specialty: string; fee: number; active: boolean; balance: number; qr_token: string; payments_count: number; payments_total: number };
 type Overview = {
@@ -150,7 +151,7 @@ function Doctors() {
   };
 
   const settle = (d: Doctor) => {
-    const v = window.prompt(`مبلغ تسویه با ${d.name} (تومان). طلب فعلی: ${d.balance.toLocaleString("fa-IR")}`, String(d.balance));
+    const v = window.prompt(`مبلغ تسویه با ${d.name} (تومان). طلب فعلی: ${d.balance.toLocaleString("fa-IR-u-ca-persian")}`, String(d.balance));
     if (v === null) return;
     const amount = parseAmount(v);
     const note = window.prompt("توضیح (مثلاً شماره واریز):", "") ?? "";
@@ -210,7 +211,7 @@ function Doctors() {
 function toCsv(rows: PayRow[]) {
   const head = ["کد پیگیری", "تاریخ", "پزشک", "تخصص", "بیمار", "ایمیل", "مبلغ (تومان)", "روش", "وضعیت", "کد پیگیری بانک", "RRN"];
   const esc = (v: unknown) => `"${String(v).replace(/"/g, '""')}"`;
-  const lines = rows.map((r) => [r.ref, new Date(r.created_at.endsWith("Z") ? r.created_at : r.created_at + "Z").toLocaleString("fa-IR"), r.doctor, r.specialty, r.user, r.email, r.amount, r.method === "wallet" ? "کیف پول" : "درگاه", r.status, r.gateway_ref ?? "", r.gateway_rrn ?? ""].map(esc).join(","));
+  const lines = rows.map((r) => [r.ref, new Date(r.created_at.endsWith("Z") ? r.created_at : r.created_at + "Z").toLocaleString("fa-IR-u-ca-persian"), r.doctor, r.specialty, r.user, r.email, r.amount, r.method === "wallet" ? "کیف پول" : "درگاه", r.status, r.gateway_ref ?? "", r.gateway_rrn ?? ""].map(esc).join(","));
   return "﻿" + [head.map(esc).join(","), ...lines].join("\n");
 }
 
@@ -245,8 +246,8 @@ function Payments() {
               {doctors.data?.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
             </select>
           </label>
-          <label className="field">از تاریخ<input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></label>
-          <label className="field">تا تاریخ<input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></label>
+          <div className="field">از تاریخ<JalaliDate value={from} onChange={setFrom} allowEmpty label="از تاریخ" /></div>
+          <div className="field">تا تاریخ<JalaliDate value={to} onChange={setTo} allowEmpty label="تا تاریخ" /></div>
         </div>
       </Card>
       {pays.data && (
@@ -311,7 +312,7 @@ function Users() {
   };
 
   const adjust = (u: UserRow) => {
-    const v = window.prompt(`تغییر موجودی ${u.email} (تومان). برای کسر، منفی وارد کنید. موجودی فعلی: ${u.wallet_balance.toLocaleString("fa-IR")}`, "");
+    const v = window.prompt(`تغییر موجودی ${u.email} (تومان). برای کسر، منفی وارد کنید. موجودی فعلی: ${u.wallet_balance.toLocaleString("fa-IR-u-ca-persian")}`, "");
     if (!v) return;
     const neg = /^\s*[-−]/.test(v);
     const amount = parseAmount(v) * (neg ? -1 : 1);

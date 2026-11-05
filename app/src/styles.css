@@ -386,3 +386,31 @@ th { color: var(--muted); font-weight: 700; font-size: 0.8rem; }
 .card.inactive { opacity: 0.6; }
 .form-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); align-items: end; }
 .modal { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.55); display: grid; place-items: center; padding: 16px; }
+
+/* ---------- Persian date picker ---------- */
+div.field { display: flex; flex-direction: column; gap: 6px; font-size: 0.88rem; font-weight: 600; color: var(--text-2); }
+.jdate { display: flex; gap: 6px; align-items: center; }
+.jdate select { flex: 1; min-width: 0; padding-inline: 8px; }
+.jdate select:nth-child(2) { flex: 1.6; }
+.refill-row { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 12px; background: var(--surface-2); color: var(--text-2); }
+.refill-row.low { background: var(--warn-soft); color: var(--warn); }
+.code { font-weight: 800; letter-spacing: 3px; padding: 2px 10px; border-radius: 10px; background: var(--surface-2); }
+
+/* ---------- cycle calendar ---------- */
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+.cal-h { font-size: 0.72rem; color: var(--muted); font-weight: 700; padding-bottom: 2px; }
+.cal-d { aspect-ratio: 1; display: grid; place-items: center; border-radius: 12px; font-size: 0.88rem; font-weight: 600; }
+.cal-d.period { background: var(--rose); color: #fff; }
+.cal-d.predicted { background: var(--rose-bg); color: var(--rose); border: 1.5px dashed var(--rose); }
+.cal-d.fertile { background: var(--teal-bg); color: var(--teal); }
+.cal-d.ovulation { background: var(--teal); color: #fff; }
+.cal-d.today { outline: 2.5px solid var(--text); outline-offset: -2px; }
+.cal-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; color: var(--muted); }
+.cal-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-inline-end: 4px; vertical-align: -1px; }
+.cal-legend i.period { background: var(--rose); } .cal-legend i.predicted { background: var(--rose-bg); border: 1px dashed var(--rose); }
+.cal-legend i.fertile { background: var(--teal-bg); } .cal-legend i.ovulation { background: var(--teal); }
+.chip { border: 1.5px solid var(--border); background: var(--surface); border-radius: 99px; padding: 5px 12px; font-size: 0.82rem; font-weight: 600; cursor: pointer; color: var(--text-2); }
+.chip.on { background: var(--rose-bg); border-color: var(--rose); color: var(--rose); }
+.heart-beat { color: #ef4444; opacity: .5; }
+.heart-beat.on { opacity: 1; animation: beat 0.9s ease-in-out infinite; }
+@keyframes beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1); } 45% { transform: scale(1.1); } }

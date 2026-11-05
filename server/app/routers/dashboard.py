@@ -11,9 +11,9 @@ from ..ai.skin import skin_model
 from ..ai.speech import speaker, transcriber
 from ..ai.xray import xray_model
 from ..auth import current_user
-from ..db import Journal, SleepSession, User, Vital, Workout, get_session, now
+from ..db import Journal, Medication, SleepSession, User, Vital, Workout, get_session, now
 from .food import day_totals
-from .meds import adherence
+from .meds import adherence, refill_status
 
 router = APIRouter(prefix="/api", tags=["dashboard"])
 
@@ -56,6 +56,9 @@ def dashboard(tz_offset: int = Query(0, ge=-900, le=900), user: User = Depends(c
         "workouts": {"count": len(workouts), "reps": sum(w.reps for w in workouts),
                      "kcal": round(sum(w.kcal for w in workouts), 1)},
         "meds": adherence(7, user, session),
+        "refill": [{"id": m.id, "name": m.name, "days_left": r["days_left"]}
+                   for m in session.exec(select(Medication).where(Medication.user_id == user.id, Medication.active)).all()
+                   if (r := refill_status(m)) and r["low"]],
     }
 
 

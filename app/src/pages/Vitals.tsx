@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { History, Mic, TrendingUp } from "lucide-react";
-import { Card, Empty, ErrorBox, Page, Spinner } from "../components/ui";
+import { Camera, Droplets, HeartPulse, History, Mic, Trash2, TrendingUp } from "lucide-react";
+import { Bar, Card, Empty, ErrorBox, Page, Spinner } from "../components/ui";
 import { api } from "../lib/api";
 import { dateTime, num, toLatinDigits } from "../lib/format";
 import { useApi } from "../lib/useApi";
@@ -10,7 +10,7 @@ type Kind = "bp" | "glucose" | "weight" | "hr" | "spo2";
 type Vital = { id: number; kind: Kind; value: number; value2: number | null; created_at: string; level: "ok" | "warn" | "danger"; message: string };
 type Insight = { kind: Kind; label: string; count: number; mean?: number; message: string; anomalies: { value: number }[] };
 
-const KINDS: Record<Kind, { fa: string; unit: string; icon: string }> = {
+const KINDS: Record<Kind, { fa: string; unit: string; icon?: string }> = {
   bp: { fa: "فشار خون", unit: "mmHg", icon: "🩸" },
   glucose: { fa: "قند خون", unit: "mg/dL", icon: "🍬" },
   weight: { fa: "وزن", unit: "kg", icon: "⚖️" },
@@ -55,7 +55,7 @@ export default function Vitals() {
       <div className="row gap wrap">
         {(Object.keys(KINDS) as Kind[]).map((k) => (
           <button key={k} className={`btn small ${kind === k ? "primary" : ""}`} onClick={() => { setKind(k); setLast(null); }}>
-            {KINDS[k].icon} {KINDS[k].fa}
+            {KINDS[k].fa}
           </button>
         ))}
       </div>
@@ -68,6 +68,14 @@ export default function Vitals() {
         <ErrorBox error={error} />
         {last && <div className={`alert ${last.level === "ok" ? "ok" : last.level}`} style={{ marginTop: 10 }}>{last.message}</div>}
       </Card>
+      {kind === "glucose" && <A1cCard key={list.data?.length ?? 0} />}
+      {kind === "hr" && (
+        <Link to="/heart" className="card pay-banner" style={{ background: "linear-gradient(135deg,#b91c1c,#ef4444)" }}>
+          <HeartPulse size={28} />
+          <span className="grow"><b>اندازه‌گیری ضربان با دوربین</b><div className="small">انگشت را روی دوربین پشت گوشی بگذارید</div></span>
+          <Camera size={20} />
+        </Link>
+      )}
       <Card title="تحلیل روند" icon={TrendingUp} tone="violet">
         {ins ? (
           <>
@@ -88,7 +96,7 @@ export default function Vitals() {
                 <div className="muted small">{dateTime(v.created_at)}</div>
               </span>
               <span className={`badge ${v.level}`}>{v.level === "ok" ? "طبیعی" : v.level === "warn" ? "توجه" : "خطر"}</span>
-              <button className="btn ghost small" aria-label="حذف" onClick={() => remove(v.id)}>🗑️</button>
+              <button className="btn ghost small" aria-label="حذف" onClick={() => remove(v.id)}><Trash2 size={16} /></button>
             </li>
           ))}
         </ul>
@@ -116,5 +124,32 @@ function Chart({ rows, kind }: { rows: Vital[]; kind: Kind }) {
       <text x="4" y="12" fontSize="10" fill="var(--muted)">{Math.round(hi)}</text>
       <text x="4" y={h - 2} fontSize="10" fill="var(--muted)">{Math.round(lo)}</text>
     </svg>
+  );
+}
+
+type A1c = { available: boolean; readings: number; needed: number; days: number; min_days?: number; mean_glucose?: number; value?: number; level?: "ok" | "warn" | "danger"; message?: string };
+
+function A1cCard() {
+  const { data } = useApi<A1c>("/api/vitals/a1c", { days: 90 });
+  if (!data) return null;
+  return (
+    <Card title="HbA1c تخمینی (۳ ماه)" icon={Droplets} tone="amber">
+      {data.available ? (
+        <>
+          <div className="row gap" style={{ alignItems: "baseline" }}>
+            <span className="big">{num(data.value)}٪</span>
+            <span className={`badge ${data.level}`}>{data.message}</span>
+          </div>
+          <p className="small muted">بر پایه {num(data.readings)} اندازه‌گیری در {num(data.days)} روز · میانگین قند {num(data.mean_glucose)} mg/dL</p>
+        </>
+      ) : (
+        <>
+          <p className="small">برای تخمین، دست‌کم {num(data.needed)} اندازه‌گیری در {num(data.min_days ?? 7)} روز لازم است.</p>
+          <Bar value={Math.min(data.readings / data.needed, data.days / (data.min_days ?? 7))} max={1} />
+          <p className="tiny muted" style={{ marginTop: 4 }}>{num(Math.min(data.readings, data.needed))} از {num(data.needed)} اندازه‌گیری · {num(Math.min(data.days, data.min_days ?? 7))} از {num(data.min_days ?? 7)} روز</p>
+        </>
+      )}
+      <p className="disclaimer">تخمین از قندهای خانگی است و جای آزمایش HbA1c را نمی‌گیرد.</p>
+    </Card>
   );
 }

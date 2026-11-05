@@ -34,6 +34,11 @@ const Wallet = lazy(() => import("./pages/Wallet"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Voice = lazy(() => import("./pages/Voice"));
 const XRay = lazy(() => import("./pages/XRay"));
+const Family = lazy(() => import("./pages/Family"));
+const CarePatient = lazy(() => import("./pages/CarePatient"));
+const Report = lazy(() => import("./pages/Report"));
+const Cycle = lazy(() => import("./pages/Cycle"));
+const Heart = lazy(() => import("./pages/Heart"));
 
 function Routed() {
   const { user, loading } = useAuth();
@@ -62,6 +67,11 @@ function Routed() {
           <Route path="admin" element={<Admin />} />
           <Route path="voice" element={<Voice />} />
           <Route path="xray" element={<XRay />} />
+          <Route path="family" element={<Family />} />
+          <Route path="family/:id" element={<CarePatient />} />
+          <Route path="report" element={<Report />} />
+          <Route path="cycle" element={<Cycle />} />
+          <Route path="heart" element={<Heart />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

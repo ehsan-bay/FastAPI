@@ -82,3 +82,24 @@ def analyze_series(kind: str, points: list[tuple[datetime, float]]) -> dict:
     if out["anomalies"]:
         out["message"] += f" {len(out['anomalies'])} مقدار غیرعادی نسبت به الگوی خودت دیده شد."
     return out
+
+
+def estimated_a1c(points: list[tuple[datetime, float]], min_readings: int = 10, min_days: int = 7) -> dict:
+    """Estimated HbA1c from home glucose readings (ADAG formula: eA1c = (mean mg/dL + 46.7) / 28.7).
+
+    Needs enough readings spread over at least a week; it is a rough guide, not a lab value."""
+    n = len(points)
+    if not n:
+        return {"available": False, "readings": 0, "needed": min_readings, "days": 0}
+    days = (max(t for t, _ in points) - min(t for t, _ in points)).days + 1
+    mean = sum(v for _, v in points) / n
+    ok = n >= min_readings and days >= min_days
+    out = {"available": ok, "readings": n, "needed": min_readings, "days": days, "min_days": min_days,
+           "mean_glucose": round(mean)}
+    if ok:
+        a1c = round((mean + 46.7) / 28.7, 1)
+        level = "ok" if a1c < 5.7 else "warn" if a1c < 6.5 else "danger"
+        msg = {"ok": "در محدوده طبیعی", "warn": "در محدوده پیش‌دیابت؛ با پزشک مشورت کنید",
+               "danger": "در محدوده دیابت؛ آزمایش HbA1c و مشورت با پزشک لازم است"}[level]
+        out |= {"value": a1c, "level": level, "message": msg}
+    return out

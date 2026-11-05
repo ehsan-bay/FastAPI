@@ -1,4 +1,4 @@
-import { Bone, Dumbbell, FlaskConical, HeartPulse, Mic, Moon, Pill, QrCode, ScanFace, Settings, Shield, Wallet } from "lucide-react";
+import { Activity, Bone, CalendarHeart, Dumbbell, FileText, FlaskConical, HeartPulse, Mic, Moon, Pill, QrCode, ScanFace, Settings, Shield, Users, Wallet } from "lucide-react";
 import { Card, ListLink, Page, SectionTitle } from "../components/ui";
 import { useAuth } from "../lib/auth";
 import { toman } from "../lib/format";
@@ -11,9 +11,16 @@ export default function More() {
       <Card className="list-card">
         <ListLink to="/voice" icon={Mic} tone="teal" title="ثبت صوتی" sub="فشار، قند، غذا و حال را بگویید" />
         <ListLink to="/vitals" icon={HeartPulse} tone="red" title="علائم حیاتی" sub="فشار، قند، وزن، ضربان" />
-        <ListLink to="/meds" icon={Pill} tone="rose" title="داروها" sub="یادآور و خواندن با صدا" />
+        <ListLink to="/meds" icon={Pill} tone="rose" title="داروها" sub="یادآور، موجودی و خواندن با صدا" />
+        <ListLink to="/heart" icon={Activity} tone="red" title="ضربان با دوربین" sub="انگشت روی دوربین گوشی" />
+        <ListLink to="/cycle" icon={CalendarHeart} tone="rose" title="سلامت بانوان" sub="تقویم قاعدگی و پیش‌بینی" />
         <ListLink to="/sleep" icon={Moon} tone="indigo" title="پایش خواب" sub="خروپف و سرفه، روی گوشی" />
         <ListLink to="/coach" icon={Dumbbell} tone="blue" title="مربی ورزش" sub="شمارش حرکات با دوربین" />
+      </Card>
+      <SectionTitle>خانواده و پزشک</SectionTitle>
+      <Card className="list-card">
+        <ListLink to="/family" icon={Users} tone="blue" title="خانواده و همراه" sub="فراموشی دارو و هشدارها برای عزیزان" />
+        <ListLink to="/report" icon={FileText} tone="indigo" title="گزارش برای پزشک" sub="PDF فشار، قند و داروها" />
       </Card>
       <SectionTitle>غربالگری با هوش مصنوعی</SectionTitle>
       <Card className="list-card">

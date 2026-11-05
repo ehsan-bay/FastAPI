@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { Brain, House, LayoutGrid, Mic, Utensils, type LucideIcon } from "lucide-react";
 import { flushPendingSleep } from "../lib/sleepStore";
+import { watchCareAlerts } from "../lib/careAlerts";
 
 const NAV: [string, LucideIcon, string][] = [
   ["/", House, "خانه"],
@@ -18,6 +19,7 @@ export default function Layout() {
       if (document.visibilityState === "visible") flushPendingSleep();
     };
     flush();
+    watchCareAlerts();
     const timer = window.setInterval(flush, 5 * 60_000);
     window.addEventListener("online", flush);
     document.addEventListener("visibilitychange", flush);

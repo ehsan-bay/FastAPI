@@ -2,8 +2,8 @@ const fa = new Intl.NumberFormat("fa-IR", { maximumFractionDigits: 1 });
 export const num = (n: number | null | undefined) => (n === null || n === undefined || Number.isNaN(n) ? "—" : fa.format(n));
 export const pct = (n: number) => `${fa.format(Math.round(n * 100))}٪`;
 
-const dt = new Intl.DateTimeFormat("fa-IR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
-const d = new Intl.DateTimeFormat("fa-IR", { weekday: "short", month: "short", day: "numeric" });
+const dt = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+const d = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { weekday: "short", month: "short", day: "numeric" });
 
 /** Server returns UTC; naive strings are UTC too. */
 export function parseDate(s: string): Date {

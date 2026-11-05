@@ -1,9 +1,9 @@
 import { useSyncExternalStore } from "react";
 
 /** Small per-device preferences (not synced): large text for older users, read-aloud speed. */
-export type Prefs = { elder: boolean; speechRate: number; autoRead: boolean };
+export type Prefs = { elder: boolean; speechRate: number; autoRead: boolean; cycle: boolean };
 const KEY = "salamat.prefs";
-const DEFAULTS: Prefs = { elder: false, speechRate: 0.9, autoRead: false };
+const DEFAULTS: Prefs = { elder: false, speechRate: 0.9, autoRead: false, cycle: false };
 
 function load(): Prefs {
   try {

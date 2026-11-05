@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field, model_validator
 from sqlmodel import Session, select
 
-from ..ai.insights import KINDS, analyze_series, classify
+from ..ai.insights import KINDS, analyze_series, classify, estimated_a1c
 from ..auth import current_user
 from ..db import Vital, User, get_session, now
 
@@ -77,3 +77,11 @@ def insights(days: int = Query(90, ge=7, le=730), user: User = Depends(current_u
         if pts:
             out.append(analyze_series(kind, pts))
     return out
+
+
+@router.get("/a1c")
+def a1c(days: int = Query(90, ge=14, le=120), user: User = Depends(current_user), session: Session = Depends(get_session)):
+    """Estimated HbA1c from the glucose readings of the last `days` days (about 3 months reflects HbA1c)."""
+    rows = session.exec(select(Vital).where(Vital.user_id == user.id, Vital.kind == "glucose",
+                                            Vital.created_at >= now() - timedelta(days=days))).all()
+    return estimated_a1c([(r.created_at, r.value) for r in rows]) | {"period_days": days}

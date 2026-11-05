@@ -56,6 +56,13 @@ export default function Settings({ firstRun }: { firstRun?: boolean }) {
             </span>
             <span className="switch"><input type="checkbox" checked={prefs.elder} onChange={(e) => setPrefs({ elder: e.target.checked })} aria-label="حالت سالمند" /><span /></span>
           </label>
+          <label className="row gap" style={{ cursor: "pointer" }}>
+            <span className="grow">
+              <b>سلامت بانوان در صفحه اصلی</b>
+              <div className="tiny muted">نمایش تقویم قاعدگی در خانه</div>
+            </span>
+            <span className="switch"><input type="checkbox" checked={prefs.cycle} onChange={(e) => setPrefs({ cycle: e.target.checked })} aria-label="سلامت بانوان" /><span /></span>
+          </label>
           <label className="field">
             سرعت خواندن متن: {prefs.speechRate <= 0.8 ? "آهسته" : prefs.speechRate >= 1.1 ? "سریع" : "معمولی"}
             <input type="range" min={0.7} max={1.2} step={0.1} value={prefs.speechRate} onChange={(e) => setPrefs({ speechRate: +e.target.value })} />

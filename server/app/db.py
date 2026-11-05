@@ -143,6 +143,33 @@ class Medication(SQLModel, table=True):
     notes: str = ""
     active: bool = True
     created_at: datetime = Field(default_factory=now)
+    # refill tracking (optional): pills left, pills per dose, warn this many days before running out
+    stock: Optional[float] = None
+    per_dose: Optional[float] = None
+    refill_days: Optional[int] = None
+
+
+class CareLink(SQLModel, table=True):
+    """A family member / caregiver who follows a patient (missed doses, dangerous readings, low stock)."""
+    id: Optional[int] = Field(default=None, primary_key=True)
+    patient_id: int = Field(index=True, foreign_key="user.id")
+    caregiver_id: Optional[int] = Field(default=None, index=True, foreign_key="user.id")  # set when the invite is accepted
+    code: str = Field(index=True, unique=True, max_length=12)  # invite code the patient gives to the caregiver
+    label: str = ""  # how the patient names them, e.g. "پسرم"
+    status: str = "pending"  # pending | active
+    created_at: datetime = Field(default_factory=now)
+
+
+class CycleEntry(SQLModel, table=True):
+    """One period (women's health). Dates are the user's local calendar days (YYYY-MM-DD)."""
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(index=True, foreign_key="user.id")
+    start: str = Field(index=True, max_length=10)
+    end: Optional[str] = Field(default=None, max_length=10)
+    flow: str = ""  # light | medium | heavy
+    symptoms: str = "[]"  # json list of keys
+    note: str = ""
+    created_at: datetime = Field(default_factory=now)
 
 
 class MedLog(SQLModel, table=True):

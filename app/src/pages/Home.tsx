@@ -1,12 +1,14 @@
 import { Link } from "react-router-dom";
 import {
   Activity, AlertTriangle, Brain, Camera, ChevronLeft, Dumbbell, FlaskConical, HeartPulse, Mic, Moon, Pill, QrCode,
-  ScanFace, Settings as Gear, Shield, Utensils, Wallet, Bone,
+  ScanFace, Settings as Gear, Shield, Utensils, Wallet, Bone, Users, FileText, CalendarHeart, Package,
 } from "lucide-react";
 import { Card, IconChip, Page, Ring, SectionTitle, Skeleton, SpeakButton, Tile } from "../components/ui";
 import { useAuth } from "../lib/auth";
 import { num, toman } from "../lib/format";
 import { useApi } from "../lib/useApi";
+import { usePrefs } from "../lib/prefs";
+import type { CareAlert } from "../lib/careAlerts";
 
 type Dash = {
   nutrition: { kcal: number; protein: number; carbs: number; fat: number; goal: number; count: number };
@@ -15,10 +17,11 @@ type Dash = {
   mood: { entries: number; avg: number | null };
   workouts: { count: number; reps: number; kcal: number };
   meds: { percent: number | null };
+  refill?: { id: number; name: string; days_left: number }[];
 };
 
 const MOOD_FA = ["", "خیلی بد", "بد", "معمولی", "خوب", "عالی"];
-const today = new Intl.DateTimeFormat("fa-IR", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
+const today = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
 
 function summary(d: Dash, name?: string): string {
   const parts = [`سلام${name ? " " + name : ""}. خلاصه امروز شما:`];
@@ -39,6 +42,9 @@ export default function Home() {
   const hello = hour < 5 ? "شب بخیر" : hour < 12 ? "صبح بخیر" : hour < 18 ? "روز بخیر" : "عصر بخیر";
   const initial = (user?.name || user?.email || "?").trim().charAt(0);
   const danger = data && Object.values(data.vitals).find((v) => v.level === "danger");
+  const prefs = usePrefs();
+  const care = useApi<CareAlert[]>("/api/care/alerts", { tz_offset: new Date().getTimezoneOffset() });
+  const careBy = (care.data ?? []).reduce<Record<string, CareAlert[]>>((acc, a) => ({ ...acc, [a.patient]: [...(acc[a.patient] ?? []), a] }), {});
   const n = data?.nutrition;
 
   return (
@@ -62,6 +68,20 @@ export default function Home() {
           <span>{danger.message}</span>
         </div>
       )}
+
+      {Object.entries(careBy).map(([who, list]) => (
+        <Link key={who} to={`/family/${list[0].patient_id}`} className={`alert ${list.some((a) => a.level === "danger") ? "danger" : "warn"}`}>
+          <Users size={20} style={{ flex: "none", marginTop: 3 }} />
+          <span className="grow"><b>{who}:</b> {list[0].text}{list.length > 1 ? ` (و ${num(list.length - 1)} مورد دیگر)` : ""}</span>
+          <ChevronLeft size={18} style={{ flex: "none", marginTop: 4 }} />
+        </Link>
+      ))}
+      {data?.refill?.map((r) => (
+        <Link key={r.id} to="/meds" className="alert warn">
+          <Package size={20} style={{ flex: "none", marginTop: 3 }} />
+          <span className="grow">داروی {r.name} {r.days_left <= 0 ? "تمام شده است" : `حدود ${num(r.days_left)} روز دیگر تمام می‌شود`}؛ تهیه کنید.</span>
+        </Link>
+      ))}
 
       <Card className="hero">
         <div className="row gap" style={{ alignItems: "center" }}>
@@ -132,6 +152,14 @@ export default function Home() {
         <Tile to="/skin" icon={ScanFace} tone="amber" title="بررسی پوست" sub="غربالگری خال" />
         <Tile to="/lab" icon={FlaskConical} tone="violet" title="برگه آزمایش" sub="توضیح نتایج به فارسی" />
         <Tile to="/sleep" icon={Moon} tone="indigo" title="پایش خواب" sub="خروپف و سرفه" />
+        <Tile to="/heart" icon={Activity} tone="red" title="ضربان با دوربین" sub="انگشت روی دوربین" />
+        {prefs.cycle && <Tile to="/cycle" icon={CalendarHeart} tone="rose" title="سلامت بانوان" sub="تقویم و پیش‌بینی" />}
+      </div>
+
+      <SectionTitle>خانواده و پزشک</SectionTitle>
+      <div className="grid2">
+        <Tile to="/family" icon={Users} tone="blue" title="خانواده و همراه" sub="مراقبت از عزیزان" />
+        <Tile to="/report" icon={FileText} tone="indigo" title="گزارش برای پزشک" sub="چاپ و PDF" />
       </div>
 
       <Link to="/wallet" className="card pay-banner">
