@@ -37,6 +37,29 @@ MODELS = [
      None, "On-device sound events (sleep: snoring/cough, Apache-2.0)"),
 ]
 
+AI = "https://raw.githubusercontent.com/ehsan-bay/FastAPI/ai-models"
+MODELS += [
+    ("clip-visual.int8.onnx", f"{AI}/clip-visual.int8.onnx",
+     "38751b52d3631e3018bd5990298a9b758b7c72c14cd681631156b65c13ec5724", "Food zero-shot (OpenCLIP ViT-B/32, MIT)"),
+    ("clip-foods.npz", f"{AI}/clip-foods.npz",
+     "6e5fb30a4537898d78664ee4d4ec342f3d35d2192054e33425337e44907295f9", "Food descriptions for CLIP"),
+    ("xray-densenet121.onnx", f"{AI}/xray-densenet121.onnx",
+     "c1d8b5297f86884bf92048714031540efba55d142fc8d23d8868a3d69aa7c4bf", "Chest X-ray (TorchXRayVision, Apache-2.0)"),
+    ("xray-labels.json", f"{AI}/xray-labels.json",
+     "047fff862717cfc8a1519788a89446c096dc01b512ec267bcfae1496ed58fbc1", "Chest X-ray labels"),
+]
+
+SHERPA = "https://github.com/k2-fsa/sherpa-onnx/releases/download"
+# (target dir, archive url, members to keep (prefix match, path inside the archive's top folder), file that marks "done", description)
+ARCHIVES = [
+    ("asr", f"{SHERPA}/asr-models/sherpa-onnx-whisper-small.tar.bz2",
+     ["small-encoder.int8.onnx", "small-decoder.int8.onnx", "small-tokens.txt"], "small-decoder.int8.onnx",
+     "Persian speech recognition (Whisper small int8, MIT)"),
+    ("tts", f"{SHERPA}/tts-models/vits-piper-fa_IR-amir-medium.tar.bz2",
+     ["fa_IR-amir-medium.onnx", "fa_IR-amir-medium.onnx.json", "tokens.txt", "espeak-ng-data/", "MODEL_CARD"],
+     "fa_IR-amir-medium.onnx", "Persian voice (Piper fa_IR amir)"),
+]
+
 LLM = ("llm/model.gguf",
        os.environ.get("LLM_URL",
                       "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/"
@@ -69,7 +92,7 @@ def fetch(rel: str, url: str, digest: str | None, desc: str, force: bool) -> boo
         tmp.unlink(missing_ok=True)
         print(f"✗ {rel}: {exc}", file=sys.stderr)
         return False
-    if tmp.stat().st_size < 1024:
+    if not digest and tmp.stat().st_size < 1024:
         print(f"✗ {rel}: file too small (Git LFS pointer or error page?)", file=sys.stderr)
         tmp.unlink()
         return False
@@ -82,6 +105,40 @@ def fetch(rel: str, url: str, digest: str | None, desc: str, force: bool) -> boo
     return True
 
 
+def fetch_archive(target: str, url: str, keep: list[str], marker: str, desc: str, force: bool) -> bool:
+    import tarfile
+    import tempfile
+
+    dest = MODELS_DIR / target
+    if (dest / marker).exists() and not force:
+        print(f"✓ {target}/ (already present)")
+        return True
+    print(f"↓ {target}/ — {desc}")
+    dest.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(suffix=".tar.bz2", dir=MODELS_DIR, delete=False) as tmp:
+        tmp_path = Path(tmp.name)
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "salamat-ai-model-downloader"})
+        with urllib.request.urlopen(req, timeout=120) as resp, tmp_path.open("wb") as out:
+            shutil.copyfileobj(resp, out, length=1 << 20)
+        with tarfile.open(tmp_path, "r:bz2") as tar:
+            for m in tar.getmembers():
+                inner = m.name.split("/", 1)[1] if "/" in m.name else ""
+                if not inner or not any(inner == k or inner.startswith(k) for k in keep):
+                    continue
+                if not (m.isfile() or m.isdir()) or ".." in inner:
+                    continue
+                m.name = inner
+                tar.extract(m, dest, filter="data")
+    except Exception as exc:
+        print(f"✗ {target}/: {exc}", file=sys.stderr)
+        return False
+    finally:
+        tmp_path.unlink(missing_ok=True)
+    print(f"✓ {target}/")
+    return (dest / marker).exists()
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--llm", action="store_true", help="also download the optional chat LLM")
@@ -89,6 +146,7 @@ def main() -> int:
     args = p.parse_args()
     items = MODELS + ([LLM] if args.llm else [])
     ok = all([fetch(*m, force=args.force) for m in items])
+    ok = all([fetch_archive(*a, force=args.force) for a in ARCHIVES]) and ok
     print("done" if ok else "some downloads failed (the related features will be disabled)")
     return 0 if ok else 1
 

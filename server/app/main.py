@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from .config import settings
 from .bootstrap import bootstrap
 from .db import db_kind, db_ok, init_db
-from .routers import activity, admin, auth, dashboard, food, lab, meds, mood, payments, skin, vitals
+from .routers import activity, admin, assist, auth, dashboard, food, lab, meds, mood, payments, skin, vitals
 
 
 @asynccontextmanager
@@ -31,7 +31,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-for r in (auth, food, skin, lab, mood, vitals, meds, activity, dashboard, payments, admin):
+for r in (auth, food, skin, lab, mood, vitals, meds, activity, dashboard, payments, admin, assist):
     app.include_router(r.router)
 
 

@@ -8,6 +8,8 @@ from ..ai.insights import classify
 from ..ai.lab import lab_ocr
 from ..ai.llm import llm
 from ..ai.skin import skin_model
+from ..ai.speech import speaker, transcriber
+from ..ai.xray import xray_model
 from ..auth import current_user
 from ..db import Journal, SleepSession, User, Vital, Workout, get_session, now
 from .food import day_totals
@@ -62,6 +64,10 @@ def models_status():
     return {
         "server": {
             "food": food_model.available(),
+            "food_engine": food_model.engine(),
+            "asr": transcriber.available(),
+            "tts": speaker.available(),
+            "xray": xray_model.available(),
             "skin": skin_model.available(),
             "lab_ocr": lab_ocr.available(),
             "llm": llm.available(),

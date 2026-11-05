@@ -10,3 +10,4 @@ ai-edge-litert>=1.2
 onnxruntime>=1.19
 rapidocr-onnxruntime>=1.2
 psycopg[binary]>=3.2
+sherpa-onnx==1.13.8  # Persian speech recognition and voice; 2.x dropped the espeak frontend the Piper voice needs
