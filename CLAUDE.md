@@ -25,7 +25,10 @@ A multi-platform health app that uses small AI models. Persian UI, RTL.
 
 | Feature | Model | Runs on | Code |
 |---|---|---|---|
-| Food photo → calories | MediaPipe EfficientNet-Lite2 (ImageNet) mapped to `server/app/data/foods.json` (includes Iranian dishes) | server (`ai-edge-litert`) | `server/app/ai/food.py` |
+| Food photo → calories | **CLIP ViT-B/32 int8** zero-shot over `foods.json` visual descriptions (Iranian dishes + "not food"); fallback MediaPipe EfficientNet-Lite2 | server (onnxruntime) | `server/app/ai/food.py` |
+| Persian voice logging | Whisper small int8 (sherpa-onnx 1.13.8) + regex/fuzzy parser → vitals/meals/journal (user confirms) | server | `server/app/ai/speech.py`, `routers/assist.py`, `app/src/pages/Voice.tsx` |
+| Read-aloud (elderly) | Piper VITS fa_IR-amir-medium (sherpa-onnx), WAV cache in `DATA_DIR/tts-cache` | server | `speech.py`, `SpeakButton` in `ui.tsx` |
+| Chest X-ray screening | TorchXRayVision DenseNet-121 "all" ONNX, 18 findings, op_norm in numpy | server | `server/app/ai/xray.py`, `pages/XRay.tsx` |
 | Skin lesion screening | EfficientNet-B3 ONNX, 9 ISIC classes (vin0san/skin-lesion-onnx-api, MIT) | server (onnxruntime) | `server/app/ai/skin.py` |
 | Lab report OCR | RapidOCR (ONNX) + regex parser + reference ranges | server | `server/app/ai/lab.py` |
 | Mood journal / crisis detection | Persian+English lexicon | server | `server/app/ai/mood.py` |
@@ -35,6 +38,8 @@ A multi-platform health app that uses small AI models. Persian UI, RTL.
 | Sleep sounds (snore/cough) | YAMNet via MediaPipe Audio | **device** | `app/src/lib/sleep.ts` |
 | Medication reminders | Capacitor LocalNotifications / web Notification API | device | `app/src/lib/reminders.ts` |
 
+- Converted models (CLIP, X-ray) live on orphan branch **`ai-models`** (raw.githubusercontent); `server/scripts/convert_models.py` rebuilds them (needs torch).
+  Whisper/Piper come as tar.bz2 from sherpa-onnx GitHub releases. Do not upgrade sherpa-onnx to 2.x (drops the espeak frontend → TTS breaks).
 - Models are **not in git**. `server/scripts/download_models.py` fetches them into `server/models/`
   (on-device ones into `server/models/device/`, served at `/models/`). The LLM is only fetched with `--llm`.
 - MediaPipe WASM is copied from npm into `app/public/mediapipe/` by `app/scripts/copy-wasm.mjs` (postinstall; gitignored).
@@ -76,6 +81,8 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
 
 ## Open items / ideas
 
+- **IPG is switched OFF** (user request 2026-11-05, "until I say"): default `ipg_enabled=0` and `bootstrap.switch_off_ipg_once` turns it off once on
+  existing installs. Re-enable only when the user asks (admin panel → settings, or `IPG_ENABLED=1` for new installs).
 - IPG: implemented against IPG_Service v1.7 ("simple" method + REST verify). Still unknown: the real REST base URL and merchant
   username/password (until set, gateway "OK" is accepted as paid but flagged `verified=False`; switch off "allow unverified" in production).
   The exact JSON shape of the REST calls (`{"param": {...}}`) is inferred from the doc and must be confirmed against the real gateway.
@@ -89,6 +96,18 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
 - Ideas: fine-tune the food model on Food-101 + Iranian food photos; web push for reminders.
 
 ## Work history (newest first)
+
+### 2026-11-05 — Session 1 (continued)
+30. **Four new AI features + full UI/UX redesign.** Server: `/api/voice/transcribe` (16-bit WAV ≤30 s), `/api/voice/understand`, `/api/tts`,
+    `/api/xray/analyze` + `/history` (table `XRayCheck`), CLIP food engine (`/api/models` reports `food_engine`, `asr`, `tts`, `xray`).
+    Parser tolerates ASR spelling errors (غ/ق, ص/ث/س, ض/ظ/ذ/ز, ح/ه, ط/ت; "رو یه"). Browser records via ScriptProcessor and resamples
+    with OfflineAudioContext (naive averaging hurt accuracy a lot). Synthetic-voice round trip is not word-perfect, so the test only checks the pipeline.
+    Client redesign: design tokens + feature hues, lucide-react icons (no emojis), floating bottom nav with a center mic button (`/voice`),
+    new Home (hero calorie ring, quick actions, status tiles, AI tools), grouped More, `Sheet`, `Ring`, `Skeleton`, `SpeakButton` (server voice,
+    browser voice fallback), **elder mode** (`lib/prefs.ts`, `html.elder` scales `--root`), speech-rate setting. 49 pytest.
+    E2E with a fake microphone (`--use-file-for-fake-audio-capture`) passed. The native app needs **no new APK** (mic permission exists, app loads the live site).
+    IPG switched off on request. Catalog v2 (21 pages, new pages for voice/elder and X-ray, all screenshots retaken; `docs/catalog/shots_new.cjs`).
+    Requirements and models changed → the server needs the **full offline bundle** (light update refuses because DEPS changed).
 
 ### 2026-11-02 — Session 1
 1. Brainstormed health-app ideas with small AI models; the user asked to build **all of them in one app**.
