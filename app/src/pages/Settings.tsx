@@ -1,15 +1,22 @@
 import { useState } from "react";
-import { Card, ErrorBox, Page } from "../components/ui";
+import { Accessibility, Cpu, LogOut, Server, User as UserIcon } from "lucide-react";
+import { Card, ErrorBox, Page, SpeakButton } from "../components/ui";
+import { setPrefs, usePrefs } from "../lib/prefs";
 import ServerForm from "../components/ServerForm";
 import { api, isBundledApp } from "../lib/api";
 import { useAuth, type User } from "../lib/auth";
 import { useApi } from "../lib/useApi";
 
-type Models = { server: Record<string, boolean>; device: string[] };
-const MODEL_FA: Record<string, string> = { food: "تشخیص غذا", skin: "بررسی پوست", lab_ocr: "خواندن برگه آزمایش", llm: "مدل زبانی گفتگو", mood: "تحلیل احساسات" };
+type Models = { server: Record<string, boolean | string>; device: string[] };
+const MODEL_FA: Record<string, string> = {
+  food: "تشخیص غذا", asr: "تشخیص گفتار فارسی", tts: "خواندن متن با صدا", xray: "غربالگری عکس قفسه سینه",
+  skin: "بررسی پوست", lab_ocr: "خواندن برگه آزمایش", llm: "مدل زبانی گفتگو", mood: "تحلیل احساسات",
+};
+const ENGINE_FA: Record<string, string> = { clip: "CLIP (غذای ایرانی)", efficientnet: "EfficientNet" };
 
 export default function Settings({ firstRun }: { firstRun?: boolean }) {
   const { user, logout, setUser } = useAuth();
+  const prefs = usePrefs();
   const models = useApi<Models>(firstRun ? null : "/api/models");
   const [goal, setGoal] = useState(String(user?.calorie_goal ?? 2000));
   const [name, setName] = useState(user?.name ?? "");
@@ -32,7 +39,7 @@ export default function Settings({ firstRun }: { firstRun?: boolean }) {
     setError("");
     try {
       setUser(await api<User>("/api/auth/me", { method: "PATCH", body: { name, calorie_goal: +goal } }));
-      setMsg("ذخیره شد ✅");
+      setMsg("ذخیره شد");
     } catch (err) {
       setError((err as Error).message);
     }
@@ -40,7 +47,23 @@ export default function Settings({ firstRun }: { firstRun?: boolean }) {
 
   return (
     <Page title="تنظیمات" back>
-      <Card title="پروفایل">
+      <Card title="دسترسی‌پذیری" icon={Accessibility} tone="blue">
+        <div className="col">
+          <label className="row gap" style={{ cursor: "pointer" }}>
+            <span className="grow">
+              <b>حالت سالمند</b>
+              <div className="tiny muted">متن و دکمه‌های بزرگ‌تر، خواندن‌پذیری بیشتر</div>
+            </span>
+            <span className="switch"><input type="checkbox" checked={prefs.elder} onChange={(e) => setPrefs({ elder: e.target.checked })} aria-label="حالت سالمند" /><span /></span>
+          </label>
+          <label className="field">
+            سرعت خواندن متن: {prefs.speechRate <= 0.8 ? "آهسته" : prefs.speechRate >= 1.1 ? "سریع" : "معمولی"}
+            <input type="range" min={0.7} max={1.2} step={0.1} value={prefs.speechRate} onChange={(e) => setPrefs({ speechRate: +e.target.value })} />
+          </label>
+          <SpeakButton text="سلام. این نمونه صدای سلامت‌یار است. داروی ساعت هشت را فراموش نکنید." label="شنیدن نمونه صدا" />
+        </div>
+      </Card>
+      <Card title="پروفایل" icon={UserIcon}>
         <form className="col" onSubmit={saveProfile}>
           <p className="muted small ltr" style={{ margin: 0 }}>{user?.email}</p>
           <label className="field">نام<input value={name} onChange={(e) => setName(e.target.value)} /></label>
@@ -50,17 +73,22 @@ export default function Settings({ firstRun }: { firstRun?: boolean }) {
           {msg && <p className="small">{msg}</p>}
         </form>
       </Card>
-      {isBundledApp() && <Card title="سرور"><ServerForm /></Card>}
-      <Card title="مدل‌های هوش مصنوعی">
+      {isBundledApp() && <Card title="سرور" icon={Server} tone="slate"><ServerForm /></Card>}
+      <Card title="مدل‌های هوش مصنوعی" icon={Cpu} tone="violet">
         <ul className="list">
-          {models.data && Object.entries(models.data.server).map(([k, ok]) => (
-            <li key={k}><span className="grow">{MODEL_FA[k] ?? k} <span className="muted small">(سرور)</span></span><span className={`badge ${ok ? "ok" : "medium"}`}>{ok ? "فعال" : k === "llm" ? "حالت ساده" : "غیرفعال"}</span></li>
+          {models.data && Object.entries(models.data.server).filter(([, v]) => typeof v === "boolean").map(([k, ok]) => (
+            <li key={k}>
+              <span className="grow">{MODEL_FA[k] ?? k} <span className="muted tiny">(سرور)</span>
+                {k === "food" && typeof models.data!.server.food_engine === "string" && <div className="tiny muted">موتور: {ENGINE_FA[models.data!.server.food_engine as string] ?? String(models.data!.server.food_engine)}</div>}
+              </span>
+              <span className={`badge ${ok ? "ok" : "medium"}`}>{ok ? "فعال" : k === "llm" ? "حالت ساده" : "غیرفعال"}</span>
+            </li>
           ))}
           <li><span className="grow">تشخیص حرکات بدن <span className="muted small">(روی گوشی)</span></span><span className="badge ok">فعال</span></li>
           <li><span className="grow">تحلیل صدای خواب <span className="muted small">(روی گوشی)</span></span><span className="badge ok">فعال</span></li>
         </ul>
       </Card>
-      <button className="btn danger" onClick={logout}>خروج از حساب</button>
+      <button className="btn danger" onClick={logout}><LogOut size={18} /> خروج از حساب</button>
       <p className="disclaimer center">سلامت‌یار هوشمند نسخه ۱٫۰ — این اپ جایگزین مشاوره پزشکی نیست.</p>
     </Page>
   );

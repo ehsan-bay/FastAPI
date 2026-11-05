@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Moon } from "lucide-react";
 import { Card, Empty, ErrorBox, Page, Spinner } from "../components/ui";
 import { api } from "../lib/api";
 import { dateOnly, duration, num } from "../lib/format";
@@ -90,9 +91,9 @@ export default function Sleep() {
   };
 
   return (
-    <Page title="پایش خواب" back>
+    <Page title="پایش خواب" subtitle="خروپف و سرفه، روی همین گوشی" back>
       {state === "idle" || state === "loading" ? (
-        <Card title="🌙 شروع ضبط خواب">
+        <Card title="شروع پایش خواب" icon={Moon} tone="indigo">
           <p className="muted small">
             گوشی را به شارژ بزن، کنار تخت (رو به پایین) بگذار و اپ را باز نگه دار. صداها روی خود گوشی تحلیل می‌شوند و هیچ صدایی ضبط یا ارسال نمی‌شود؛
             فقط تعداد رویدادها (خروپف، سرفه، تنفس) ذخیره می‌شود. آمار هر دقیقه روی گوشی ذخیره می‌شود تا اگر اپ بسته شد از دست نرود.
@@ -102,7 +103,7 @@ export default function Sleep() {
           </button>
         </Card>
       ) : (
-        <Card title="در حال پایش… 😴">
+        <Card title="در حال پایش…" icon={Moon} tone="indigo">
           <div className="center big">{duration(elapsed)}</div>
           <div className="meter" style={{ margin: "10px 0" }}><div style={{ width: `${live.level * 100}%` }} /></div>
           <p className="center muted small">صدای فعلی: {live.label}</p>

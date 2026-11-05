@@ -7,6 +7,7 @@ import Layout from "./components/Layout";
 import { Spinner } from "./components/ui";
 import { AuthProvider, useAuth } from "./lib/auth";
 import { needsServerSetup } from "./lib/api";
+import "./lib/prefs";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 
@@ -28,6 +29,8 @@ const Pay = lazy(() => import("./pages/Pay"));
 const PayResult = lazy(() => import("./pages/PayResult"));
 const Wallet = lazy(() => import("./pages/Wallet"));
 const Admin = lazy(() => import("./pages/Admin"));
+const Voice = lazy(() => import("./pages/Voice"));
+const XRay = lazy(() => import("./pages/XRay"));
 
 function Routed() {
   const { user, loading } = useAuth();
@@ -54,6 +57,8 @@ function Routed() {
           <Route path="pay/:token" element={<Pay />} />
           <Route path="wallet" element={<Wallet />} />
           <Route path="admin" element={<Admin />} />
+          <Route path="voice" element={<Voice />} />
+          <Route path="xray" element={<XRay />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

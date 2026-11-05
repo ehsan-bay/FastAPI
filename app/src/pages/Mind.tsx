@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Card, Disclaimer, Empty, ErrorBox, Page, Spinner, Tabs } from "../components/ui";
+import { Link } from "react-router-dom";
+import { Mic, Phone, Send, Sparkles } from "lucide-react";
+import { Card, Disclaimer, Empty, ErrorBox, Page, Spinner, SpeakButton, Tabs } from "../components/ui";
 import { api } from "../lib/api";
 import { dateTime, num } from "../lib/format";
 import { useApi } from "../lib/useApi";
@@ -11,12 +13,12 @@ const MOODS = ["😢", "🙁", "😐", "🙂", "😄"];
 export default function Mind() {
   const [tab, setTab] = useState<"journal" | "chat" | "breathe">("journal");
   return (
-    <Page title="سلامت روان">
-      <Tabs value={tab} onChange={setTab} items={[["journal", "📓 یادداشت"], ["chat", "💬 گفتگو"], ["breathe", "🌬️ تنفس"]]} />
+    <Page title="سلامت روان" subtitle="یادداشت، گفتگو و آرام‌سازی">
+      <Tabs value={tab} onChange={setTab} items={[["journal", "یادداشت"], ["chat", "گفتگو"], ["breathe", "تنفس"]]} />
       {tab === "journal" && <Journal />}
       {tab === "chat" && <Chat />}
       {tab === "breathe" && <Breathe />}
-      <div className="alert info small">در شرایط بحرانی: اورژانس اجتماعی ۱۲۳ · صدای مشاور ۱۴۸۰ · اورژانس ۱۱۵</div>
+      <div className="alert info small"><Phone size={16} style={{ flex: "none", marginTop: 4 }} /><span>در شرایط بحرانی: اورژانس اجتماعی ۱۲۳ · صدای مشاور ۱۴۸۰ · اورژانس ۱۱۵</span></div>
     </Page>
   );
 }
@@ -46,7 +48,7 @@ function Journal() {
 
   return (
     <>
-      <Card title="امروز چه حسی داری؟">
+      <Card title="امروز چه حسی داری؟" action={<Link to="/voice" className="btn small soft"><Mic size={16} /> با صدا</Link>}>
         <div className="moods">
           {MOODS.map((m, i) => (
             <button key={i} className={mood === i + 1 ? "active" : ""} onClick={() => setMood(i + 1)} aria-label={`حال ${i + 1}`}>{m}</button>
@@ -59,7 +61,7 @@ function Journal() {
         </button>
       </Card>
       {last && (
-        <Card className={last.risk ? "alert danger" : ""} title="🤖 بازخورد">
+        <Card className={last.risk ? "alert danger" : ""} title="بازخورد" icon={Sparkles} tone="violet" action={<SpeakButton compact text={last.reply} />}>
           <p style={{ margin: 0 }}>{last.reply}</p>
           {last.emotions.length > 0 && (
             <div className="row gap wrap" style={{ marginTop: 8 }}>
@@ -103,7 +105,7 @@ function MoodChart({ entries }: { entries: Entry[] }) {
 }
 
 function Chat() {
-  const [msgs, setMsgs] = useState<Msg[]>([{ role: "assistant", content: "سلام! من سلامت‌یار هستم. درباره خواب، تغذیه، ورزش یا حال روحی‌ات بپرس. 🌱" }]);
+  const [msgs, setMsgs] = useState<Msg[]>([{ role: "assistant", content: "سلام! من سلامت‌یار هستم. درباره خواب، تغذیه، ورزش یا حال روحی‌ات بپرس." }]);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const end = useRef<HTMLDivElement>(null);
@@ -122,7 +124,7 @@ function Chat() {
       const r = await api<{ reply: string }>("/api/assistant/chat", { body: { messages: next.slice(1).slice(-12) } });
       setMsgs([...next, { role: "assistant", content: r.reply }]);
     } catch (err) {
-      setMsgs([...next, { role: "assistant", content: "⚠️ " + (err as Error).message }]);
+      setMsgs([...next, { role: "assistant", content: (err as Error).message }]);
     } finally {
       setBusy(false);
     }
@@ -131,13 +133,18 @@ function Chat() {
   return (
     <Card>
       <div className="chat">
-        {msgs.map((m, i) => <div key={i} className={`msg ${m.role}`}>{m.content}</div>)}
+        {msgs.map((m, i) => (
+          <div key={i} className={`msg ${m.role}`}>
+            {m.content}
+            {m.role === "assistant" && i > 0 && <div style={{ marginTop: 6 }}><SpeakButton compact text={m.content} /></div>}
+          </div>
+        ))}
         {busy && <div className="msg assistant">…</div>}
         <div ref={end} />
       </div>
       <form className="row gap" style={{ marginTop: 12 }} onSubmit={send}>
         <input className="grow" value={text} onChange={(e) => setText(e.target.value)} placeholder="پیامت را بنویس…" maxLength={2000} />
-        <button className="btn primary" disabled={busy}>ارسال</button>
+        <button className="btn primary" disabled={busy} aria-label="ارسال"><Send size={18} /></button>
       </form>
       <Disclaimer>دستیار فقط راهنمایی عمومی می‌دهد و جایگزین پزشک یا روان‌درمانگر نیست.</Disclaimer>
     </Card>

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { History, Mic, TrendingUp } from "lucide-react";
 import { Card, Empty, ErrorBox, Page, Spinner } from "../components/ui";
 import { api } from "../lib/api";
 import { dateTime, num, toLatinDigits } from "../lib/format";
@@ -49,7 +51,7 @@ export default function Vitals() {
 
   const ins = insights.data?.find((i) => i.kind === kind);
   return (
-    <Page title="علائم حیاتی" back>
+    <Page title="علائم حیاتی" subtitle="فشار، قند، وزن، ضربان، اکسیژن" back action={<Link to="/voice" className="icon-btn" aria-label="ثبت صوتی"><Mic size={20} /></Link>}>
       <div className="row gap wrap">
         {(Object.keys(KINDS) as Kind[]).map((k) => (
           <button key={k} className={`btn small ${kind === k ? "primary" : ""}`} onClick={() => { setKind(k); setLast(null); }}>
@@ -66,7 +68,7 @@ export default function Vitals() {
         <ErrorBox error={error} />
         {last && <div className={`alert ${last.level === "ok" ? "ok" : last.level}`} style={{ marginTop: 10 }}>{last.message}</div>}
       </Card>
-      <Card title="🤖 تحلیل روند">
+      <Card title="تحلیل روند" icon={TrendingUp} tone="violet">
         {ins ? (
           <>
             <p style={{ margin: 0 }}>{ins.message}</p>
@@ -75,7 +77,7 @@ export default function Vitals() {
         ) : <Empty>داده کافی نیست.</Empty>}
         <Chart rows={list.data ?? []} kind={kind} />
       </Card>
-      <Card title="سابقه">
+      <Card title="سابقه" icon={History} tone="slate">
         {list.loading && <Spinner />}
         {list.data?.length === 0 && <Empty>موردی ثبت نشده.</Empty>}
         <ul className="list">

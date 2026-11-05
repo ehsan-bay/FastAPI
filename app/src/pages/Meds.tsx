@@ -1,11 +1,21 @@
 import { useEffect, useState } from "react";
-import { Card, Empty, ErrorBox, Page, Spinner } from "../components/ui";
+import { AlarmClock, Pill, Plus, Trash2, X } from "lucide-react";
+import { Card, Empty, ErrorBox, IconChip, Page, Ring, Spinner, SpeakButton } from "../components/ui";
 import { api } from "../lib/api";
 import { num } from "../lib/format";
 import { requestPermission, scheduleReminders, type Med } from "../lib/reminders";
 import { useApi } from "../lib/useApi";
 
 type MedRow = Med & { notes: string; today: { status: string; at: string }[] };
+
+function medsSpeech(list: MedRow[]): string {
+  const parts = ["داروهای امروز شما:"];
+  for (const m of list) {
+    const taken = m.today.filter((t) => t.status === "taken").length;
+    parts.push(`${m.name}${m.dose ? "، " + m.dose : ""}، ساعت ${m.times.join(" و ")}. امروز ${taken} نوبت از ${m.times.length} نوبت مصرف شده.`);
+  }
+  return parts.join(" ");
+}
 
 export default function Meds() {
   const meds = useApi<MedRow[]>("/api/meds");
@@ -29,7 +39,7 @@ export default function Meds() {
       setDose("");
       setTimes(["08:00"]);
       meds.reload();
-      if (await requestPermission()) setNotif("یادآورها فعال شد ✅");
+      if (await requestPermission()) setNotif("یادآورها فعال شد");
       else setNotif("اجازه اعلان داده نشد؛ یادآورها نمایش داده نمی‌شوند.");
     } catch (err) {
       setError((err as Error).message);
@@ -49,37 +59,43 @@ export default function Meds() {
   };
 
   return (
-    <Page title="داروها و یادآور" back>
+    <Page title="داروها" subtitle="یادآور مصرف و خواندن با صدا" back>
       {adherence.data?.percent !== null && adherence.data && (
         <Card>
-          <div className="row between">
-            <span>مصرف به‌موقع در ۷ روز اخیر</span>
-            <span className="big">{num(adherence.data.percent)}٪</span>
+          <div className="row gap">
+            <Ring value={adherence.data.percent ?? 0} max={100} size={84} stroke={9}>
+              <b>{num(adherence.data.percent)}٪</b>
+            </Ring>
+            <div className="grow">
+              <b>مصرف به‌موقع</b>
+              <div className="small muted">{num(adherence.data.taken)} از {num(adherence.data.expected)} نوبت در ۷ روز اخیر</div>
+            </div>
           </div>
         </Card>
       )}
-      <Card title="داروهای من">
+      <Card title="داروهای من" icon={Pill} tone="rose" action={meds.data?.length ? <SpeakButton compact text={() => medsSpeech(meds.data!)} /> : undefined}>
         {meds.loading && <Spinner />}
-        {meds.data?.length === 0 && <Empty>هنوز دارویی اضافه نکرده‌ای.</Empty>}
+        {meds.data?.length === 0 && <Empty icon={Pill}>هنوز دارویی اضافه نکرده‌اید.</Empty>}
         <ul className="list">
           {meds.data?.map((m) => {
             const takenToday = m.today.filter((t) => t.status === "taken").length;
             return (
               <li key={m.id} style={{ flexWrap: "wrap" }}>
+                <IconChip icon={Pill} tone="rose" size="sm" />
                 <span className="grow">
-                  💊 <b>{m.name}</b> {m.dose && <span className="muted">— {m.dose}</span>}
-                  <div className="muted small ltr" style={{ textAlign: "right" }}>⏰ {m.times.join(" · ")}</div>
+                  <b>{m.name}</b> {m.dose && <span className="muted">— {m.dose}</span>}
+                  <div className="muted small row gap-s"><AlarmClock size={14} /><span className="ltr">{m.times.join(" · ")}</span></div>
                   <div className="small">امروز: {num(takenToday)} از {num(m.times.length)}</div>
                 </span>
                 <button className="btn small primary" onClick={() => log(m.id, "taken")}>مصرف کردم</button>
                 <button className="btn small" onClick={() => log(m.id, "skipped")}>جا ماند</button>
-                <button className="btn ghost small" aria-label="حذف" onClick={() => remove(m.id)}>🗑️</button>
+                <button className="btn ghost small" aria-label="حذف" onClick={() => remove(m.id)}><Trash2 size={16} /></button>
               </li>
             );
           })}
         </ul>
       </Card>
-      <Card title="➕ افزودن دارو">
+      <Card title="افزودن دارو" icon={Plus} tone="teal">
         <form className="col" onSubmit={add}>
           <input required placeholder="نام دارو" value={name} onChange={(e) => setName(e.target.value)} />
           <input placeholder="دوز (مثلاً ۵۰۰ میلی‌گرم)" value={dose} onChange={(e) => setDose(e.target.value)} />
@@ -87,7 +103,7 @@ export default function Meds() {
             {times.map((t, i) => (
               <div className="row gap" key={i}>
                 <input type="time" dir="ltr" required value={t} onChange={(e) => setTimes(times.map((x, j) => (j === i ? e.target.value : x)))} />
-                {times.length > 1 && <button type="button" className="btn small" onClick={() => setTimes(times.filter((_, j) => j !== i))}>✕</button>}
+                {times.length > 1 && <button type="button" className="btn small" onClick={() => setTimes(times.filter((_, j) => j !== i))} aria-label="حذف زمان"><X size={16} /></button>}
               </div>
             ))}
             <button type="button" className="btn small" onClick={() => setTimes([...times, "20:00"])}>+ زمان دیگر</button>

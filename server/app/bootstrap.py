@@ -7,7 +7,7 @@ from sqlmodel import Session, select
 from .auth import hash_password, verify_password
 from .config import settings
 from .db import Doctor, User, engine
-from .wallet import credit, get_int, new_token
+from .wallet import credit, get_int, get_setting, new_token, set_setting
 
 log = logging.getLogger("salamat.bootstrap")
 
@@ -81,8 +81,20 @@ def backfill_wallets(session: Session) -> None:
         log.info("initial wallet credit for %d existing users", len(ids))
 
 
+def switch_off_ipg_once(session: Session) -> None:
+    """The gateway was on by default in earlier versions; turn it off once on existing installs.
+    After this the admin panel decides (turning it back on there is kept)."""
+    if get_setting(session, "ipg_off_applied"):
+        return
+    set_setting(session, "ipg_enabled", "0")
+    set_setting(session, "ipg_off_applied", "1")
+    session.commit()
+    log.info("bank gateway (IPG) switched off; enable it in the admin panel when ready")
+
+
 def bootstrap() -> None:
     with Session(engine) as session:
+        switch_off_ipg_once(session)
         seed_doctors(session)
         ensure_admin(session)
         backfill_wallets(session)

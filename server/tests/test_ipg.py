@@ -216,3 +216,25 @@ def test_without_verify_settings(client, admin):
     callback(client, {"State": "OK", "ResNum": f["ref"], "RefNum": "R6", "MID": "41642444"})
     assert client.get(f"/api/payments/{f['payment_id']}", headers=h).json()["status"] == "pending"
     client.put("/api/admin/settings", headers=admin, json={"ipg_enabled": False, "ipg_allow_unverified": True})
+
+
+def test_gateway_switched_off_once_on_existing_installs(client, admin):
+    from sqlmodel import Session
+
+    from app.bootstrap import switch_off_ipg_once
+    from app.db import AppSetting, engine
+    from app.wallet import get_setting, set_setting
+
+    with Session(engine) as s:
+        set_setting(s, "ipg_enabled", "1")  # an older install that had it on
+        if row := s.get(AppSetting, "ipg_off_applied"):
+            s.delete(row)
+        s.commit()
+        switch_off_ipg_once(s)
+        assert get_setting(s, "ipg_enabled") == "0"
+        set_setting(s, "ipg_enabled", "1")  # the admin turns it back on later
+        s.commit()
+        switch_off_ipg_once(s)
+        assert get_setting(s, "ipg_enabled") == "1"
+        set_setting(s, "ipg_enabled", "0")  # leave it as the other tests expect
+        s.commit()

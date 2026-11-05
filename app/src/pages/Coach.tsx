@@ -89,7 +89,7 @@ export default function Coach() {
   };
 
   return (
-    <Page title="مربی ورزش هوشمند">
+    <Page title="مربی ورزش" subtitle="شمارش حرکات با دوربین، روی گوشی" back>
       {!running && (
         <Card title="تمرین را انتخاب کن">
           <div className="row gap wrap">

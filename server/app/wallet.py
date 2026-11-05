@@ -14,7 +14,9 @@ DEFAULTS = {
     "initial_wallet": "5000000",   # credit every new user gets (toman)
     "max_payment": "100000000",    # safety limit per payment (toman)
     # --- bank gateway (IPG). Every value can be changed later in the admin panel (or via env at first start).
-    "ipg_enabled": os.environ.get("IPG_ENABLED", "1"),
+    # Off until the owner confirms the gateway is ready (2026-11-05); switch on in the admin panel.
+    "ipg_enabled": os.environ.get("IPG_ENABLED", "0"),
+    "ipg_off_applied": "",  # internal marker: the one-time switch-off below has run
     "ipg_payment_url": os.environ.get("IPG_PAYMENT_URL", "http://192.168.141.45:1212/_ipgw_//payment/simple/"),
     "ipg_mid": os.environ.get("IPG_MID", "41642444"),
     # Base URL of the gateway's REST services (merchantLogin, verifyMerchantTrans, reverseTransaction).

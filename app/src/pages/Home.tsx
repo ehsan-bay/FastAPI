@@ -1,5 +1,9 @@
-import { Bar, Card, Page, Spinner, Tile } from "../components/ui";
 import { Link } from "react-router-dom";
+import {
+  Activity, AlertTriangle, Brain, Camera, ChevronLeft, Dumbbell, FlaskConical, HeartPulse, Mic, Moon, Pill, QrCode,
+  ScanFace, Settings as Gear, Shield, Utensils, Wallet, Bone,
+} from "lucide-react";
+import { Card, IconChip, Page, Ring, SectionTitle, Skeleton, SpeakButton, Tile } from "../components/ui";
 import { useAuth } from "../lib/auth";
 import { num, toman } from "../lib/format";
 import { useApi } from "../lib/useApi";
@@ -13,58 +17,137 @@ type Dash = {
   meds: { percent: number | null };
 };
 
-const MOOD_EMOJI = ["", "😢", "🙁", "😐", "🙂", "😄"];
+const MOOD_FA = ["", "خیلی بد", "بد", "معمولی", "خوب", "عالی"];
+const today = new Intl.DateTimeFormat("fa-IR", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
+
+function summary(d: Dash, name?: string): string {
+  const parts = [`سلام${name ? " " + name : ""}. خلاصه امروز شما:`];
+  parts.push(`امروز ${Math.round(d.nutrition.kcal)} کیلوکالری از هدف ${d.nutrition.goal} خورده‌اید.`);
+  const bp = d.vitals.bp;
+  if (bp) parts.push(`آخرین فشار خون ${bp.value} روی ${bp.value2} بوده است. ${bp.message}`);
+  const g = d.vitals.glucose;
+  if (g) parts.push(`آخرین قند خون ${g.value} بوده است.`);
+  if (d.sleep) parts.push(`دیشب ${d.sleep.hours} ساعت خوابیده‌اید.`);
+  if (d.meds.percent !== null) parts.push(`در این هفته ${d.meds.percent} درصد داروها را به‌موقع مصرف کرده‌اید.`);
+  return parts.join(" ");
+}
 
 export default function Home() {
   const { user } = useAuth();
   const { data, loading, error } = useApi<Dash>("/api/dashboard", { tz_offset: new Date().getTimezoneOffset() });
   const hour = new Date().getHours();
-  const hello = hour < 12 ? "صبح بخیر" : hour < 18 ? "روز بخیر" : "شب بخیر";
+  const hello = hour < 5 ? "شب بخیر" : hour < 12 ? "صبح بخیر" : hour < 18 ? "روز بخیر" : "عصر بخیر";
+  const initial = (user?.name || user?.email || "?").trim().charAt(0);
+  const danger = data && Object.values(data.vitals).find((v) => v.level === "danger");
+  const n = data?.nutrition;
 
   return (
-    <Page title={`${hello}${user?.name ? "، " + user.name : ""} 👋`}>
-      {loading && <Spinner />}
-      {error && <div className="alert danger">{error}</div>}
-      <Link to="/scan" className="card pay-banner">
-        <span style={{ fontSize: "2rem" }}>📷</span>
-        <span className="grow">
-          <b>پرداخت ویزیت پزشک</b>
-          <div className="small">QR مطب را اسکن کنید · موجودی کیف پول: {toman(user?.wallet_balance)}</div>
+    <Page
+      title={
+        <span className="hello">
+          <span className="avatar" aria-hidden>{initial}</span>
+          <span>
+            <span className="tiny muted" style={{ display: "block", fontWeight: 600 }}>{today}</span>
+            {hello}{user?.name ? `، ${user.name}` : ""}
+          </span>
         </span>
-        <span>←</span>
-      </Link>
-      {user?.is_admin && <Link to="/admin" className="btn">🛠️ پنل مدیریت</Link>}
-      {data && (
-        <>
-          <Card title="کالری امروز">
-            <div className="row between">
-              <span className="big">{num(data.nutrition.kcal)}</span>
-              <span className="muted">از {num(data.nutrition.goal)} کیلوکالری</span>
-            </div>
-            <Bar value={data.nutrition.kcal} max={data.nutrition.goal} tone={data.nutrition.kcal > data.nutrition.goal ? "warn" : undefined} />
-            <div className="grid3 small muted" style={{ marginTop: 8 }}>
-              <span>پروتئین {num(data.nutrition.protein)}g</span>
-              <span>کربوهیدرات {num(data.nutrition.carbs)}g</span>
-              <span>چربی {num(data.nutrition.fat)}g</span>
-            </div>
-          </Card>
+      }
+      action={<Link to="/settings" className="icon-btn" aria-label="تنظیمات"><Gear size={20} /></Link>}
+    >
+      {error && <div className="alert danger">{error}</div>}
 
-          {Object.values(data.vitals).some((v) => v.level === "danger") && (
-            <div className="alert danger">⚠️ {Object.values(data.vitals).find((v) => v.level === "danger")!.message}</div>
-          )}
-
-          <div className="grid2">
-            <Tile to="/food" icon="🍽️" title="عکس غذا" sub="تشخیص کالری با AI" />
-            <Tile to="/coach" icon="🏋️" title="مربی ورزش" sub={`${num(data.workouts.reps)} تکرار در هفته`} />
-            <Tile to="/sleep" icon="😴" title="خواب" sub={data.sleep ? `امتیاز ${num(data.sleep.score)} · ${num(data.sleep.hours)} ساعت` : "ثبت نشده"} />
-            <Tile to="/mind" icon="🧠" title="حال من" sub={data.mood.avg ? `${MOOD_EMOJI[Math.round(data.mood.avg)]} میانگین هفته` : "یادداشت امروز"} />
-            <Tile to="/skin" icon="🩺" title="بررسی پوست" sub="غربالگری خال و ضایعه" />
-            <Tile to="/lab" icon="🧪" title="برگه آزمایش" sub="توضیح نتایج به فارسی" />
-            <Tile to="/vitals" icon="❤️" title="فشار و قند" sub={data.vitals.bp ? `${num(data.vitals.bp.value)}/${num(data.vitals.bp.value2)}` : "ثبت علائم"} />
-            <Tile to="/meds" icon="💊" title="داروها" sub={data.meds.percent !== null ? `${num(data.meds.percent)}٪ مصرف به‌موقع` : "یادآور دارو"} />
-          </div>
-        </>
+      {danger && (
+        <div className="alert danger" role="alert">
+          <AlertTriangle size={20} style={{ flex: "none", marginTop: 3 }} />
+          <span>{danger.message}</span>
+        </div>
       )}
+
+      <Card className="hero">
+        <div className="row gap" style={{ alignItems: "center" }}>
+          <Ring value={n?.kcal ?? 0} max={n?.goal ?? 2000} size={118} stroke={11} tone="#ffffff" track="rgb(255 255 255 / 22%)">
+            <div>
+              <div style={{ fontSize: "1.45rem", fontWeight: 800 }}>{n ? num(Math.round(n.kcal)) : "—"}</div>
+              <div className="tiny" style={{ opacity: 0.85 }}>کیلوکالری</div>
+            </div>
+          </Ring>
+          <div className="grow col" style={{ gap: 8 }}>
+            <div>
+              <div style={{ fontWeight: 800 }}>انرژی امروز</div>
+              <div className="small">{n ? `${num(Math.max(0, Math.round(n.goal - n.kcal)))} کیلوکالری تا هدف` : "…"}</div>
+            </div>
+            {[["پروتئین", n?.protein ?? 0, 90], ["کربوهیدرات", n?.carbs ?? 0, 260], ["چربی", n?.fat ?? 0, 70]].map(([l, v, m]) => (
+              <div key={l as string} className="macro">
+                <div className="row between tiny"><span>{l}</span><span>{num(Math.round(v as number))} گرم</span></div>
+                <div className="bar" style={{ background: "rgb(255 255 255 / 22%)" }}>
+                  <div className="bar-fill" style={{ width: `${Math.min(100, ((v as number) / (m as number)) * 100)}%`, background: "#fff" }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        {data && (
+          <div style={{ marginTop: 12 }}>
+            <SpeakButton text={() => summary(data, user?.name)} label="خلاصه امروز را برایم بخوان" />
+          </div>
+        )}
+      </Card>
+
+      <div className="quick">
+        <Link to="/voice"><IconChip icon={Mic} tone="teal" />ثبت صوتی</Link>
+        <Link to="/food"><IconChip icon={Camera} tone="orange" />عکس غذا</Link>
+        <Link to="/vitals"><IconChip icon={HeartPulse} tone="red" />فشار و قند</Link>
+        <Link to="/scan"><IconChip icon={QrCode} tone="indigo" />پرداخت</Link>
+      </div>
+
+      <SectionTitle>وضعیت من</SectionTitle>
+      {loading && !data ? (
+        <div className="stat-row">{[0, 1, 2, 3].map((i) => <Skeleton key={i} h={72} r={16} />)}</div>
+      ) : data && (
+        <div className="stat-row">
+          <Link to="/vitals" className="stat">
+            <span className="stat-label"><HeartPulse size={14} color="var(--red)" />فشار خون</span>
+            <span className="stat-value">{data.vitals.bp ? <>{num(data.vitals.bp.value)}/{num(data.vitals.bp.value2)}<small>mmHg</small></> : <Empty2 />}</span>
+          </Link>
+          <Link to="/sleep" className="stat">
+            <span className="stat-label"><Moon size={14} color="var(--indigo)" />خواب</span>
+            <span className="stat-value">{data.sleep ? <>{num(data.sleep.hours)}<small>ساعت</small></> : <Empty2 />}</span>
+          </Link>
+          <Link to="/mind" className="stat">
+            <span className="stat-label"><Brain size={14} color="var(--violet)" />حال هفته</span>
+            <span className="stat-value">{data.mood.avg ? MOOD_FA[Math.round(data.mood.avg)] : <Empty2 />}</span>
+          </Link>
+          <Link to="/meds" className="stat">
+            <span className="stat-label"><Pill size={14} color="var(--rose)" />مصرف دارو</span>
+            <span className="stat-value">{data.meds.percent !== null ? <>{num(data.meds.percent)}<small>٪</small></> : <Empty2 />}</span>
+          </Link>
+        </div>
+      )}
+
+      <SectionTitle>ابزارهای هوشمند</SectionTitle>
+      <div className="grid2 tiles">
+        <Tile to="/food" icon={Utensils} tone="orange" title="تشخیص غذا" sub="غذای ایرانی از روی عکس" />
+        <Tile to="/coach" icon={Dumbbell} tone="blue" title="مربی ورزش" sub={data ? `${num(data.workouts.reps)} تکرار این هفته` : "شمارش حرکات"} />
+        <Tile to="/xray" icon={Bone} tone="slate" title="عکس قفسه سینه" sub="غربالگری رادیولوژی" />
+        <Tile to="/skin" icon={ScanFace} tone="amber" title="بررسی پوست" sub="غربالگری خال" />
+        <Tile to="/lab" icon={FlaskConical} tone="violet" title="برگه آزمایش" sub="توضیح نتایج به فارسی" />
+        <Tile to="/sleep" icon={Moon} tone="indigo" title="پایش خواب" sub="خروپف و سرفه" />
+      </div>
+
+      <Link to="/wallet" className="card pay-banner">
+        <IconChip icon={Wallet} tone="indigo" />
+        <span className="grow">
+          <b>کیف پول</b>
+          <div className="small">موجودی: {toman(user?.wallet_balance)}</div>
+        </span>
+        <ChevronLeft size={20} />
+      </Link>
+      {user?.is_admin && (
+        <Link to="/admin" className="btn"><Shield size={18} /> پنل مدیریت</Link>
+      )}
+      <p className="disclaimer center" style={{ justifyContent: "center" }}><Activity size={14} /> سلامت‌یار جایگزین پزشک نیست؛ در شرایط اورژانسی با ۱۱۵ تماس بگیرید.</p>
     </Page>
   );
 }
+
+const Empty2 = () => <span className="small muted" style={{ fontWeight: 600 }}>ثبت کنید</span>;

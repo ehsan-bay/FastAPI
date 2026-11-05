@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Card, Disclaimer, Empty, ErrorBox, ImagePicker, Page, Spinner, Tabs } from "../components/ui";
+import { FlaskConical, History } from "lucide-react";
+import { Card, Disclaimer, Empty, ErrorBox, ImagePicker, Page, Spinner, SpeakButton, Tabs } from "../components/ui";
 import { api, shrinkImage, upload } from "../lib/api";
 import { dateTime, num } from "../lib/format";
 import { useApi } from "../lib/useApi";
@@ -39,9 +40,9 @@ export default function Lab() {
   });
 
   return (
-    <Page title="تفسیر برگه آزمایش" back>
-      <Tabs value={mode} onChange={setMode} items={[["photo", "📷 عکس برگه"], ["text", "⌨️ تایپ نتایج"]]} />
-      <Card>
+    <Page title="برگه آزمایش" subtitle="خواندن و توضیح نتایج به فارسی" back>
+      <Tabs value={mode} onChange={setMode} items={[["photo", "عکس برگه"], ["text", "تایپ نتایج"]]} />
+      <Card icon={FlaskConical} tone="violet" title={mode === "photo" ? "عکس برگه را بگیرید" : "نتایج را تایپ کنید"}>
         {mode === "photo" ? (
           <>
             <p className="muted small">برگه را صاف و در نور کافی بگیر. نام آزمایش‌ها (مثل FBS، CBC، Cholesterol) باید خوانا باشد.</p>
@@ -58,7 +59,7 @@ export default function Lab() {
       </Card>
 
       {result && (
-        <Card title="نتیجه">
+        <Card title="نتیجه" action={<SpeakButton compact text={() => labSpeech(result)} />}>
           <div className={`alert ${result.results.some((r) => r.status !== "normal") ? "warn" : "ok"}`}>{result.summary}</div>
           {result.results.length > 0 && <ResultTable rows={result.results} />}
           <button className="btn ghost small" onClick={() => setShowRaw(!showRaw)}>{showRaw ? "پنهان کردن متن خوانده‌شده" : "نمایش متن خوانده‌شده"}</button>
@@ -67,7 +68,7 @@ export default function Lab() {
         </Card>
       )}
 
-      <Card title="آزمایش‌های قبلی">
+      <Card title="آزمایش‌های قبلی" icon={History} tone="slate">
         {history.data?.length === 0 && <Empty>موردی ثبت نشده.</Empty>}
         <ul className="list">
           {history.data?.map((h) => (
@@ -80,6 +81,13 @@ export default function Lab() {
       </Card>
     </Page>
   );
+}
+
+function labSpeech(r: Result): string {
+  const parts = [r.summary];
+  for (const x of r.results) parts.push(`${x.name}: ${x.value} ${x.unit}، ${STATUS_FA[x.status]}.${x.status !== "normal" && x.note ? " " + x.note : ""}`);
+  parts.push(r.disclaimer);
+  return parts.join(" ");
 }
 
 function ResultTable({ rows }: { rows: Row[] }) {

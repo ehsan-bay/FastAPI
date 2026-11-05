@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Card, Page, Spinner } from "../components/ui";
+import { CheckCircle2, Clock, XCircle } from "lucide-react";
+import { Card, IconChip, Page, Spinner, SpeakButton } from "../components/ui";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { dateTime, toman } from "../lib/format";
@@ -36,7 +37,8 @@ export default function PayResult() {
     return () => window.clearTimeout(timer);
   }, [id, refresh]);
 
-  const icon = p?.status === "paid" ? "✅" : p?.status === "failed" ? "❌" : "⏳";
+  const Icon = p?.status === "paid" ? CheckCircle2 : p?.status === "failed" ? XCircle : Clock;
+  const tone = p?.status === "paid" ? "green" : p?.status === "failed" ? "red" : "amber";
   const title = p?.status === "paid" ? "پرداخت موفق" : p?.status === "failed" ? "پرداخت ناموفق" : "در انتظار تأیید بانک";
 
   return (
@@ -45,9 +47,10 @@ export default function PayResult() {
       {error && <div className="alert danger">{error}</div>}
       {p && (
         <Card className="center">
-          <div style={{ fontSize: "3rem" }}>{icon}</div>
+          <div style={{ display: "grid", placeItems: "center", marginBottom: 6 }}><IconChip icon={Icon} tone={tone} size="lg" /></div>
           <h2>{title}</h2>
           <div className="big" style={{ margin: "8px 0" }}>{toman(p.amount)}</div>
+          <SpeakButton compact text={`${title}. مبلغ ${p.amount} تومان به ${p.doctor}.`} />
           {p.message && <p className={`small ${p.status === "paid" ? "muted" : ""}`} style={{ margin: "0 0 8px" }}>{p.message}</p>}
           <table style={{ marginTop: 6 }}>
             <tbody>

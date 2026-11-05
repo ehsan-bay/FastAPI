@@ -173,20 +173,28 @@ def _aliases(f: dict) -> list[str]:
 _FOOD_ALIASES = [(f, _aliases(f)) for f in FOODS]
 
 
+# Letters that sound the same in Persian; speech recognition often picks the wrong one.
+_SOUND = str.maketrans({"غ": "ق", "ص": "س", "ث": "س", "ض": "ز", "ظ": "ز", "ذ": "ز", "ح": "ه", "ط": "ت", "آ": "ا"})
+
+
+def _sound(s: str) -> str:
+    return s.translate(_SOUND)
+
+
 def _match_foods(text: str) -> list[dict]:
-    t = " " + text.replace("\u200c", " ") + " "
+    t = " " + _sound(text.replace("\u200c", " ")) + " "
     words = t.split()
     found: dict[str, tuple[float, dict]] = {}
     for f, aliases in _FOOD_ALIASES:
         best = 0.0
-        for a in aliases:
+        for a in map(_sound, aliases):
             if f" {a} " in t:  # whole words only ("است" must not match "ماست")
                 best = max(best, 0.9 + 0.01 * len(a.split()))
             elif len(a) >= 5:  # tolerate small recognition errors in longer names
                 n = len(a.split())
                 for k in range(len(words) - n + 1):
                     r = SequenceMatcher(None, " ".join(words[k:k + n]), a).ratio()
-                    if r >= 0.8:
+                    if r >= (0.75 if n >= 2 else 0.8):  # multi-word names carry more context
                         best = max(best, r * 0.95)
         if best and (f["key"] not in found or found[f["key"]][0] < best):
             found[f["key"]] = (best, f)
@@ -203,7 +211,7 @@ def understand(text: str) -> list[dict]:
     t = words_to_numbers(normalize(text))
     items: list[dict] = []
 
-    m = re.search(r"فشار\D{0,20}?" + _NUM + r"\s*(?:روی|رو|بر|به|/|و)\s*" + _NUM, t)
+    m = re.search(r"فشار\D{0,20}?" + _NUM + r"\s*(?:روی|رو(?: 1)?|بر|به|/|و)\s*" + _NUM, t)
     if m:
         s, d = float(m.group(1)), float(m.group(2))
         if s < 30:  # "۱۳ روی ۸" means 130/80

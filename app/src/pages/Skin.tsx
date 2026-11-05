@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ScanFace } from "lucide-react";
 import { Bar, Card, Disclaimer, Empty, ErrorBox, ImagePicker, Page, Spinner } from "../components/ui";
 import { shrinkImage, upload } from "../lib/api";
 import { dateTime, num } from "../lib/format";
@@ -34,9 +35,9 @@ export default function Skin() {
   };
 
   return (
-    <Page title="بررسی پوست و خال" back>
+    <Page title="بررسی پوست" subtitle="غربالگری خال و ضایعه پوستی" back>
       <div className="alert warn small">این ابزار فقط برای غربالگری است و تشخیص قطعی نمی‌دهد. هر خال در حال تغییر را به پزشک نشان بده.</div>
-      <Card title="📸 عکس از نزدیک بگیر">
+      <Card title="عکس از نزدیک بگیر" icon={ScanFace} tone="amber">
         <p className="muted small">نور طبیعی، فاصله ۱۰ سانتی‌متر، ضایعه وسط کادر و واضح باشد. عکس ذخیره نمی‌شود.</p>
         <label className="field" style={{ marginBottom: 10 }}>
           محل ضایعه
