@@ -12,7 +12,6 @@ const MODEL_FA: Record<string, string> = {
   food: "تشخیص غذا", asr: "تشخیص گفتار فارسی", tts: "خواندن متن با صدا", xray: "غربالگری عکس قفسه سینه",
   skin: "بررسی پوست", lab_ocr: "خواندن برگه آزمایش", llm: "مدل زبانی گفتگو", mood: "تحلیل احساسات",
 };
-const ENGINE_FA: Record<string, string> = { clip: "CLIP (غذای ایرانی)", efficientnet: "EfficientNet" };
 
 export default function Settings({ firstRun }: { firstRun?: boolean }) {
   const { user, logout, setUser } = useAuth();
@@ -79,7 +78,6 @@ export default function Settings({ firstRun }: { firstRun?: boolean }) {
           {models.data && Object.entries(models.data.server).filter(([, v]) => typeof v === "boolean").map(([k, ok]) => (
             <li key={k}>
               <span className="grow">{MODEL_FA[k] ?? k} <span className="muted tiny">(سرور)</span>
-                {k === "food" && typeof models.data!.server.food_engine === "string" && <div className="tiny muted">موتور: {ENGINE_FA[models.data!.server.food_engine as string] ?? String(models.data!.server.food_engine)}</div>}
               </span>
               <span className={`badge ${ok ? "ok" : "medium"}`}>{ok ? "فعال" : k === "llm" ? "حالت ساده" : "غیرفعال"}</span>
             </li>

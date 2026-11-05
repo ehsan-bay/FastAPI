@@ -73,7 +73,7 @@ export default function FoodPage() {
 
   return (
     <Page title="تغذیه" subtitle="عکس بگیرید، کالری را بدانید" action={<Link to="/voice" className="icon-btn" aria-label="ثبت صوتی"><Mic size={20} /></Link>}>
-      <Card title="تشخیص غذا از روی عکس" icon={Camera} tone="orange" action={result?.engine === "clip" ? <span className="badge info"><Sparkles size={12} /> CLIP</span> : undefined}>
+      <Card title="تشخیص غذا از روی عکس" icon={Camera} tone="orange">
         <p className="muted small" style={{ marginBottom: 10 }}>غذاهای ایرانی مثل قورمه‌سبزی، کباب، تهچین و آش هم شناخته می‌شوند.</p>
         <ImagePicker onPick={analyze} disabled={busy} label="عکس غذا" />
         {preview && <img src={preview} alt="عکس غذا" className="preview" style={{ marginTop: 12 }} />}
