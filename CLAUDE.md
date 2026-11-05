@@ -112,6 +112,10 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     Catalog: on request, **no model/library names** anywhere (text, architecture page, screenshots; app no longer shows the food engine)
     and the PDF is locked against copying (pypdf, view + print only). Keep it that way when editing the catalog.
     Container RAM with all models loaded: ~1.3 GB.
+31. "App version didn't update" → added self-refresh: each web build gets an id (`__APP_BUILD__`, also written to `dist/version.json`);
+    `lib/version.ts` compares it with the live `/version.json` on start, on foreground and every 15 min, and if different unregisters the
+    service worker, clears caches and reloads once. Settings shows running vs server version + a "refresh" button. Server sends
+    `sw.js`/`version.json`/manifest with no-cache. Browser test: rebuild while open → app switched to the new build. `update-bundle` = eaaaf21.
 
 ### 2026-11-02 — Session 1
 1. Brainstormed health-app ideas with small AI models; the user asked to build **all of them in one app**.
