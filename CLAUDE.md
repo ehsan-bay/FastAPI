@@ -108,6 +108,10 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     E2E with a fake microphone (`--use-file-for-fake-audio-capture`) passed. The native app needs **no new APK** (mic permission exists, app loads the live site).
     IPG switched off on request. Catalog v2 (21 pages, new pages for voice/elder and X-ray, all screenshots retaken; `docs/catalog/shots_new.cjs`).
     Requirements and models changed → the server needs the **full offline bundle** (light update refuses because DEPS changed).
+    Published: `offline-bundle` = 84705a3 (832 MB, 10 parts, checksum verified from a fresh clone), then `update-bundle` = 1f293a6 on top of it.
+    Catalog: on request, **no model/library names** anywhere (text, architecture page, screenshots; app no longer shows the food engine)
+    and the PDF is locked against copying (pypdf, view + print only). Keep it that way when editing the catalog.
+    Container RAM with all models loaded: ~1.3 GB.
 
 ### 2026-11-02 — Session 1
 1. Brainstormed health-app ideas with small AI models; the user asked to build **all of them in one app**.
