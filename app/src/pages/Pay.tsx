@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Card, ErrorBox, Page, Spinner } from "../components/ui";
+import { CheckCircle2, CreditCard, Stethoscope, Wallet as WalletIcon } from "lucide-react";
+import { Card, ErrorBox, IconChip, Page, Spinner } from "../components/ui";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { dateTime, groupDigits, parseAmount, toman } from "../lib/format";
@@ -85,7 +86,7 @@ export default function Pay() {
     return (
       <Page title="رسید پرداخت">
         <Card className="center">
-          <div style={{ fontSize: "3rem" }}>✅</div>
+          <div style={{ display: "grid", placeItems: "center", marginBottom: 6 }}><IconChip icon={CheckCircle2} tone="green" size="lg" /></div>
           <h2>پرداخت موفق</h2>
           <div className="big" style={{ margin: "8px 0" }}>{toman(receipt.amount)}</div>
           <table style={{ marginTop: 10 }}>
@@ -114,7 +115,7 @@ export default function Pay() {
       {info.data && (
         <>
           <Card className="center">
-            <div className="doc-avatar">🩺</div>
+            <div className="doc-avatar"><Stethoscope size={36} /></div>
             <h2 style={{ fontSize: "1.3rem" }}>{info.data.name}</h2>
             <p className="muted" style={{ margin: 0 }}>{info.data.specialty}</p>
           </Card>
@@ -139,14 +140,14 @@ export default function Pay() {
             <label className={`pay-method ${method === "wallet" ? "active" : ""}`}>
               <input type="radio" name="m" checked={method === "wallet"} onChange={() => setMethod("wallet")} />
               <span className="grow">
-                <b>👛 کیف پول</b>
+                <b className="row gap-s"><WalletIcon size={18} /> کیف پول</b>
                 <div className="small muted">موجودی: {toman(balance)}</div>
               </span>
             </label>
             <label className={`pay-method ${info.data.ipg_enabled ? "" : "disabled"}`}>
               <input type="radio" name="m" disabled={!info.data.ipg_enabled} checked={method === "ipg"} onChange={() => setMethod("ipg")} />
               <span className="grow">
-                <b>💳 درگاه بانکی</b>
+                <b className="row gap-s"><CreditCard size={18} /> درگاه بانکی</b>
                 <div className="small muted">پرداخت با کارت بانکی</div>
               </span>
               {!info.data.ipg_enabled && <span className="badge medium">به‌زودی</span>}

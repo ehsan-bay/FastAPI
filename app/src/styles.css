@@ -30,7 +30,8 @@
   --shadow: 0 1px 2px rgb(16 40 32 / 5%), 0 6px 20px -6px rgb(16 40 32 / 10%);
   --shadow-lg: 0 10px 40px -10px rgb(16 40 32 / 25%);
   --nav-h: 68px;
-  --fs: 15px;
+  --root: 16px; /* rem base; the elder mode scales everything through it */
+  --fs: 0.9375rem;
   --tap: 46px;
   --ease: cubic-bezier(.2, .8, .2, 1);
   /* feature hues: [fg, bg] */
@@ -85,12 +86,13 @@
   }
 }
 /* Large text and targets for older users (Settings → "حالت سالمند") */
-:root.elder { --fs: 18.5px; --tap: 56px; --nav-h: 80px; }
+:root.elder { --root: 19.5px; --tap: 58px; --nav-h: 80px; }
 :root.elder .tile-sub, :root.elder .small { font-size: 0.92rem; }
 :root.elder .bottom-nav a { font-size: 0.85rem; }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--text); }
+html { font-size: var(--root); }
 body {
   background-image: var(--bg-grad); background-attachment: fixed; background-repeat: no-repeat;
   font-family: "Vazirmatn", system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;

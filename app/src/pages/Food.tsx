@@ -85,7 +85,7 @@ export default function FoodPage() {
             <div className="row gap wrap">
               {result.candidates.map((c) => (
                 <button key={c.key} className={`btn small ${selected?.key === c.key ? "primary" : ""}`} onClick={() => setSelected(c)}>
-                  {c.fa} {c.score !== undefined && <span className="small">({num(Math.round(c.score * 100))}٪)</span>}
+                  {c.fa} {c.score !== undefined && c.score >= 0.01 && <span className="small">({num(Math.round(c.score * 100))}٪)</span>}
                 </button>
               ))}
             </div>

@@ -80,16 +80,20 @@ export default function Meds() {
           {meds.data?.map((m) => {
             const takenToday = m.today.filter((t) => t.status === "taken").length;
             return (
-              <li key={m.id} style={{ flexWrap: "wrap" }}>
-                <IconChip icon={Pill} tone="rose" size="sm" />
-                <span className="grow">
-                  <b>{m.name}</b> {m.dose && <span className="muted">— {m.dose}</span>}
-                  <div className="muted small row gap-s"><AlarmClock size={14} /><span className="ltr">{m.times.join(" · ")}</span></div>
-                  <div className="small">امروز: {num(takenToday)} از {num(m.times.length)}</div>
-                </span>
-                <button className="btn small primary" onClick={() => log(m.id, "taken")}>مصرف کردم</button>
-                <button className="btn small" onClick={() => log(m.id, "skipped")}>جا ماند</button>
-                <button className="btn ghost small" aria-label="حذف" onClick={() => remove(m.id)}><Trash2 size={16} /></button>
+              <li key={m.id} style={{ flexDirection: "column", alignItems: "stretch", gap: 10 }}>
+                <div className="row gap">
+                  <IconChip icon={Pill} tone="rose" />
+                  <span className="grow">
+                    <b>{m.name}</b>{m.dose && <span className="muted small"> · {m.dose}</span>}
+                    <div className="muted small row gap-s"><AlarmClock size={14} /><span className="ltr">{m.times.join(" · ")}</span></div>
+                  </span>
+                  <span className={`badge ${takenToday >= m.times.length ? "ok" : "neutral"}`}>امروز {num(takenToday)}/{num(m.times.length)}</span>
+                </div>
+                <div className="row gap">
+                  <button className="btn small primary grow" onClick={() => log(m.id, "taken")}>مصرف کردم</button>
+                  <button className="btn small grow" onClick={() => log(m.id, "skipped")}>جا ماند</button>
+                  <button className="btn ghost small" aria-label="حذف" onClick={() => remove(m.id)}><Trash2 size={16} /></button>
+                </div>
               </li>
             );
           })}
