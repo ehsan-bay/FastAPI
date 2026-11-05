@@ -1,12 +1,24 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
 const API = process.env.API_PROXY ?? "http://127.0.0.1:8000";
 
+// A new id for every build. The app compares it with /version.json to notice that the site was updated
+// (a phone can keep an old copy in its cache or service worker) and then reloads itself once.
+const BUILD = new Date().toISOString().replace(/[-:T]/g, "").slice(0, 12);
+const versionFile = (): Plugin => ({
+  name: "version-file",
+  generateBundle() {
+    this.emitFile({ type: "asset", fileName: "version.json", source: JSON.stringify({ build: BUILD }) });
+  },
+});
+
 export default defineConfig({
+  define: { __APP_BUILD__: JSON.stringify(BUILD) },
   plugins: [
     react(),
+    versionFile(),
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["icon.svg", "apple-touch-icon.png"],
@@ -30,7 +42,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
-        globIgnores: ["mediapipe/**"],
+        globIgnores: ["mediapipe/**", "version.json"],
         navigateFallbackDenylist: [/^\/api\//, /^\/models\//, /^\/docs/],
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
         runtimeCaching: [

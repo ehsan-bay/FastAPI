@@ -189,3 +189,14 @@ def test_add_missing_columns_upgrades_old_table(tmp_path):
     assert add_missing_columns(eng) == []  # second run is a no-op
     with eng.connect() as conn:
         assert conn.execute(text("SELECT score, recovered FROM sleepsession")).one() == (80, None)
+
+
+def test_version_file_is_never_cached(client):
+    from app.config import settings
+
+    if not (settings.static_dir / "version.json").exists():
+        import pytest
+        pytest.skip("web app not built")
+    r = client.get("/version.json")
+    assert r.status_code == 200 and "build" in r.json() and r.headers["cache-control"] == "no-cache"
+    assert client.get("/sw.js").headers.get("cache-control") == "no-cache"

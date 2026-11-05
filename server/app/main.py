@@ -67,6 +67,11 @@ if settings.static_dir.exists():
             raise HTTPException(404, "Not found")
         target = (_static_root / path).resolve()
         if path and target.is_file() and _static_root in target.parents:
-            headers = {"Cache-Control": "public, max-age=31536000, immutable"} if path.startswith("assets/") else {}
+            if path.startswith("assets/"):
+                headers = {"Cache-Control": "public, max-age=31536000, immutable"}  # file names change every build
+            elif path in ("sw.js", "version.json", "manifest.webmanifest", "registerSW.js"):
+                headers = {"Cache-Control": "no-cache"}  # must be re-checked so phones notice a new version
+            else:
+                headers = {}
             return FileResponse(target, headers=headers)
         return FileResponse(_static_root / "index.html", headers={"Cache-Control": "no-cache"})

@@ -8,11 +8,14 @@ import { Spinner } from "./components/ui";
 import { AuthProvider, useAuth } from "./lib/auth";
 import { needsServerSetup } from "./lib/api";
 import "./lib/prefs";
+import { watchForUpdates } from "./lib/version";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 
 // Service worker = offline PWA. Not needed inside the native app shell.
 if (!Capacitor.isNativePlatform()) registerSW({ immediate: true });
+// Reload when the server has a newer version than the copy this phone is showing.
+if (import.meta.env.PROD) watchForUpdates();
 
 const Food = lazy(() => import("./pages/Food"));
 const Coach = lazy(() => import("./pages/Coach"));

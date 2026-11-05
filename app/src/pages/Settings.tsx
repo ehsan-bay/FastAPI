@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { Accessibility, Cpu, LogOut, Server, User as UserIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Accessibility, Cpu, LogOut, RefreshCw, Server, User as UserIcon } from "lucide-react";
 import { Card, ErrorBox, Page, SpeakButton } from "../components/ui";
 import { setPrefs, usePrefs } from "../lib/prefs";
+import { APP_BUILD, forceRefresh, liveBuild } from "../lib/version";
 import ServerForm from "../components/ServerForm";
 import { api, isBundledApp } from "../lib/api";
 import { useAuth, type User } from "../lib/auth";
@@ -87,7 +88,28 @@ export default function Settings({ firstRun }: { firstRun?: boolean }) {
         </ul>
       </Card>
       <button className="btn danger" onClick={logout}><LogOut size={18} /> خروج از حساب</button>
-      <p className="disclaimer center">سلامت‌یار هوشمند نسخه ۱٫۰ — این اپ جایگزین مشاوره پزشکی نیست.</p>
+      <VersionCard />
+      <p className="disclaimer center">سلامت‌یار هوشمند — این اپ جایگزین مشاوره پزشکی نیست.</p>
     </Page>
+  );
+}
+
+const fmtBuild = (b: string | null) => (b && b.length >= 12 ? `${b.slice(0, 4)}.${b.slice(4, 6)}.${b.slice(6, 8)}-${b.slice(8, 12)}` : b ?? "—");
+
+function VersionCard() {
+  const [live, setLive] = useState<string | null>(null);
+  useEffect(() => {
+    liveBuild().then(setLive);
+  }, []);
+  const old = live !== null && live !== APP_BUILD;
+  return (
+    <Card title="نسخه برنامه" icon={RefreshCw} tone="slate">
+      <div className="small col" style={{ gap: 4 }}>
+        <div className="row between"><span className="muted">نسخه در حال اجرا</span><span className="ltr">{fmtBuild(APP_BUILD)}</span></div>
+        <div className="row between"><span className="muted">آخرین نسخه روی سرور</span><span className="ltr">{fmtBuild(live)}</span></div>
+      </div>
+      {old && <div className="alert warn small" style={{ marginTop: 8 }}>نسخه جدیدتری روی سرور هست.</div>}
+      <button className="btn soft block" style={{ marginTop: 10 }} onClick={forceRefresh}><RefreshCw size={16} /> به‌روزرسانی و بارگذاری مجدد</button>
+    </Card>
   );
 }
