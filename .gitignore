@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 server/models/
 server/data/*.db
+server/data/tts-cache/
 node_modules/
 app/dist/
 .env
