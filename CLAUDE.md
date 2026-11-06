@@ -116,6 +116,22 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     `lib/version.ts` compares it with the live `/version.json` on start, on foreground and every 15 min, and if different unregisters the
     service worker, clears caches and reloads once. Settings shows running vs server version + a "refresh" button. Server sends
     `sw.js`/`version.json`/manifest with no-cache. Browser test: rebuild while open → app switched to the new build. `update-bundle` = eaaaf21.
+32. **Seven features chosen from the competitor review (items 1, 3, 4, 5, 14, 8, 9).** No new Python packages → light update only.
+    - Family/caregiver (`CareLink`, `app/care.py`, `routers/care.py`, `pages/Family.tsx`, `CarePatient.tsx`): patient makes a 6-char invite code,
+      caregiver joins; alerts = missed dose (60 min grace, counts logs since local midnight via `tz_offset`), latest dangerous vital in 48 h,
+      low stock. Journal/cycle stay private. `lib/careAlerts.ts` polls `/api/care/alerts` every 5 min while the app is open and shows
+      local/web notifications once per alert key (ids 900000+). No real push when the app is closed (no FCM).
+    - Refill: nullable `Medication.stock/per_dose/refill_days`; "taken" decrements; `POST /api/meds/{id}/refill`; warn ≤5 days; home banner.
+      Adherence now counts only days since each medicine was added (`active_days`).
+    - Doctor report (`routers/report.py`): `POST /api/report/link` → JWT with `rid` + `purpose` (no `sub`, so never a login), 7 days;
+      `GET /api/report/view?t=` = print-ready HTML (tiles, SVG charts, tables, Jalali dates, fonts from `app/public/fonts`). PDF = browser print.
+    - Estimated HbA1c (`insights.estimated_a1c`, ADAG, ≥10 readings over ≥7 days) at `/api/vitals/a1c`, glucose tab and report.
+    - Jalali: `server/app/jalali.py`, `app/src/lib/jalali.ts`, `components/JalaliDate.tsx` (admin filters); formats use `fa-IR-u-ca-persian`.
+    - Women's health (`CycleEntry`, `routers/cycle.py`, `pages/Cycle.tsx`): predictions from last 6 cycles (21–45 d), fertile window,
+      Jalali month calendar; home tile via Settings toggle (`prefs.cycle`).
+    - Camera heart rate (`lib/ppg.ts`, `pages/Heart.tsx`): red-channel PPG, torch if supported, 25 s, autocorrelation + peak check, "poor" rejected.
+      Tested with a synthetic 72 bpm y4m (`--use-file-for-fake-video-capture`) → 72.
+    55 pytest on SQLite + PostgreSQL; upgrade from the 84705a3 image's Postgres DB verified (columns/tables added, data kept). `update-bundle` = 64af987.
 
 ### 2026-11-02 — Session 1
 1. Brainstormed health-app ideas with small AI models; the user asked to build **all of them in one app**.
