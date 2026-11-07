@@ -136,6 +136,7 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     cover "پانزده دستیار", 15 modules, comparison row, roadmap refreshed (built items removed), architecture boxes. Shots via
     `docs/catalog/shots_v3.cjs` (needs a finger y4m). Still no model/library/platform names; PDF locked. Report fixes: Persian decimal
     separator, taken ≤ expected in adherence text, chart date labels drawn RTL inside the LTR SVG.
+34. Removed the contact block (name/phone, email, website, demo address placeholders) from the catalog's back cover on request.
 
 ### 2026-11-02 — Session 1
 1. Brainstormed health-app ideas with small AI models; the user asked to build **all of them in one app**.
@@ -166,7 +167,7 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     (model file + WASM/native runtime such as MediaPipe/LiteRT, no API), and why Python for the server (AI ecosystem). No code changes.
 14. Built a **17-page Persian sales catalog PDF** (`docs/catalog/Salamatyar-Catalog.pdf`): cover, executive summary, problem/opportunity,
     8 modules, real screenshots (seeded demo data), architecture, trust & safety, comparison, business model & packages (prices left
-    "by agreement"), 6-month launch plan, roadmap, buyer FAQ, back cover. Contact fields on the last page are placeholders. How to rebuild: `docs/catalog/README.md`.
+    "by agreement"), 6-month launch plan, roadmap, buyer FAQ, back cover. Contact fields were later removed from the last page on request. How to rebuild: `docs/catalog/README.md`.
 15. Explained the models used; made a 2-page demo-server spec PDF for the user's DevOps team (scratchpad only, product name removed on request).
 16. The user wants Claude to deploy on their own server. **This cloud sandbox cannot SSH out** (port 22 blocked, no ssh client).
     Added `deploy/install.sh`: a one-command installer (Docker, clone to /opt/salamat, .env with random secrets, ufw, compose up with optional
