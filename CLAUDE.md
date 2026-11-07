@@ -132,6 +132,10 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     - Camera heart rate (`lib/ppg.ts`, `pages/Heart.tsx`): red-channel PPG, torch if supported, 25 s, autocorrelation + peak check, "poor" rejected.
       Tested with a synthetic 72 bpm y4m (`--use-file-for-fake-video-capture`) → 72.
     55 pytest on SQLite + PostgreSQL; upgrade from the 84705a3 image's Postgres DB verified (columns/tables added, data kept). `update-bundle` = 64af987.
+33. Catalog v3 (**24 pages**): new pages 13–15 (family/caregiver + refill, doctor report + HbA1c, women's health + camera heart rate),
+    cover "پانزده دستیار", 15 modules, comparison row, roadmap refreshed (built items removed), architecture boxes. Shots via
+    `docs/catalog/shots_v3.cjs` (needs a finger y4m). Still no model/library/platform names; PDF locked. Report fixes: Persian decimal
+    separator, taken ≤ expected in adherence text, chart date labels drawn RTL inside the LTR SVG.
 
 ### 2026-11-02 — Session 1
 1. Brainstormed health-app ideas with small AI models; the user asked to build **all of them in one app**.

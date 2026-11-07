@@ -1,6 +1,6 @@
 # Product catalog (PDF)
 
-`Salamatyar-Catalog.pdf` is a 21-page Persian sales catalog built from `catalog.html` with real app screenshots in `shots/`.
+`Salamatyar-Catalog.pdf` is a 24-page Persian sales catalog built from `catalog.html` with real app screenshots in `shots/`.
 
 To change the text (e.g. the contact details on the last page) and rebuild:
 
@@ -15,6 +15,7 @@ To retake the screenshots: start the server with an empty `DATA_DIR`, run `seed.
 then `node shots.cjs <out-dir> <mole-image.jpg>`. For the payment/admin pages: start the server with `ADMIN_EMAIL=admin@salamatyar.ir ADMIN_PASSWORD=Admin12345`,
 run `seed_pay.py`, then `node shots_pay.cjs <out-dir> <doctor-qr-token>` and `node shot_qr.cjs <out-dir>`.
 New-feature shots (voice, X-ray, elder mode): `node shots_new.cjs <out-dir> <voice.wav>` (any Persian WAV; used as the fake microphone).
+Family, refill, doctor report, HbA1c, women's health, camera heart rate: `node shots_v3.cjs <out-dir> <finger.y4m>` (a y4m of a pulsing red frame is the fake camera).
 
 After `render.cjs`, the PDF is locked against copying/editing (view and print only) with pypdf: AES-256, empty user password,
 random owner password, metadata set to the product name. The catalog intentionally names no models or libraries.

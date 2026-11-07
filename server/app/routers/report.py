@@ -43,7 +43,7 @@ def _local(dt: datetime, tz: int) -> datetime:
 def _n(x, d=0) -> str:
     if x is None:
         return "—"
-    return fa_digits(f"{x:.{d}f}" if d else f"{round(x):d}")
+    return fa_digits(f"{x:.{d}f}".replace(".", "٫") if d else f"{round(x):d}")
 
 
 def _chart(series: list[tuple[str, list[tuple[datetime, float]], str]], lo: float, hi: float,
@@ -56,7 +56,7 @@ def _chart(series: list[tuple[str, list[tuple[datetime, float]], str]], lo: floa
     W, H, P = 700, 190, 28
     x = lambda t: P + (W - 2 * P) * (t - t0).total_seconds() / span
     y = lambda v: H - P - (H - 2 * P) * (min(hi, max(lo, v)) - lo) / (hi - lo)
-    out = [f'<svg viewBox="0 0 {W} {H}" class="chart" role="img">']
+    out = [f'<svg viewBox="0 0 {W} {H}" class="chart" role="img" style="direction:ltr">']
     for a, b, color in bands:
         out.append(f'<rect x="{P}" y="{y(b):.1f}" width="{W - 2 * P}" height="{y(a) - y(b):.1f}" fill="{color}"/>')
     for i in range(5):
@@ -70,8 +70,9 @@ def _chart(series: list[tuple[str, list[tuple[datetime, float]], str]], lo: floa
         path = " ".join(f"{x(t):.1f},{y(v):.1f}" for t, v in s)
         out.append(f'<polyline fill="none" stroke="{color}" stroke-width="2" points="{path}"/>')
         out += [f'<circle cx="{x(t):.1f}" cy="{y(v):.1f}" r="2.6" fill="{color}"/>' for t, v in s]
-    out.append(f'<text x="{P}" y="{H - 6}" font-size="10" fill="#7b8b85">{jdate(t0)}</text>'
-               f'<text x="{W - P}" y="{H - 6}" font-size="10" fill="#7b8b85" text-anchor="end">{jdate(t1)}</text></svg>')
+    # Persian labels in a left-to-right chart: draw them right-to-left (in RTL, "end" is the left edge).
+    out.append(f'<text x="{P}" y="{H - 6}" font-size="10" fill="#7b8b85" direction="rtl" text-anchor="end">{jdate(t0)}</text>'
+               f'<text x="{W - P}" y="{H - 6}" font-size="10" fill="#7b8b85" direction="rtl" text-anchor="start">{jdate(t1)}</text></svg>')
     return "".join(out)
 
 
@@ -114,8 +115,8 @@ def render(session: Session, user: User, days: int, tz: int) -> str:
         ("میانگین فشار خون", f"{_n(avg([v.value for v in bp]))}/{_n(avg([v.value2 or 0 for v in bp]))}" if bp else "—", f"{_n(len(bp))} اندازه‌گیری"),
         ("میانگین قند خون", _n(avg([v.value for v in glu])), f"{_n(len(glu))} اندازه‌گیری · mg/dL"),
         ("HbA1c تخمینی", _n(a1c.get("value"), 1) + ("٪" if a1c.get("value") else ""), "از قندهای خانگی" if a1c.get("available") else "داده کافی نیست"),
-        ("مصرف به‌موقع دارو", (_n(adher) + "٪") if adher is not None else "—", f"{_n(taken)} از {_n(expected)} نوبت"),
-        ("وزن", f"{_n(wt[-1].value, 1)} kg" if wt else "—", (f"تغییر {fa_digits(f'{wt[-1].value - wt[0].value:+.1f}')} kg" if len(wt) > 1 else "")),
+        ("مصرف به‌موقع دارو", (_n(adher) + "٪") if adher is not None else "—", f"{_n(min(taken, expected))} از {_n(expected)} نوبت"),
+        ("وزن", f"{_n(wt[-1].value, 1)} کیلوگرم" if wt else "—", (f"تغییر {fa_digits(f'{wt[-1].value - wt[0].value:+.1f}'.replace('.', '٫'))} kg" if len(wt) > 1 else "")),
         ("میانگین خواب", f"{_n(sleep_h, 1)} ساعت" if sleep_h else "—", f"{_n(len(sleeps))} شب"),
         ("ضربان قلب", _n(avg([v.value for v in hr])) if hr else "—", "میانگین در دقیقه"),
         ("اکسیژن خون", (_n(min(v.value for v in spo)) + "٪") if spo else "—", "کمترین مقدار"),
