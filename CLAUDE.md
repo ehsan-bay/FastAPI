@@ -137,6 +137,10 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     `docs/catalog/shots_v3.cjs` (needs a finger y4m). Still no model/library/platform names; PDF locked. Report fixes: Persian decimal
     separator, taken ≤ expected in adherence text, chart date labels drawn RTL inside the LTR SVG.
 34. Removed the contact block (name/phone, email, website, demo address placeholders) from the catalog's back cover on request.
+35. Suggested diet features (no code): personal calorie/macro goals (TDEE + adaptive from weight trend), diet modes for diabetes/blood
+    pressure/kidney linked to vitals (meal → glucose 2 h later, sodium), Iranian weekly meal plan + shopping list, water tracker,
+    fasting/Ramadan mode, Iranian portion units, recipe calculator, packaged-food barcode with traffic-light label, weekly nutrition score,
+    dietitian panel (B2B), allergy warnings. Recommended first: goals, disease diets + glucose link, Iranian meal plan, Ramadan, water. User to choose.
 
 ### 2026-11-02 — Session 1
 1. Brainstormed health-app ideas with small AI models; the user asked to build **all of them in one app**.
