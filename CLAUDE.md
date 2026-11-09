@@ -145,6 +145,9 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     SVG diagrams: architecture, server layers, 4 sequence flows, payment flow; data model, API table, security, deployment, measured
     performance, testing, limits + roadmap). No AI model names (generic descriptions), platform stack named; PDF locked like the catalog.
     Measured on 4 cores, no GPU: food 0.03 s, skin 0.05 s, X-ray 0.14 s, TTS 0.3 s (cached <0.01), ASR 3.5 s for 8 s audio, RSS up to ~1.9 GB.
+37. **App server address changed to `https://salamatyar-app.ir`** (user request): `app/.env.production`, `app/public/offline.html`.
+    CI no longer reads `vars.SERVER_URL` (it could silently override); `.env.production` is the single source. Verified `cap sync`
+    writes the new URL into the Android config. The new domain is not reachable from this sandbox (untested here). New APK via CI.
 
 ### 2026-11-02 — Session 1
 1. Brainstormed health-app ideas with small AI models; the user asked to build **all of them in one app**.
@@ -197,7 +200,7 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     split -b 90m, force-push the orphan branch (force push keeps the repo from growing with each version).
 19. GitHub Actions do run: "Docker image" is green (image on GHCR), but "CI" and "Offline bundle" fail in under a minute; cause unknown
     (logs not reachable from here; server tests and web build pass on a clean clone with Python 3.12 / Node 22). Waiting for a screenshot of the error.
-    **Production URL: `https://salamatyar.tosantechno.ir`** (blocked by this sandbox's network policy, so untested from here).
+    **Production URL (old): `https://salamatyar.tosantechno.ir`; now `https://salamatyar-app.ir` (item 37)** (blocked by this sandbox's network policy, so untested from here).
     Set it as the default server for native apps only (`app/.env.production` + `serverUrl()` ignores it on web); the CI android job uses
     `vars.SERVER_URL` or that default. APK is still not built.
 20. CI android job failed in `android-actions/setup-android@v3` (SDK re-download/licenses). Replaced it with the runner's preinstalled SDK
