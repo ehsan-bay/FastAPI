@@ -4,6 +4,8 @@ import { Card, ErrorBox, Page, SpeakButton } from "../components/ui";
 import { setPrefs, usePrefs } from "../lib/prefs";
 import { APP_BUILD, forceRefresh, liveBuild } from "../lib/version";
 import ServerForm from "../components/ServerForm";
+import NativeServerForm from "../components/NativeServerForm";
+import { canChangeServer } from "../lib/serverConfig";
 import { api, isBundledApp } from "../lib/api";
 import { useAuth, type User } from "../lib/auth";
 import { useApi } from "../lib/useApi";
@@ -80,7 +82,8 @@ export default function Settings({ firstRun }: { firstRun?: boolean }) {
           {msg && <p className="small">{msg}</p>}
         </form>
       </Card>
-      {isBundledApp() && <Card title="سرور" icon={Server} tone="slate"><ServerForm /></Card>}
+      {isBundledApp() ? <Card title="سرور" icon={Server} tone="slate"><ServerForm /></Card>
+        : canChangeServer() && <Card title="سرور" icon={Server} tone="slate"><NativeServerForm /></Card>}
       <Card title="مدل‌های هوش مصنوعی" icon={Cpu} tone="violet">
         <ul className="list">
           {models.data && Object.entries(models.data.server).filter(([, v]) => typeof v === "boolean").map(([k, ok]) => (

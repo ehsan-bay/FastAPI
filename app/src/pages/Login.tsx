@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Card, ErrorBox, Tabs } from "../components/ui";
 import ServerForm from "../components/ServerForm";
+import NativeServerForm from "../components/NativeServerForm";
+import { canChangeServer } from "../lib/serverConfig";
 import { isBundledApp } from "../lib/api";
 import { useAuth } from "../lib/auth";
 
@@ -57,11 +59,11 @@ export default function Login() {
           <button className="btn primary" disabled={busy}>
             {busy ? "…" : mode === "login" ? "ورود" : "ساخت حساب"}
           </button>
-          {isBundledApp() && (
+          {(isBundledApp() || canChangeServer()) && (
             <button type="button" className="btn ghost small" onClick={() => setShowServer(!showServer)}>تنظیم آدرس سرور</button>
           )}
         </form>
-        {showServer && <ServerForm onSaved={() => setShowServer(false)} />}
+        {showServer && (isBundledApp() ? <ServerForm onSaved={() => setShowServer(false)} /> : <div style={{ marginTop: 12 }}><NativeServerForm /></div>)}
       </Card>
     </div>
   );

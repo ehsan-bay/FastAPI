@@ -20,11 +20,41 @@
     <h1>اتصال به سلامت‌یار برقرار نشد</h1>
     <p>اینترنت گوشی را بررسی کنید و دوباره تلاش کنید.</p>
     <button onclick="retry()">تلاش دوباره</button>
+    <div id="srv" style="display:none; margin-top:26px;">
+      <p style="margin:0 0 8px; font-size:.9rem;">سرور: <span id="cur" dir="ltr"></span></p>
+      <input id="url" dir="ltr" type="url" placeholder="https://" style="width:100%; max-width:320px; box-sizing:border-box; padding:12px; border-radius:12px; border:1px solid #cbd8d3; font-size:1rem;">
+      <div style="margin-top:10px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+        <button onclick="change()" style="background:#33443f">تغییر سرور</button>
+        <button id="rst" onclick="reset()" style="background:#8a9a94; display:none">سرور پیش‌فرض</button>
+      </div>
+      <p id="msg" style="margin-top:10px; font-size:.85rem;"></p>
+    </div>
   </div>
   <script>
-    // Address of the live app (same as VITE_API_URL in app/.env.production).
+    // Default address of the live app (same as VITE_API_URL in app/.env.production).
     var SITE = "https://salamatyar-app.ir";
+    // Newer APKs can point the app at another server (ServerConfig plugin).
+    function plugin(method, data) {
+      var C = window.Capacitor;
+      if (!C) return Promise.reject(new Error("no bridge"));
+      if (C.nativePromise) return C.nativePromise("ServerConfig", method, data || {});
+      if (C.Plugins && C.Plugins.ServerConfig) return C.Plugins.ServerConfig[method](data || {});
+      return Promise.reject(new Error("no plugin"));
+    }
     function retry() { window.location.replace(SITE); }
+    function change() {
+      var u = document.getElementById("url").value;
+      document.getElementById("msg").textContent = "در حال بررسی…";
+      plugin("set", { url: u }).catch(function (e) { document.getElementById("msg").textContent = (e && e.message) || "سرور در دسترس نیست"; });
+    }
+    function reset() { plugin("reset"); }
+    plugin("get").then(function (r) {
+      SITE = r.url;
+      document.getElementById("cur").textContent = r.url;
+      document.getElementById("url").value = r.url;
+      document.getElementById("srv").style.display = "";
+      if (r.custom) document.getElementById("rst").style.display = "";
+    }).catch(function () {});
     window.addEventListener("online", retry);
   </script>
 </body>

@@ -148,6 +148,12 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
 37. **App server address changed to `https://salamatyar-app.ir`** (user request): `app/.env.production`, `app/public/offline.html`.
     CI no longer reads `vars.SERVER_URL` (it could silently override); `.env.production` is the single source. Verified `cap sync`
     writes the new URL into the Android config. The new domain is not reachable from this sandbox (untested here). New APK via CI.
+38. **Changeable server in the APK (default stays salamatyar-app.ir).** Native plugin `ServerConfig`
+    (`app/android/.../ServerConfigPlugin.java`): `get/set({url, skipCheck})/reset`; `set` checks `<url>/api/health` natively (200/503),
+    stores the URL in SharedPreferences and `recreate()`s the activity. `MainActivity` registers it and, before `super.onCreate`, sets
+    `this.config` = default CapConfig with `serverUrl` replaced by reflection (minify is off). JS: `lib/serverConfig.ts`,
+    `components/NativeServerForm.tsx` (Settings + Login, only when `Capacitor.isPluginAvailable("ServerConfig")`, so old APKs hide it),
+    `public/offline.html` can change/reset the server too (via `Capacitor.nativePromise`). Java compiled only in CI (no Android SDK here).
 
 ### 2026-11-02 — Session 1
 1. Brainstormed health-app ideas with small AI models; the user asked to build **all of them in one app**.
