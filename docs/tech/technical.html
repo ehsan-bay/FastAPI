@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>سلامت‌یار هوشمند — مستند فنی و معماری</title>
+<style>
+@font-face { font-family: "Vazirmatn"; font-weight: 400; src: url("fonts/vazirmatn-arabic-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Vazirmatn"; font-weight: 500; src: url("fonts/vazirmatn-arabic-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Vazirmatn"; font-weight: 700; src: url("fonts/vazirmatn-arabic-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Vazirmatn"; font-weight: 800; src: url("fonts/vazirmatn-arabic-800-normal.woff2") format("woff2"); }
+@font-face { font-family: "Vazirmatn"; font-weight: 900; src: url("fonts/vazirmatn-arabic-900-normal.woff2") format("woff2"); }
+@font-face { font-family: "VazirLatin"; font-weight: 400; src: url("fonts/vazirmatn-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "VazirLatin"; font-weight: 700; src: url("fonts/vazirmatn-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "VazirLatin"; font-weight: 800; src: url("fonts/vazirmatn-latin-800-normal.woff2") format("woff2"); }
+@page { size: A4 landscape; margin: 0; }
+:root { --g: #0e8f6d; --g2: #12b886; --deep: #052e25; --ink: #10201b; --muted: #5b6f68; --mint: #e3f6ef; --mint2: #f2fbf7; --line: #d8e7e1;
+  --blue: #2563eb; --blue-bg: #e7eefe; --amber: #b45309; --amber-bg: #fdf1dc; --rose: #db2777; --rose-bg: #fde7f1; --violet: #7c3aed; --violet-bg: #f0e8fe; --slate: #475569; --slate-bg: #edf1f6; }
+* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+html, body { margin: 0; padding: 0; }
+body { font-family: "VazirLatin", "Vazirmatn", sans-serif; color: var(--ink); font-size: 10pt; line-height: 1.8; }
+.page { width: 297mm; height: 210mm; position: relative; overflow: hidden; page-break-after: always; background: #fff; padding: 14mm 16mm 14mm; }
+.page:last-child { page-break-after: auto; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.35; font-weight: 900; }
+p { margin: 0 0 2.5mm; }
+.ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+.hdr { position: absolute; top: 6mm; right: 16mm; left: 16mm; display: flex; justify-content: space-between; font-size: 7.5pt; color: var(--muted); }
+.hdr b { color: var(--g); }
+.ftr { position: absolute; bottom: 6mm; right: 16mm; left: 16mm; display: flex; justify-content: space-between; font-size: 7.5pt; color: #8aa098; border-top: 1px solid var(--line); padding-top: 2mm; }
+.kicker { color: var(--g); font-weight: 800; font-size: 9pt; margin-bottom: 1mm; }
+.title { font-size: 20pt; margin-bottom: 3mm; }
+.lead { font-size: 10.5pt; color: #33443f; max-width: 240mm; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4mm; }
+.card { border: 1px solid var(--line); border-radius: 4mm; padding: 3.5mm 4.5mm; background: #fff; }
+.card.tint { background: var(--mint2); border-color: #cfeadf; }
+.card h3 { font-size: 11.5pt; margin-bottom: 1.5mm; }
+.card p, .card li { font-size: 9pt; color: #33443f; }
+.stat { border-radius: 4mm; padding: 4mm; background: var(--mint2); border: 1px solid #cfeadf; text-align: center; }
+.stat b { display: block; font-size: 22pt; font-weight: 900; color: var(--g); line-height: 1.2; }
+.stat span { font-size: 8.5pt; color: var(--muted); }
+ul.check { list-style: none; padding: 0; margin: 0; }
+ul.check li { position: relative; padding-right: 5mm; margin-bottom: 1.2mm; font-size: 9.3pt; }
+ul.check li::before { content: ""; position: absolute; right: 0; top: 2.2mm; width: 2.2mm; height: 2.2mm; border-radius: 50%; background: var(--g); }
+table { width: 100%; border-collapse: collapse; font-size: 8.8pt; }
+th, td { text-align: right; padding: 1.6mm 2mm; border-bottom: 1px solid #e5ece9; vertical-align: top; }
+th { background: #eef6f2; color: #1f3d33; font-weight: 800; }
+code, .mono { font-family: "VazirLatin", monospace; direction: ltr; unicode-bidi: isolate; background: #f1f5f3; padding: 0 1.5mm; border-radius: 1.5mm; font-size: 8.3pt; }
+.pill { display: inline-block; font-size: 7.5pt; font-weight: 800; padding: 0.3mm 2.5mm; border-radius: 99px; }
+.pill.dev { background: var(--blue-bg); color: var(--blue); }
+.pill.srv { background: var(--mint); color: var(--g); }
+.pill.mix { background: var(--amber-bg); color: var(--amber); }
+.band { background: var(--deep); color: #dff5ec; border-radius: 4mm; padding: 4mm 6mm; }
+.band h3 { color: #fff; font-size: 11.5pt; margin-bottom: 1mm; }
+.band p { margin: 0; font-size: 9.3pt; }
+svg text { font-family: "VazirLatin", "Vazirmatn", sans-serif; }
+.diagram { width: 100%; height: auto; display: block; }
+.cover { background: linear-gradient(135deg, #0b6e55 0%, #052e25 70%); color: #fff; padding: 22mm 22mm; }
+.cover .brand { display: flex; align-items: center; gap: 4mm; font-weight: 800; font-size: 13pt; }
+.cover .brand img { width: 14mm; height: 14mm; border-radius: 4mm; }
+.cover h1 { font-size: 34pt; margin-top: 30mm; line-height: 1.3; }
+.cover h1 span { color: #7ee2bf; }
+.cover .sub { font-size: 12pt; color: #c7eadc; margin-top: 5mm; max-width: 180mm; }
+.cover .meta { position: absolute; bottom: 18mm; right: 22mm; left: 22mm; display: flex; justify-content: space-between; font-size: 9pt; color: #9fd3c1; }
+.toc { columns: 2; column-gap: 12mm; margin-top: 4mm; }
+.toc div { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--line); padding: 1.6mm 0; font-size: 10pt; break-inside: avoid; }
+.toc b { color: var(--g); margin-left: 3mm; }
+.seq { font-size: 8.8pt; }
+.note { font-size: 8pt; color: var(--muted); }
+.stats-sm .stat { padding: 2.2mm; } .stats-sm .stat b { font-size: 17pt; }
+.toc div { padding: 1.1mm 0; }
+</style>
+</head>
+<body>
+
+<!-- 1. COVER -->
+<section class="page cover">
+  <div class="brand"><img src="icon.png" alt="">سلامت‌یار هوشمند</div>
+  <h1>مستند فنی و <span>معماری سامانه</span></h1>
+  <p class="sub">ساختار کلی، اجزای سامانه، موتورهای هوش مصنوعی، جریان داده، امنیت، استقرار، کارایی و کیفیت؛ برای ارائه به تیم‌های فنی، مدیران فناوری و خریداران سازمانی.</p>
+  <div class="meta"><span>نسخه ۱٫۰ · آبان ۱۴۰۵</span><span>محرمانه — فقط برای ارائه</span></div>
+</section>
+
+<!-- 2. TOC + SUMMARY -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>مستند فنی</span></div>
+  <div class="kicker">در یک نگاه</div>
+  <h2 class="title">خلاصه فنی</h2>
+  <p class="lead">سلامت‌یار یک سامانه یکپارچه سلامت دیجیتال است: یک سرور که رابط برنامه‌نویسی (API)، نسخه وب و فایل‌های مدل را از یک کانتینر سرو می‌کند، و یک اپ چندسکویی که هم در مرورگر و هم به‌صورت اپ اندروید و iOS اجرا می‌شود. پردازش‌های لحظه‌ای تصویر و صدا روی گوشی و پردازش‌های سنگین‌تر روی سرور خودِ سازمان انجام می‌شود.</p>
+  <div class="grid4 stats-sm" style="margin:3mm 0;">
+    <div class="stat"><b>۱۵</b><span>ماژول سلامت</span></div>
+    <div class="stat"><b>۷۵</b><span>سرویس API</span></div>
+    <div class="stat"><b>۱۸</b><span>جدول داده</span></div>
+    <div class="stat"><b>۲۴</b><span>صفحه اپ</span></div>
+    <div class="stat"><b>۹</b><span>مدل هوش مصنوعی (+۱ اختیاری)</span></div>
+    <div class="stat"><b>۴</b><span>سکو از یک کد: اندروید، iOS، وب، PWA</span></div>
+    <div class="stat"><b>۵۵</b><span>آزمون خودکار روی دو پایگاه داده</span></div>
+    <div class="stat"><b>CPU</b><span>بدون نیاز به کارت گرافیک</span></div>
+  </div>
+  <div class="kicker">فهرست</div>
+  <div class="toc">
+    <div><span>معماری کلی</span><b>۳</b></div>
+    <div><span>اصول طراحی</span><b>۴</b></div>
+    <div><span>لایه کلاینت (اپ و وب)</span><b>۵</b></div>
+    <div><span>لایه سرور</span><b>۶</b></div>
+    <div><span>موتورهای هوش مصنوعی</span><b>۷</b></div>
+    <div><span>جریان داده: عکس غذا و ثبت صوتی</span><b>۸</b></div>
+    <div><span>جریان داده: همراه خانواده و گزارش پزشک</span><b>۹</b></div>
+    <div><span>مدل داده</span><b>۱۰</b></div>
+    <div><span>رابط برنامه‌نویسی (API)</span><b>۱۱</b></div>
+    <div><span>امنیت و حریم خصوصی</span><b>۱۲</b></div>
+    <div><span>پرداخت و کیف پول</span><b>۱۳</b></div>
+    <div><span>استقرار و به‌روزرسانی</span><b>۱۴</b></div>
+    <div><span>کارایی و ظرفیت</span><b>۱۵</b></div>
+    <div><span>کیفیت و آزمون</span><b>۱۶</b></div>
+    <div><span>محدودیت‌ها و نقشه راه فنی</span><b>۱۷</b></div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۲</span></div>
+</section>
+
+<!-- 3. ARCHITECTURE OVERVIEW -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>معماری کلی</span></div>
+  <div class="kicker">معماری کلی</div>
+  <h2 class="title">سه لایه، یک مسیر امن</h2>
+  <svg class="diagram" viewBox="0 0 1000 430" style="margin-top:2mm">
+    <defs>
+      <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0e8f6d"/></marker>
+    </defs>
+    <!-- devices (right) -->
+    <rect x="740" y="20" width="245" height="390" rx="18" fill="#e7eefe" stroke="#bcd0fb"/>
+    <text x="862" y="50" text-anchor="middle" font-size="17" font-weight="800" fill="#1d4ed8" direction="rtl">گوشی و مرورگر کاربر</text>
+    <rect x="760" y="70" width="205" height="62" rx="10" fill="#fff" stroke="#c8d7fb"/>
+    <text x="862" y="96" text-anchor="middle" font-size="13" font-weight="700" direction="rtl">اپ اندروید / iOS</text>
+    <text x="862" y="118" text-anchor="middle" font-size="11" fill="#5b6f68" direction="rtl">پوسته بومی که نسخه زنده را باز می‌کند</text>
+    <rect x="760" y="142" width="205" height="62" rx="10" fill="#fff" stroke="#c8d7fb"/>
+    <text x="862" y="168" text-anchor="middle" font-size="13" font-weight="700" direction="rtl">وب و PWA</text>
+    <text x="862" y="190" text-anchor="middle" font-size="11" fill="#5b6f68" direction="rtl">نصب روی صفحه گوشی، کار آفلاین</text>
+    <rect x="760" y="214" width="205" height="86" rx="10" fill="#fff" stroke="#c8d7fb"/>
+    <text x="862" y="240" text-anchor="middle" font-size="13" font-weight="700" direction="rtl">هوش مصنوعی روی گوشی</text>
+    <text x="862" y="262" text-anchor="middle" font-size="11" fill="#5b6f68" direction="rtl">حرکات بدن، صدای خواب،</text>
+    <text x="862" y="280" text-anchor="middle" font-size="11" fill="#5b6f68" direction="rtl">ضربان قلب با دوربین</text>
+    <rect x="760" y="310" width="205" height="84" rx="10" fill="#fff" stroke="#c8d7fb"/>
+    <text x="862" y="336" text-anchor="middle" font-size="13" font-weight="700" direction="rtl">ذخیره محلی و اعلان</text>
+    <text x="862" y="358" text-anchor="middle" font-size="11" fill="#5b6f68" direction="rtl">یادآور دارو، ذخیره آفلاین خواب،</text>
+    <text x="862" y="376" text-anchor="middle" font-size="11" fill="#5b6f68" direction="rtl">به‌روزرسانی خودکار نسخه</text>
+    <!-- arrow devices <-> proxy -->
+    <line x1="738" y1="215" x2="655" y2="215" stroke="#0e8f6d" stroke-width="3" marker-end="url(#ar)" marker-start="url(#ar)"/>
+    <text x="697" y="200" text-anchor="middle" font-size="11" fill="#0e8f6d" font-weight="700">HTTPS</text>
+    <text x="697" y="238" text-anchor="middle" font-size="10" fill="#5b6f68" direction="rtl">توکن امن</text>
+    <!-- server zone -->
+    <rect x="225" y="20" width="425" height="390" rx="18" fill="#f2fbf7" stroke="#bfe5d6"/>
+    <text x="437" y="50" text-anchor="middle" font-size="17" font-weight="800" fill="#0b6e55" direction="rtl">سرور سازمان (داخل کشور)</text>
+    <rect x="245" y="66" width="385" height="48" rx="10" fill="#fff" stroke="#bfe5d6"/>
+    <text x="437" y="95" text-anchor="middle" font-size="13" font-weight="700" direction="rtl">دروازه HTTPS (گواهی خودکار، فشرده‌سازی)</text>
+    <line x1="437" y1="116" x2="437" y2="136" stroke="#0e8f6d" stroke-width="2.5" marker-end="url(#ar)"/>
+    <rect x="245" y="138" width="385" height="256" rx="12" fill="#fff" stroke="#0e8f6d" stroke-width="1.5"/>
+    <text x="437" y="164" text-anchor="middle" font-size="14" font-weight="800" fill="#0b6e55" direction="rtl">کانتینر برنامه</text>
+    <rect x="262" y="178" width="170" height="96" rx="9" fill="#e3f6ef"/>
+    <text x="347" y="203" text-anchor="middle" font-size="12.5" font-weight="700" direction="rtl">سرویس‌های API</text>
+    <text x="347" y="224" text-anchor="middle" font-size="10.5" fill="#33443f" direction="rtl">۱۵ ماژول · ۷۵ سرویس</text>
+    <text x="347" y="243" text-anchor="middle" font-size="10.5" fill="#33443f" direction="rtl">احراز هویت و دسترسی</text>
+    <text x="347" y="262" text-anchor="middle" font-size="10.5" fill="#33443f" direction="rtl">پرداخت و پنل مدیریت</text>
+    <rect x="443" y="178" width="170" height="96" rx="9" fill="#f0e8fe"/>
+    <text x="528" y="203" text-anchor="middle" font-size="12.5" font-weight="700" direction="rtl">موتور هوش مصنوعی</text>
+    <text x="528" y="224" text-anchor="middle" font-size="10.5" fill="#33443f" direction="rtl">غذا، گفتار، صدا،</text>
+    <text x="528" y="243" text-anchor="middle" font-size="10.5" fill="#33443f" direction="rtl">رادیولوژی، پوست، آزمایش،</text>
+    <text x="528" y="262" text-anchor="middle" font-size="10.5" fill="#33443f" direction="rtl">احساس و روند علائم</text>
+    <rect x="262" y="286" width="170" height="92" rx="9" fill="#fdf1dc"/>
+    <text x="347" y="312" text-anchor="middle" font-size="12.5" font-weight="700" direction="rtl">نسخه وب ساخته‌شده</text>
+    <text x="347" y="334" text-anchor="middle" font-size="10.5" fill="#33443f" direction="rtl">همان آدرس، بدون سرور جدا</text>
+    <text x="347" y="353" text-anchor="middle" font-size="10.5" fill="#33443f" direction="rtl">شناسه نسخه برای به‌روزرسانی</text>
+    <rect x="443" y="286" width="170" height="92" rx="9" fill="#edf1f6"/>
+    <text x="528" y="312" text-anchor="middle" font-size="12.5" font-weight="700" direction="rtl">فایل مدل‌های گوشی</text>
+    <text x="528" y="334" text-anchor="middle" font-size="10.5" fill="#33443f" direction="rtl">از همین سرور دانلود می‌شوند</text>
+    <text x="528" y="353" text-anchor="middle" font-size="10.5" fill="#33443f" direction="rtl">(بدون وابستگی خارجی)</text>
+    <!-- arrow server -> db -->
+    <line x1="243" y1="250" x2="182" y2="250" stroke="#0e8f6d" stroke-width="3" marker-end="url(#ar)" marker-start="url(#ar)"/>
+    <!-- db -->
+    <rect x="15" y="110" width="165" height="220" rx="18" fill="#fff" stroke="#0e8f6d" stroke-width="1.5"/>
+    <ellipse cx="97" cy="160" rx="45" ry="13" fill="#e3f6ef" stroke="#0e8f6d"/>
+    <path d="M52,160 v55 a45,13 0 0 0 90,0 v-55" fill="#e3f6ef" stroke="#0e8f6d"/>
+    <text x="97" y="252" text-anchor="middle" font-size="13" font-weight="800" fill="#0b6e55">PostgreSQL</text>
+    <text x="97" y="276" text-anchor="middle" font-size="11" fill="#33443f" direction="rtl">۱۸ جدول</text>
+    <text x="97" y="296" text-anchor="middle" font-size="11" fill="#33443f" direction="rtl">بکاپ خودکار شبانه</text>
+    <text x="97" y="316" text-anchor="middle" font-size="11" fill="#33443f" direction="rtl">نگهداری ۱۴ نسخه</text>
+  </svg>
+  <div class="grid3" style="margin-top:2mm;">
+    <div class="card"><h3>کلاینت</h3><p>یک کد برای وب، PWA، اندروید و iOS. اپ بومی نسخه زنده سایت را باز می‌کند؛ هر تغییر روی سرور بدون نسخه جدید اپ به دست کاربر می‌رسد.</p></div>
+    <div class="card"><h3>سرور</h3><p>یک کانتینر که API، نسخه وب و فایل‌های مدل را سرو می‌کند. بی‌حالت (stateless) است؛ همه وضعیت در پایگاه داده است و افقی قابل افزایش است.</p></div>
+    <div class="card"><h3>داده</h3><p>پایگاه داده رابطه‌ای روی همان سرور، با بکاپ خودکار و بازیابی یک‌مرحله‌ای. تصویر و صدای کاربر هرگز ذخیره نمی‌شود؛ فقط نتیجه.</p></div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۳</span></div>
+</section>
+
+<!-- 4. PRINCIPLES -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>اصول طراحی</span></div>
+  <div class="kicker">اصول طراحی</div>
+  <h2 class="title">تصمیم‌های کلیدی معماری و دلیل آن‌ها</h2>
+  <div class="grid3" style="margin-top:3mm;">
+    <div class="card tint"><h3>۱. هوش مصنوعی ترکیبی</h3><p>ویدیو و صدای زنده (ورزش، خواب، ضربان) روی گوشی پردازش می‌شود: پاسخ لحظه‌ای، کار بدون اینترنت و حریم خصوصی کامل. تحلیل عکس، گفتار و متن روی سرور انجام می‌شود تا روی هر گوشی‌ای کار کند.</p></div>
+    <div class="card tint"><h3>۲. همه‌چیز روی سرور شما</h3><p>هیچ فراخوانی به سرویس ابری خارجی وجود ندارد. مدل‌ها، داده و نسخه وب روی زیرساخت سازمان است؛ سامانه در اختلال اینترنت بین‌الملل هم کار می‌کند.</p></div>
+    <div class="card tint"><h3>۳. فقط CPU</h3><p>همه مدل‌ها کوچک و بهینه‌شده‌اند (کوانتیزه) و روی CPU اجرا می‌شوند؛ یک سرور مجازی معمولی کافی است و هزینه کارت گرافیک حذف می‌شود.</p></div>
+    <div class="card"><h3>۴. یک کد، چهار سکو</h3><p>رابط کاربری یک‌بار نوشته می‌شود. اپ بومی فقط پوسته‌ای برای مجوزها (دوربین، میکروفون، اعلان) است و محتوای زنده سایت را نشان می‌دهد.</p></div>
+    <div class="card"><h3>۵. حریم خصوصی از طراحی</h3><p>عکس و صدا فقط پردازش می‌شوند و ذخیره نمی‌شوند. هر ردیف داده به یک کاربر تعلق دارد و دسترسی به داده دیگران با پاسخ «یافت نشد» رد می‌شود.</p></div>
+    <div class="card"><h3>۶. نصب و به‌روزرسانی بدون اینترنت</h3><p>بسته کامل آفلاین برای سرورهای بدون دسترسی به مخازن، و بسته سبک حدود ۱ مگابایتی برای به‌روزرسانی کد با بازگشت خودکار در صورت خطا.</p></div>
+    <div class="card"><h3>۷. انسان در حلقه</h3><p>خروجی‌های پزشکی هیچ‌وقت تشخیص نیستند و همیشه با توضیح محدودیت همراه‌اند. ثبت صوتی قبل از ذخیره، تأیید کاربر را می‌خواهد.</p></div>
+    <div class="card"><h3>۸. فارسی‌محور</h3><p>رابط راست‌به‌چپ، اعداد و تقویم شمسی، گفتار و صدای فارسی، شناخت غذاهای ایرانی و واحدهای مصرفی بومی.</p></div>
+    <div class="card"><h3>۹. دسترس‌پذیری</h3><p>حالت سالمند (متن و دکمه بزرگ)، خواندن متن با صدا، کنتراست مناسب، حالت تیره و پشتیبانی از کاهش حرکت.</p></div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۴</span></div>
+</section>
+
+<!-- 5. CLIENT -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>لایه کلاینت</span></div>
+  <div class="kicker">لایه کلاینت</div>
+  <h2 class="title">اپ و وب: یک برنامه تک‌صفحه‌ای پیشرو</h2>
+  <div class="grid2" style="margin-top:3mm;">
+    <div>
+      <table>
+        <tr><th style="width:32%">بخش</th><th>شرح</th></tr>
+        <tr><td><b>فناوری رابط</b></td><td>React و TypeScript، ساخت با Vite؛ بارگذاری تنبل صفحات (هر صفحه فقط هنگام نیاز دانلود می‌شود)</td></tr>
+        <tr><td><b>PWA</b></td><td>Service Worker برای کار آفلاین و نصب روی صفحه گوشی؛ مانیفست با جهت راست‌به‌چپ</td></tr>
+        <tr><td><b>اپ بومی</b></td><td>پوسته اندروید و iOS که نسخه زنده را بار می‌کند؛ صفحه آفلاین اختصاصی هنگام قطع اتصال</td></tr>
+        <tr><td><b>به‌روزرسانی خودکار</b></td><td>هر ساخت شناسه نسخه دارد؛ اپ هنگام باز شدن، بازگشت به برنامه و هر ۱۵ دقیقه نسخه سرور را می‌پرسد و در صورت تفاوت، حافظه نهان را پاک و صفحه را تازه می‌کند</td></tr>
+        <tr><td><b>ذخیره محلی</b></td><td>آمار خواب هر دقیقه روی گوشی ذخیره و پس از اتصال ارسال می‌شود (هیچ شبی گم نمی‌شود)</td></tr>
+        <tr><td><b>اعلان‌ها</b></td><td>یادآور دارو با اعلان بومی (حتی با اپ بسته)، هشدارهای همراه خانواده هنگام باز بودن اپ</td></tr>
+        <tr><td><b>ضبط صدا</b></td><td>ضبط در مرورگر و تبدیل به صدای ۱۶ کیلوهرتز با بازنمونه‌گیری استاندارد مرورگر؛ ارسال فایل کوچک</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="card tint" style="margin-bottom:4mm;">
+        <h3>سیستم طراحی</h3>
+        <ul class="check">
+          <li>توکن‌های رنگ و فاصله، ۱۰ رنگ موضوعی برای ماژول‌ها</li>
+          <li>اجزای مشترک: کارت، کاشی، حلقه پیشرفت، برگه پایین‌رو، اسکلت بارگذاری</li>
+          <li>نوار پایین شناور با دکمه مرکزی ثبت صوتی</li>
+          <li>حالت تیره خودکار، حالت سالمند با مقیاس‌دهی کل رابط</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>پردازش روی گوشی</h3>
+        <table>
+          <tr><td>مربی ورزش</td><td>مدل تشخیص حالت بدن (۳۳ نقطه) روی هر فریم دوربین</td><td><span class="pill dev">گوشی</span></td></tr>
+          <tr><td>پایش خواب</td><td>مدل طبقه‌بندی صدا برای خروپف و سرفه</td><td><span class="pill dev">گوشی</span></td></tr>
+          <tr><td>ضربان قلب</td><td>پردازش سیگنال نوری انگشت روی دوربین (خودهمبستگی + تشخیص قله)</td><td><span class="pill dev">گوشی</span></td></tr>
+        </table>
+        <p class="note" style="margin-top:2mm;">موتور اجرای مدل‌های گوشی (WebAssembly) و فایل مدل‌ها از همان سرور سازمان دانلود می‌شوند.</p>
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۵</span></div>
+</section>
+
+<!-- 6. SERVER -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>لایه سرور</span></div>
+  <div class="kicker">لایه سرور</div>
+  <h2 class="title">سرویس‌ها، موتور هوش مصنوعی و داده</h2>
+  <svg class="diagram" viewBox="0 0 1000 300" style="margin-top:1mm">
+    <rect x="10" y="10" width="980" height="70" rx="12" fill="#e3f6ef" stroke="#bfe5d6"/>
+    <text x="500" y="34" text-anchor="middle" font-size="14" font-weight="800" fill="#0b6e55" direction="rtl">لایه سرویس (API) — Python / FastAPI، اعتبارسنجی ورودی، احراز هویت با توکن</text>
+    <g font-size="11" text-anchor="middle" direction="rtl">
+      <text x="920" y="62">حساب کاربری</text><text x="820" y="62">تغذیه</text><text x="725" y="62">علائم و دارو</text><text x="625" y="62">خواب و ورزش</text>
+      <text x="530" y="62">ذهن و گفتگو</text><text x="435" y="62">صوت و رادیولوژی</text><text x="335" y="62">خانواده و گزارش</text><text x="245" y="62">بانوان</text>
+      <text x="160" y="62">پرداخت</text><text x="70" y="62">پنل مدیریت</text>
+    </g>
+    <rect x="10" y="95" width="640" height="105" rx="12" fill="#f0e8fe" stroke="#d9c7fb"/>
+    <text x="330" y="120" text-anchor="middle" font-size="14" font-weight="800" fill="#6d28d9" direction="rtl">لایه هوش مصنوعی (بارگذاری تنبل، اجرای هم‌زمان امن، CPU)</text>
+    <g font-size="11" text-anchor="middle" direction="rtl">
+      <text x="575" y="150">تشخیص غذا</text><text x="470" y="150">گفتار به متن</text><text x="365" y="150">متن به گفتار</text><text x="265" y="150">رادیولوژی</text><text x="170" y="150">پوست</text><text x="75" y="150">خواندن برگه</text>
+      <text x="575" y="182">تحلیل احساس</text><text x="470" y="182">فهم جمله فارسی</text><text x="365" y="182">روند و ناهنجاری</text><text x="265" y="182">HbA1c تخمینی</text><text x="170" y="182">پیش‌بینی چرخه</text><text x="75" y="182">دستیار گفتگو</text>
+    </g>
+    <rect x="665" y="95" width="325" height="105" rx="12" fill="#fdf1dc" stroke="#f3d9a8"/>
+    <text x="827" y="120" text-anchor="middle" font-size="14" font-weight="800" fill="#92400e" direction="rtl">منطق دامنه</text>
+    <g font-size="11" text-anchor="middle" direction="rtl">
+      <text x="827" y="146">دفتر کل کیف پول (تراکنش اتمی)</text>
+      <text x="827" y="166">هشدار همراه، موجودی دارو</text>
+      <text x="827" y="186">تقویم شمسی، گزارش چاپی</text>
+    </g>
+    <rect x="10" y="215" width="980" height="75" rx="12" fill="#edf1f6" stroke="#d3dce7"/>
+    <text x="500" y="240" text-anchor="middle" font-size="14" font-weight="800" fill="#334155" direction="rtl">لایه داده — ORM با پشتیبانی PostgreSQL و SQLite، مهاجرت خودکار ستون‌های جدید</text>
+    <text x="500" y="268" text-anchor="middle" font-size="11" fill="#475569" direction="rtl">اتصال‌های پایدار (بررسی پیش از استفاده، استخر اتصال)، صبر برای بالا آمدن پایگاه داده، گزارش وضعیت در /api/health</text>
+  </svg>
+  <div class="grid3" style="margin-top:3mm;">
+    <div class="card"><h3>همروندی</h3><p>درخواست‌های سبک به‌صورت ناهمگام پاسخ داده می‌شوند و پردازش‌های سنگین هوش مصنوعی در رشته‌های جداگانه اجرا می‌شوند تا سرور قفل نشود.</p></div>
+    <div class="card"><h3>بارگذاری مدل‌ها</h3><p>هر مدل در اولین استفاده بارگذاری و برای درخواست‌های بعدی نگه داشته می‌شود. نبود یک مدل فقط همان قابلیت را غیرفعال می‌کند، نه کل سامانه.</p></div>
+    <div class="card"><h3>راه‌اندازی خودکار</h3><p>هنگام شروع: ساخت جدول‌ها، افزودن ستون‌های جدید، ساخت حساب مدیر از تنظیمات محیطی، پزشکان نمونه و اعتبار اولیه کیف پول.</p></div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۶</span></div>
+</section>
+
+<!-- 7. AI ENGINES -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>موتورهای هوش مصنوعی</span></div>
+  <div class="kicker">موتورهای هوش مصنوعی</div>
+  <h2 class="title">ورودی، پردازش، خروجی</h2>
+  <table style="margin-top:2mm;">
+    <tr><th style="width:15%">قابلیت</th><th style="width:23%">ورودی</th><th style="width:30%">پردازش</th><th style="width:20%">خروجی</th><th style="width:12%">محل اجرا</th></tr>
+    <tr><td><b>تشخیص غذا</b></td><td>عکس بشقاب (کوچک‌شده روی گوشی)</td><td>مدل تطبیق تصویر با توصیف ظاهری هر غذا؛ دسته «غیرغذا» برای رد عکس‌های نامربوط</td><td>۵ پیشنهاد با درصد اطمینان، کالری و درشت‌مغذی</td><td><span class="pill srv">سرور</span></td></tr>
+    <tr><td><b>ثبت صوتی</b></td><td>صدای فارسی تا ۳۰ ثانیه</td><td>مدل گفتار به متن فارسی + تحلیل‌گر جمله (عدد گفتاری، نام غذا، تحمل خطای املایی)</td><td>متن قابل ویرایش + موارد پیشنهادی برای تأیید</td><td><span class="pill srv">سرور</span></td></tr>
+    <tr><td><b>خواندن با صدا</b></td><td>متن فارسی</td><td>مدل تولید صدای فارسی؛ تبدیل عدد به حروف؛ حافظه نهان صدا</td><td>فایل صوتی</td><td><span class="pill srv">سرور</span></td></tr>
+    <tr><td><b>رادیولوژی قفسه سینه</b></td><td>عکس فیلم یا فایل دیجیتال</td><td>مدل غربالگری ۱۸ یافته + تنظیم آستانه هر یافته</td><td>سطح اولویت و احتمال هر یافته</td><td><span class="pill srv">سرور</span></td></tr>
+    <tr><td><b>پوست</b></td><td>عکس نزدیک ضایعه</td><td>مدل طبقه‌بندی ۹ دسته ضایعه</td><td>سطح ریسک و توصیه</td><td><span class="pill srv">سرور</span></td></tr>
+    <tr><td><b>برگه آزمایش</b></td><td>عکس برگه یا متن</td><td>خواندن متن از تصویر + تجزیه و مقایسه با محدوده مرجع</td><td>جدول نتایج و توضیح فارسی</td><td><span class="pill srv">سرور</span></td></tr>
+    <tr><td><b>سلامت روان</b></td><td>یادداشت روزانه</td><td>تحلیل احساس و تشخیص جملات بحرانی</td><td>بازخورد همدلانه، ارجاع اضطراری</td><td><span class="pill srv">سرور</span></td></tr>
+    <tr><td><b>علائم حیاتی</b></td><td>فشار، قند، وزن، ضربان، اکسیژن</td><td>آستانه‌های بالینی، ناهنجاری نسبت به الگوی فرد، روند خطی، HbA1c تخمینی</td><td>هشدار و تحلیل روند</td><td><span class="pill srv">سرور</span></td></tr>
+    <tr><td><b>ورزش</b></td><td>ویدیوی زنده دوربین</td><td>مدل تشخیص حالت بدن + قواعد شمارش و فرم</td><td>تعداد تکرار و تذکر فرم</td><td><span class="pill dev">گوشی</span></td></tr>
+    <tr><td><b>خواب</b></td><td>صدای زنده میکروفون</td><td>مدل طبقه‌بندی صدا</td><td>خروپف، سرفه، امتیاز خواب</td><td><span class="pill dev">گوشی</span></td></tr>
+    <tr><td><b>ضربان قلب</b></td><td>ویدیوی انگشت روی دوربین</td><td>سیگنال نوری، فیلتر میان‌گذر، خودهمبستگی و تأیید با فاصله قله‌ها</td><td>ضربان و کیفیت سیگنال</td><td><span class="pill dev">گوشی</span></td></tr>
+    <tr><td><b>دستیار گفتگو</b></td><td>پرسش متنی</td><td>پاسخ‌های کنترل‌شده؛ مدل زبانی کوچک اختیاری روی همان سرور</td><td>پاسخ فارسی</td><td><span class="pill mix">اختیاری</span></td></tr>
+  </table>
+  <div class="ftr"><span>همه مدل‌ها مجوز استفاده تجاری دارند و روی CPU اجرا می‌شوند</span><span>۷</span></div>
+</section>
+
+<!-- 8. FLOWS 1 -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>جریان داده</span></div>
+  <div class="kicker">جریان داده</div>
+  <h2 class="title">از عکس و صدا تا ثبت در پرونده</h2>
+  <div class="grid2" style="margin-top:2mm;">
+    <div>
+      <h3 style="font-size:12pt;margin-bottom:2mm;">۱. عکس غذا</h3>
+      <svg class="diagram seq" viewBox="0 0 470 330">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0e8f6d"/></marker></defs>
+        <g font-size="12" font-weight="800" text-anchor="middle" direction="rtl"><text x="400" y="18">گوشی</text><text x="235" y="18">سرور</text><text x="70" y="18">پایگاه داده</text></g>
+        <g stroke="#cfe0da" stroke-dasharray="4 4"><line x1="400" y1="28" x2="400" y2="320"/><line x1="235" y1="28" x2="235" y2="320"/><line x1="70" y1="28" x2="70" y2="320"/></g>
+        <g font-size="11" text-anchor="middle" direction="rtl" fill="#10201b">
+          <text x="400" y="50">عکس → کوچک‌سازی (۸۰۰ پیکسل)</text>
+          <line x1="395" y1="72" x2="242" y2="72" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a2)"/><text x="318" y="66">ارسال عکس + توکن</text>
+          <text x="235" y="100">بررسی تصویر، اجرای مدل</text>
+          <text x="235" y="118">رتبه‌بندی غذاها، دسته غیرغذا</text>
+          <line x1="240" y1="140" x2="393" y2="140" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a2)"/><text x="318" y="134">۵ پیشنهاد + اطمینان</text>
+          <text x="400" y="168">انتخاب غذا و تعداد وعده</text>
+          <line x1="395" y1="190" x2="242" y2="190" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a2)"/><text x="318" y="184">ثبت وعده</text>
+          <line x1="230" y1="214" x2="77" y2="214" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a2)"/><text x="152" y="208">ذخیره نتیجه</text>
+          <text x="235" y="244" fill="#b45309">عکس هیچ‌جا ذخیره نمی‌شود</text>
+          <line x1="240" y1="270" x2="393" y2="270" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a2)"/><text x="318" y="264">کالری امروز به‌روز شد</text>
+        </g>
+      </svg>
+    </div>
+    <div>
+      <h3 style="font-size:12pt;margin-bottom:2mm;">۲. ثبت صوتی</h3>
+      <svg class="diagram seq" viewBox="0 0 470 330">
+        <defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0e8f6d"/></marker></defs>
+        <g font-size="12" font-weight="800" text-anchor="middle" direction="rtl"><text x="400" y="18">گوشی</text><text x="235" y="18">سرور</text><text x="70" y="18">پایگاه داده</text></g>
+        <g stroke="#cfe0da" stroke-dasharray="4 4"><line x1="400" y1="28" x2="400" y2="320"/><line x1="235" y1="28" x2="235" y2="320"/><line x1="70" y1="28" x2="70" y2="320"/></g>
+        <g font-size="11" text-anchor="middle" direction="rtl" fill="#10201b">
+          <text x="400" y="50">ضبط ≤۳۰ ثانیه، تبدیل به ۱۶kHz</text>
+          <line x1="395" y1="72" x2="242" y2="72" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a3)"/><text x="318" y="66">فایل صوتی</text>
+          <text x="235" y="100">گفتار به متن فارسی</text>
+          <text x="235" y="118">فهم جمله: فشار، قند، غذا، حال</text>
+          <line x1="240" y1="140" x2="393" y2="140" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a3)"/><text x="318" y="134">متن + موارد پیشنهادی</text>
+          <text x="400" y="168">ویرایش متن (اختیاری) و تأیید</text>
+          <line x1="395" y1="190" x2="242" y2="190" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a3)"/><text x="318" y="184">ثبت موارد تأییدشده</text>
+          <line x1="230" y1="214" x2="77" y2="214" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a3)"/><text x="152" y="208">علائم، وعده، یادداشت</text>
+          <text x="235" y="244" fill="#b45309">صدا ذخیره نمی‌شود</text>
+          <line x1="240" y1="270" x2="393" y2="270" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a3)"/><text x="318" y="264">هشدار در صورت عدد خطرناک</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <div class="band" style="margin-top:2mm;"><h3>الگوی مشترک</h3><p>هر ورودی هوشمند ابتدا «پیشنهاد» تولید می‌کند و کاربر تأیید می‌کند؛ داده خام (عکس، صدا) فقط در حافظه پردازش می‌شود و سپس دور ریخته می‌شود.</p></div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۸</span></div>
+</section>
+
+<!-- 9. FLOWS 2 -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>جریان داده</span></div>
+  <div class="kicker">جریان داده</div>
+  <h2 class="title">همراه خانواده و گزارش پزشک</h2>
+  <div class="grid2" style="margin-top:2mm;">
+    <div>
+      <h3 style="font-size:12pt;margin-bottom:2mm;">۳. هشدار به همراه</h3>
+      <svg class="diagram seq" viewBox="0 0 470 330">
+        <defs><marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0e8f6d"/></marker></defs>
+        <g font-size="12" font-weight="800" text-anchor="middle" direction="rtl"><text x="400" y="18">بیمار</text><text x="235" y="18">سرور</text><text x="70" y="18">همراه</text></g>
+        <g stroke="#cfe0da" stroke-dasharray="4 4"><line x1="400" y1="28" x2="400" y2="320"/><line x1="235" y1="28" x2="235" y2="320"/><line x1="70" y1="28" x2="70" y2="320"/></g>
+        <g font-size="11" text-anchor="middle" direction="rtl" fill="#10201b">
+          <line x1="395" y1="52" x2="242" y2="52" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a4)"/><text x="318" y="46">ساخت کد دعوت ۶ حرفی</text>
+          <line x1="77" y1="86" x2="228" y2="86" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a4)"/><text x="152" y="80">پیوستن با کد</text>
+          <text x="235" y="112">پیوند فعال، کد باطل</text>
+          <text x="400" y="146">داروی ساعت ۱۰ مصرف نشد</text>
+          <text x="235" y="176">هر ۵ دقیقه: نوبت جامانده</text>
+          <text x="235" y="194">(یک ساعت مهلت)، فشار/قند خطر،</text>
+          <text x="235" y="212">دارو رو به اتمام</text>
+          <line x1="228" y1="238" x2="77" y2="238" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a4)"/><text x="152" y="232">فهرست هشدار</text>
+          <text x="70" y="266">اعلان یک‌باره</text>
+          <text x="70" y="284">برای هر هشدار</text>
+          <text x="400" y="300" fill="#b45309">یادداشت و تقویم خصوصی می‌ماند</text>
+        </g>
+      </svg>
+    </div>
+    <div>
+      <h3 style="font-size:12pt;margin-bottom:2mm;">۴. گزارش برای پزشک</h3>
+      <svg class="diagram seq" viewBox="0 0 470 330">
+        <defs><marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0e8f6d"/></marker></defs>
+        <g font-size="12" font-weight="800" text-anchor="middle" direction="rtl"><text x="400" y="18">بیمار</text><text x="235" y="18">سرور</text><text x="70" y="18">پزشک</text></g>
+        <g stroke="#cfe0da" stroke-dasharray="4 4"><line x1="400" y1="28" x2="400" y2="320"/><line x1="235" y1="28" x2="235" y2="320"/><line x1="70" y1="28" x2="70" y2="320"/></g>
+        <g font-size="11" text-anchor="middle" direction="rtl" fill="#10201b">
+          <line x1="395" y1="52" x2="242" y2="52" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a5)"/><text x="318" y="46">درخواست گزارش ۳۰/۹۰ روز</text>
+          <text x="235" y="78">لینک امضاشده، فقط‌خواندنی،</text>
+          <text x="235" y="96">اعتبار ۷ روز، بدون امکان ورود</text>
+          <line x1="242" y1="118" x2="393" y2="118" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a5)"/><text x="318" y="112">لینک</text>
+          <text x="400" y="146">ارسال در پیام‌رسان</text>
+          <line x1="77" y1="180" x2="228" y2="180" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a5)"/><text x="152" y="174">باز کردن لینک</text>
+          <text x="235" y="208">ساخت صفحه: نمودار، جدول،</text>
+          <text x="235" y="226">داروها، HbA1c، تقویم شمسی</text>
+          <line x1="228" y1="252" x2="77" y2="252" stroke="#0e8f6d" stroke-width="2" marker-end="url(#a5)"/><text x="152" y="246">صفحه آماده چاپ</text>
+          <text x="70" y="282">چاپ یا PDF</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۹</span></div>
+</section>
+
+<!-- 10. DATA MODEL -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>مدل داده</span></div>
+  <div class="kicker">مدل داده</div>
+  <h2 class="title">۱۸ جدول در پنج حوزه</h2>
+  <div class="grid3" style="margin-top:3mm;">
+    <div class="card tint"><h3>هسته کاربر</h3><p><span class="mono">User</span> — حساب، هدف کالری، نقش مدیر، موجودی کیف پول<br><span class="mono">AppSetting</span> — تنظیمات سامانه (کلید/مقدار)</p></div>
+    <div class="card"><h3>سوابق سلامت</h3><p><span class="mono">Meal</span> وعده‌ها · <span class="mono">Vital</span> علائم حیاتی · <span class="mono">Journal</span> یادداشت و احساس · <span class="mono">SleepSession</span> خواب · <span class="mono">Workout</span> ورزش · <span class="mono">LabReport</span> آزمایش · <span class="mono">SkinCheck</span> پوست · <span class="mono">XRayCheck</span> رادیولوژی · <span class="mono">CycleEntry</span> چرخه قاعدگی</p></div>
+    <div class="card"><h3>دارو</h3><p><span class="mono">Medication</span> — نام، دوز، ساعت‌ها، موجودی و تعداد در هر نوبت<br><span class="mono">MedLog</span> — مصرف یا جاماندن هر نوبت</p></div>
+    <div class="card"><h3>خانواده</h3><p><span class="mono">CareLink</span> — بیمار، همراه، کد دعوت، وضعیت (در انتظار/فعال)</p></div>
+    <div class="card"><h3>پرداخت</h3><p><span class="mono">Doctor</span> پزشک و کد QR · <span class="mono">Payment</span> پرداخت و نتیجه درگاه · <span class="mono">WalletTxn</span> دفتر کل کیف پول · <span class="mono">DoctorSettlement</span> تسویه با پزشک</p></div>
+    <div class="card tint"><h3>قواعد مشترک</h3><ul class="check"><li>همه زمان‌ها UTC و دارای منطقه زمانی</li><li>هر ردیف سلامت کلید کاربر دارد</li><li>ستون‌های جدید و اختیاری خودکار به پایگاه موجود اضافه می‌شوند</li></ul></div>
+  </div>
+  <div class="grid2" style="margin-top:4mm;">
+    <div class="card"><h3>آنچه ذخیره <u>نمی‌شود</u></h3><ul class="check"><li>عکس غذا، پوست، رادیولوژی و برگه آزمایش</li><li>صدای ثبت صوتی و صدای خواب</li><li>ویدیوی ورزش و ضربان قلب</li><li>رمز عبور به‌صورت خوانا (فقط چکیده یک‌طرفه)</li></ul></div>
+    <div class="card"><h3>نگهداری و بکاپ</h3><ul class="check"><li>بکاپ خودکار شبانه پایگاه داده با نگهداری ۱۴ نسخه</li><li>اسکریپت بازیابی یک‌مرحله‌ای، آزموده‌شده</li><li>حافظه نهان صدا روی دیسک با سقف ۳۰۰ فایل</li></ul></div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۱۰</span></div>
+</section>
+
+<!-- 11. API -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>رابط برنامه‌نویسی</span></div>
+  <div class="kicker">رابط برنامه‌نویسی (REST / JSON)</div>
+  <h2 class="title">۷۵ سرویس در ۱۵ گروه</h2>
+  <table style="margin-top:2mm;">
+    <tr><th style="width:17%">گروه</th><th style="width:8%">تعداد</th><th>نمونه سرویس‌ها</th></tr>
+    <tr><td>حساب کاربری</td><td>۴</td><td><span class="mono">POST /api/auth/register</span> <span class="mono">POST /api/auth/login</span> <span class="mono">GET /api/auth/me</span></td></tr>
+    <tr><td>تغذیه</td><td>۵</td><td><span class="mono">POST /api/food/analyze</span> <span class="mono">GET /api/food/search</span> <span class="mono">POST /api/meals</span></td></tr>
+    <tr><td>علائم حیاتی</td><td>۵</td><td><span class="mono">POST /api/vitals</span> <span class="mono">GET /api/vitals/insights</span> <span class="mono">GET /api/vitals/a1c</span></td></tr>
+    <tr><td>دارو</td><td>۷</td><td><span class="mono">POST /api/meds/{id}/log</span> <span class="mono">POST /api/meds/{id}/refill</span> <span class="mono">GET /api/meds/adherence</span></td></tr>
+    <tr><td>صوت و رادیولوژی</td><td>۵</td><td><span class="mono">POST /api/voice/transcribe</span> <span class="mono">POST /api/tts</span> <span class="mono">POST /api/xray/analyze</span></td></tr>
+    <tr><td>پوست و آزمایش</td><td>۴</td><td><span class="mono">POST /api/skin/analyze</span> <span class="mono">POST /api/lab/analyze</span></td></tr>
+    <tr><td>ذهن و گفتگو</td><td>۴</td><td><span class="mono">POST /api/journal</span> <span class="mono">POST /api/assistant/chat</span></td></tr>
+    <tr><td>خواب و ورزش</td><td>۵</td><td><span class="mono">POST /api/sleep</span> (ارسال تکراری بی‌خطر) <span class="mono">POST /api/workouts</span></td></tr>
+    <tr><td>خانواده</td><td>۶</td><td><span class="mono">POST /api/care/invite</span> <span class="mono">POST /api/care/join</span> <span class="mono">GET /api/care/alerts</span></td></tr>
+    <tr><td>گزارش پزشک</td><td>۲</td><td><span class="mono">POST /api/report/link</span> <span class="mono">GET /api/report/view</span></td></tr>
+    <tr><td>سلامت بانوان</td><td>۴</td><td><span class="mono">GET /api/cycle</span> (ثبت‌ها + پیش‌بینی) <span class="mono">POST /api/cycle</span></td></tr>
+    <tr><td>پرداخت</td><td>۶</td><td><span class="mono">GET /api/pay/doctors/{token}</span> <span class="mono">POST /api/pay</span> <span class="mono">GET /api/wallet</span> و بازگشت درگاه</td></tr>
+    <tr><td>پنل مدیریت</td><td>۱۵</td><td>گزارش، پزشکان، QR، تسویه، پرداخت‌ها، کاربران، تنظیمات، استعلام مجدد</td></tr>
+    <tr><td>وضعیت</td><td>۳</td><td><span class="mono">GET /api/health</span> <span class="mono">GET /api/dashboard</span> <span class="mono">GET /api/models</span></td></tr>
+  </table>
+  <p class="note" style="margin-top:2mm;">مستندات تعاملی سرویس‌ها به‌صورت خودکار تولید می‌شود. خطاها با پیام فارسی و کد استاندارد HTTP برگردانده می‌شوند؛ دسترسی به داده کاربر دیگر پاسخ ۴۰۴ می‌گیرد.</p>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۱۱</span></div>
+</section>
+
+<!-- 12. SECURITY -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>امنیت و حریم خصوصی</span></div>
+  <div class="kicker">امنیت و حریم خصوصی</div>
+  <h2 class="title">داده‌ای به حساسیت سلامت</h2>
+  <div class="grid3" style="margin-top:3mm;">
+    <div class="card"><h3>احراز هویت</h3><ul class="check"><li>رمز عبور با الگوریتم چکیده کُند و نمک‌دار ذخیره می‌شود</li><li>توکن امضاشده با کلید سرور و تاریخ انقضا</li><li>خروج خودکار هنگام نامعتبر شدن توکن</li></ul></div>
+    <div class="card"><h3>کنترل دسترسی</h3><ul class="check"><li>هر سرویس داده کاربر، هویت را بررسی می‌کند</li><li>هر ردیف فقط برای مالک آن قابل دسترسی است</li><li>سرویس‌های مدیریت فقط برای نقش مدیر</li></ul></div>
+    <div class="card"><h3>انتقال و میزبانی</h3><ul class="check"><li>ارتباط فقط HTTPS با گواهی خودکار</li><li>نصب کامل داخل کشور، بدون سرویس خارجی</li><li>دیواره آتش و باز بودن فقط درگاه‌های لازم</li></ul></div>
+    <div class="card"><h3>لینک‌های محدود</h3><ul class="check"><li>لینک گزارش پزشک: فقط‌خواندنی، ۷ روز، غیرقابل استفاده برای ورود</li><li>کد همراه: یک‌بارمصرف، قابل لغو توسط بیمار</li><li>کد QR پزشک قابل باطل کردن و صدور مجدد</li></ul></div>
+    <div class="card"><h3>حداقل‌سازی داده</h3><ul class="check"><li>تصویر و صدا ذخیره نمی‌شود</li><li>همراه خانواده یادداشت و تقویم را نمی‌بیند</li><li>رمز درگاه بانکی فقط‌نوشتنی است</li></ul></div>
+    <div class="card"><h3>ایمنی بالینی</h3><ul class="check"><li>هیچ خروجی ادعای تشخیص ندارد</li><li>هشدار فوری در اعداد خطرناک و ارجاع به اورژانس</li><li>تشخیص جملات بحرانی و نمایش شماره‌های کمک</li></ul></div>
+  </div>
+  <div class="band" style="margin-top:4mm;"><h3>مالی</h3><p>هر تغییر موجودی کیف پول یک دستور اتمی پایگاه داده است؛ دو پرداخت هم‌زمان نمی‌توانند یک مبلغ را دو بار خرج کنند (با ۶ پرداخت موازی آزموده شده). پرداخت درگاه فقط پس از تأیید سمت سرور و برابری مبلغ ثبت می‌شود.</p></div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۱۲</span></div>
+</section>
+
+<!-- 13. PAYMENTS -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>پرداخت و کیف پول</span></div>
+  <div class="kicker">پرداخت ویزیت</div>
+  <h2 class="title">QR، کیف پول و درگاه بانکی</h2>
+  <svg class="diagram" viewBox="0 0 1000 200" style="margin-top:2mm">
+    <defs><marker id="a6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0e8f6d"/></marker></defs>
+    <g font-size="12" text-anchor="middle" direction="rtl">
+      <rect x="840" y="40" width="150" height="80" rx="12" fill="#e7eefe"/><text x="915" y="74" font-weight="800">اسکن QR مطب</text><text x="915" y="96" font-size="10.5" fill="#475569">نام و تخصص پزشک</text>
+      <line x1="838" y1="80" x2="782" y2="80" stroke="#0e8f6d" stroke-width="2.5" marker-end="url(#a6)"/>
+      <rect x="630" y="40" width="150" height="80" rx="12" fill="#e3f6ef"/><text x="705" y="74" font-weight="800">تأیید مبلغ</text><text x="705" y="96" font-size="10.5" fill="#475569">پیش‌فرض قابل تغییر</text>
+      <line x1="628" y1="62" x2="560" y2="40" stroke="#0e8f6d" stroke-width="2.5" marker-end="url(#a6)"/>
+      <line x1="628" y1="98" x2="560" y2="140" stroke="#0e8f6d" stroke-width="2.5" marker-end="url(#a6)"/>
+      <rect x="400" y="5" width="158" height="62" rx="12" fill="#fdf1dc"/><text x="479" y="32" font-weight="800">کیف پول</text><text x="479" y="52" font-size="10.5" fill="#475569">کسر اتمی + دفتر کل</text>
+      <rect x="400" y="110" width="158" height="80" rx="12" fill="#f0e8fe"/><text x="479" y="136" font-weight="800">درگاه بانکی</text><text x="479" y="156" font-size="10.5" fill="#475569">ورود، تأیید تراکنش،</text><text x="479" y="174" font-size="10.5" fill="#475569">برگشت در عدم تطابق</text>
+      <line x1="398" y1="36" x2="282" y2="70" stroke="#0e8f6d" stroke-width="2.5" marker-end="url(#a6)"/>
+      <line x1="398" y1="150" x2="282" y2="100" stroke="#0e8f6d" stroke-width="2.5" marker-end="url(#a6)"/>
+      <rect x="130" y="45" width="150" height="80" rx="12" fill="#e3f6ef"/><text x="205" y="78" font-weight="800">رسید + کد پیگیری</text><text x="205" y="100" font-size="10.5" fill="#475569">افزایش طلب پزشک</text>
+      <line x1="128" y1="85" x2="80" y2="85" stroke="#0e8f6d" stroke-width="2.5" marker-end="url(#a6)"/>
+      <rect x="5" y="45" width="73" height="80" rx="12" fill="#edf1f6"/><text x="41" y="80" font-weight="800">تسویه</text><text x="41" y="100" font-size="10.5" fill="#475569">پنل مدیر</text>
+    </g>
+  </svg>
+  <div class="grid3" style="margin-top:4mm;">
+    <div class="card"><h3>کیف پول</h3><p>شارژ اولیه قابل تنظیم برای هر کاربر، دفتر کل کامل تراکنش‌ها، کسر و افزایش از پنل مدیر. موجودی هیچ‌گاه منفی نمی‌شود.</p></div>
+    <div class="card"><h3>درگاه بانکی</h3><p>پیاده‌سازی طبق مستند درگاه: ارسال فرم پرداخت، دریافت نتیجه، تأیید سمت سرور، مقایسه مبلغ و برگشت خودکار. تراکنش‌های نامعلوم «در انتظار» می‌مانند و مدیر می‌تواند استعلام مجدد کند. در حال حاضر تا تکمیل قرارداد بانکی غیرفعال است.</p></div>
+    <div class="card"><h3>پنل مدیریت</h3><p>گزارش لحظه‌ای و نمودار ۳۰ روزه، تعریف پزشک و چاپ کارت QR، فیلتر پرداخت‌ها با تقویم شمسی، خروجی اکسل، مدیریت کاربران و تسویه با پزشکان.</p></div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۱۳</span></div>
+</section>
+
+<!-- 14. DEPLOYMENT -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>استقرار و به‌روزرسانی</span></div>
+  <div class="kicker">استقرار</div>
+  <h2 class="title">نصب در یک دستور، حتی بدون اینترنت</h2>
+  <div class="grid2" style="margin-top:2mm;">
+    <div>
+      <table>
+        <tr><th style="width:30%">جزء</th><th>شرح</th></tr>
+        <tr><td><b>کانتینرها</b></td><td>برنامه، پایگاه داده و دروازه HTTPS با Docker Compose؛ راه‌اندازی مجدد خودکار</td></tr>
+        <tr><td><b>نصب‌کننده</b></td><td>نصب پیش‌نیازها، ساخت تنظیمات با کلیدهای تصادفی، دیواره آتش، بالا آوردن سرویس‌ها، انتظار برای سلامت، زمان‌بندی بکاپ</td></tr>
+        <tr><td><b>بسته آفلاین</b></td><td>همه تصاویر کانتینر، مدل‌ها و کد در یک بسته (حدود ۸۳۰ مگابایت) برای سرورهای بدون دسترسی به مخازن بسته</td></tr>
+        <tr><td><b>به‌روزرسانی سبک</b></td><td>فقط کد و نسخه وب (حدود ۱ مگابایت)؛ بررسی سازگاری بسته‌ها و مدل‌ها، ساخت محلی، راه‌اندازی، و <b>بازگشت خودکار</b> اگر نسخه جدید سالم بالا نیاید</td></tr>
+        <tr><td><b>اپ کاربران</b></td><td>بدون انتشار نسخه جدید اپ به‌روز می‌شود؛ فقط تغییر مجوزهای بومی نیاز به نسخه جدید دارد</td></tr>
+        <tr><td><b>ساخت خودکار</b></td><td>هر تغییر: آزمون‌ها، ساخت نسخه وب، ساخت فایل اپ اندروید امضاشده</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="card tint" style="margin-bottom:4mm;">
+        <h3>مشخصات پیشنهادی سرور</h3>
+        <table>
+          <tr><td>پردازنده</td><td><b>۲ تا ۴ هسته</b></td></tr>
+          <tr><td>حافظه</td><td><b>۴ گیگابایت</b> (برنامه با همه مدل‌ها حدود ۱٫۳ تا ۱٫۹ گیگابایت)</td></tr>
+          <tr><td>دیسک</td><td><b>۴۰ گیگابایت</b></td></tr>
+          <tr><td>سیستم‌عامل</td><td>لینوکس سرور (Ubuntu 24.04 آزموده شده)</td></tr>
+          <tr><td>کارت گرافیک</td><td>لازم نیست</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>عملیات روزانه</h3>
+        <ul class="check">
+          <li>بررسی سلامت: <span class="mono">/api/health</span> (وضعیت پایگاه داده)</li>
+          <li>بکاپ شبانه خودکار و بازیابی با یک اسکریپت</li>
+          <li>راهنمای کامل فارسی استقرار و عیب‌یابی</li>
+          <li>امکان استقرار بدون Docker با سرویس سیستمی و Nginx</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۱۴</span></div>
+</section>
+
+<!-- 15. PERFORMANCE -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>کارایی و ظرفیت</span></div>
+  <div class="kicker">کارایی (اندازه‌گیری واقعی)</div>
+  <h2 class="title">زمان پاسخ روی یک سرور ۴ هسته‌ای بدون کارت گرافیک</h2>
+  <div class="grid2" style="margin-top:2mm;">
+    <div>
+      <table>
+        <tr><th>عملیات</th><th>زمان پاسخ سرور</th></tr>
+        <tr><td>تشخیص غذا از عکس</td><td><b>حدود ۰٫۰۳ ثانیه</b></td></tr>
+        <tr><td>بررسی پوست</td><td><b>حدود ۰٫۰۵ ثانیه</b></td></tr>
+        <tr><td>غربالگری رادیولوژی (۱۸ یافته)</td><td><b>حدود ۰٫۱۴ ثانیه</b></td></tr>
+        <tr><td>خواندن جمله با صدا (بار اول)</td><td><b>حدود ۰٫۳ ثانیه</b></td></tr>
+        <tr><td>خواندن با صدا (تکراری، از حافظه نهان)</td><td><b>کمتر از ۰٫۰۱ ثانیه</b></td></tr>
+        <tr><td>تبدیل ۸ ثانیه گفتار فارسی به متن</td><td><b>حدود ۳٫۵ ثانیه</b></td></tr>
+        <tr><td>تفسیر نتایج آزمایش (متنی)</td><td><b>کمتر از ۰٫۰۱ ثانیه</b></td></tr>
+        <tr><td>داشبورد روزانه</td><td><b>کمتر از ۰٫۰۱ ثانیه</b></td></tr>
+      </table>
+      <p class="note" style="margin-top:2mm;">میانه چند اجرا روی سرور آزمون، بدون احتساب زمان شبکه. زمان شبکه و بارگذاری عکس از گوشی به اینترنت کاربر بستگی دارد.</p>
+    </div>
+    <div>
+      <div class="grid2">
+        <div class="stat"><b>۱۰۰ KB</b><span>حجم فشرده کد اصلی وب</span></div>
+        <div class="stat"><b>۱٫۹ GB</b><span>حداکثر حافظه برنامه با همه مدل‌ها</span></div>
+        <div class="stat"><b>۰</b><span>هزینه پردازش ویدیو روی سرور</span></div>
+        <div class="stat"><b>۱ MB</b><span>حجم به‌روزرسانی سبک</span></div>
+      </div>
+      <div class="card" style="margin-top:4mm;">
+        <h3>مسیر افزایش ظرفیت</h3>
+        <ul class="check">
+          <li>برنامه بی‌حالت است: چند نسخه پشت یک توزیع‌کننده بار</li>
+          <li>پایگاه داده جدا با تکثیر خواندنی برای گزارش‌ها</li>
+          <li>جداسازی سرویس گفتار (سنگین‌ترین) روی سرور مستقل</li>
+          <li>حافظه نهان صدا بار تکراری را تقریباً صفر می‌کند</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۱۵</span></div>
+</section>
+
+<!-- 16. QUALITY -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>کیفیت و آزمون</span></div>
+  <div class="kicker">کیفیت و آزمون</div>
+  <h2 class="title">هر قابلیت، پیش از تحویل آزموده می‌شود</h2>
+  <div class="grid3" style="margin-top:3mm;">
+    <div class="card tint"><h3>آزمون‌های خودکار سرور</h3><p><b>۵۵ آزمون</b> که روی هر دو پایگاه داده SQLite و PostgreSQL اجرا می‌شوند: حساب، تغذیه، علائم، دارو و موجودی، خانواده و دسترسی‌ها، گزارش و امنیت لینک، چرخه، پرداخت هم‌زمان، درگاه با شبیه‌ساز بانک، و مدل‌های هوش مصنوعی روی نمونه واقعی.</p></div>
+    <div class="card tint"><h3>آزمون سرتاسری در مرورگر</h3><p>همه مسیرها روی نمای موبایل با مرورگر خودکار: ثبت‌نام، عکس غذا، ثبت صوتی با میکروفون شبیه‌سازی‌شده، اسکن QR با دوربین شبیه‌سازی‌شده، ضربان با ویدیوی شبیه‌سازی‌شده (۷۲ در برابر ۷۲)، همراه خانواده و پنل مدیریت.</p></div>
+    <div class="card tint"><h3>آزمون استقرار</h3><p>نصب از بسته آفلاین روی سرور تمیز، ارتقا از نسخه قبلی با حفظ داده، رد به‌روزرسانی ناسازگار و بازگشت خودکار نسخه معیوب.</p></div>
+    <div class="card"><h3>آزمون الگوریتم‌ها</h3><p>ضربان قلب روی سیگنال‌های شبیه‌سازی ۵۲ تا ۱۴۰ ضربه (خطای کمتر از ۱ ضربه)، تبدیل تقویم شمسی روی ۲۰ هزار روز، پیش‌بینی چرخه و HbA1c با داده معلوم.</p></div>
+    <div class="card"><h3>سازگاری مرورگرها</h3><p>بررسی ویژه سافاری iOS (محدودیت‌های اجرای مدل روی گوشی) و نسخه‌گذاری دقیق موتور اجرای مدل‌های گوشی.</p></div>
+    <div class="card"><h3>ساخت پیوسته</h3><p>با هر تغییر: اجرای آزمون‌ها، ساخت نسخه وب و ساخت فایل نصب اندروید با امضای ثابت برای به‌روزرسانی بی‌دردسر.</p></div>
+  </div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۱۶</span></div>
+</section>
+
+<!-- 17. LIMITS + ROADMAP -->
+<section class="page">
+  <div class="hdr"><b>سلامت‌یار هوشمند</b><span>محدودیت‌ها و نقشه راه</span></div>
+  <div class="kicker">شفافیت فنی</div>
+  <h2 class="title">محدودیت‌های فعلی و نقشه راه فنی</h2>
+  <div class="grid2" style="margin-top:3mm;">
+    <div class="card">
+      <h3>محدودیت‌های فعلی</h3>
+      <ul class="check">
+        <li>هشدار همراه خانواده وقتی اپ همراه باز است یا باز می‌شود ارسال می‌شود (اعلان فوری با اپ بسته در نقشه راه است)</li>
+        <li>پایش خواب در وب با خاموش شدن صفحه متوقف می‌شود؛ در اپ اندروید سرویس پیش‌زمینه لازم است</li>
+        <li>مدل‌های پوست و رادیولوژی در حد غربالگری‌اند و برای استفاده بالینی گسترده، اعتبارسنجی با داده محلی لازم است</li>
+        <li>دقت گفتار به متن به کیفیت صدا و لهجه بستگی دارد؛ به همین دلیل تأیید کاربر الزامی است</li>
+        <li>اپ‌های مبتنی بر وب ممکن است در فروشگاه اپل بررسی سخت‌گیرانه‌تری داشته باشند</li>
+        <li>تغییرات ساختاری بزرگ پایگاه داده نیاز به ابزار مهاجرت کامل دارد (ستون‌های جدید خودکارند)</li>
+      </ul>
+    </div>
+    <div class="card tint">
+      <h3>نقشه راه فنی</h3>
+      <ul class="check">
+        <li>اعلان فوری (push) برای یادآور و هشدار همراه حتی با اپ بسته</li>
+        <li>همگام‌سازی با ساعت‌ها و گوشی‌های هوشمند</li>
+        <li>هشدار تداخل دارویی با فهرست داروهای ایران</li>
+        <li>برنامه غذایی ایرانی، حالت رمضان و اهداف شخصی تغذیه</li>
+        <li>اسکن بارکد خوراکی‌های بسته‌بندی</li>
+        <li>بازآموزی مدل غذا با عکس‌های غذای ایرانی</li>
+        <li>ابزار مهاجرت کامل پایگاه داده و مانیتورینگ متمرکز</li>
+        <li>سرویس پیش‌زمینه اندروید برای پایش خواب</li>
+      </ul>
+    </div>
+  </div>
+  <div class="band" style="margin-top:4mm;"><h3>جمع‌بندی</h3><p>معماری سلامت‌یار برای سه هدف ساخته شده است: <b>حریم خصوصی</b> (پردازش روی گوشی و سرور داخلی، ذخیره نکردن تصویر و صدا)، <b>هزینه پایین</b> (فقط CPU، یک کانتینر، به‌روزرسانی ۱ مگابایتی) و <b>سرعت توسعه</b> (یک کد برای چهار سکو، ماژول‌های مستقل و آزمون خودکار).</p></div>
+  <div class="ftr"><span>سلامت‌یار هوشمند · مستند فنی</span><span>۱۷</span></div>
+</section>
+
+</body>
+</html>

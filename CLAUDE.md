@@ -141,6 +141,10 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     pressure/kidney linked to vitals (meal → glucose 2 h later, sodium), Iranian weekly meal plan + shopping list, water tracker,
     fasting/Ramadan mode, Iranian portion units, recipe calculator, packaged-food barcode with traffic-light label, weekly nutrition score,
     dietitian panel (B2B), allergy warnings. Recommended first: goals, disease diets + glucose link, Iranian meal plan, Ramadan, water. User to choose.
+36. **Technical/architecture document** for presentations: `docs/tech/technical.html` → `Salamatyar-Technical.pdf` (17 pages, A4 landscape,
+    SVG diagrams: architecture, server layers, 4 sequence flows, payment flow; data model, API table, security, deployment, measured
+    performance, testing, limits + roadmap). No AI model names (generic descriptions), platform stack named; PDF locked like the catalog.
+    Measured on 4 cores, no GPU: food 0.03 s, skin 0.05 s, X-ray 0.14 s, TTS 0.3 s (cached <0.01), ASR 3.5 s for 8 s audio, RSS up to ~1.9 GB.
 
 ### 2026-11-02 — Session 1
 1. Brainstormed health-app ideas with small AI models; the user asked to build **all of them in one app**.
