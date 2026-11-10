@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- leaf -->
+  <path d="M66 22 C74 10 90 8 98 12 C94 22 82 30 68 28 Z" fill="#5E8C4A"/>
+  <path d="M68 27 C76 22 84 18 93 14" stroke="#3F6A33" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- crown (calyx) -->
+  <path d="M46 30 L50 18 L55 26 L60 15 L65 26 L70 18 L74 30 Z" fill="#8E2433"/>
+  <!-- body -->
+  <path d="M60 28 C86 28 104 46 104 70 C104 94 84 110 60 110 C36 110 16 94 16 70 C16 46 34 28 60 28 Z" fill="#B23A48"/>
+  <!-- heart cut-out of seeds -->
+  <path d="M60 96 C52 89 38 80 38 67 C38 59 44 54 50 54 C54.5 54 58 56.5 60 60 C62 56.5 65.5 54 70 54 C76 54 82 59 82 67 C82 80 68 89 60 96 Z" fill="#FBF3E8"/>
+  <circle cx="52" cy="66" r="3.4" fill="#B23A48"/><circle cx="60" cy="72" r="3.4" fill="#B23A48"/><circle cx="68" cy="66" r="3.4" fill="#B23A48"/>
+  <circle cx="56" cy="80" r="3.4" fill="#B23A48"/><circle cx="64" cy="80" r="3.4" fill="#B23A48"/>
+</svg>

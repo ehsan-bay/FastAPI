@@ -70,8 +70,8 @@ export default function Vitals() {
       </Card>
       {kind === "glucose" && <A1cCard key={list.data?.length ?? 0} />}
       {kind === "hr" && (
-        <Link to="/heart" className="card pay-banner" style={{ background: "linear-gradient(135deg,#b91c1c,#ef4444)" }}>
-          <HeartPulse size={28} />
+        <Link to="/heart" className="card pay-banner">
+          <HeartPulse size={26} color="var(--red)" />
           <span className="grow"><b>اندازه‌گیری ضربان با دوربین</b><div className="small">انگشت را روی دوربین پشت گوشی بگذارید</div></span>
           <Camera size={20} />
         </Link>

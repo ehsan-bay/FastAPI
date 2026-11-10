@@ -25,7 +25,7 @@ export async function scheduleReminders(meds: Med[]) {
           const [hour, minute] = t.split(":").map(Number);
           return {
             id: m.id * 100 + i,
-            title: "یادآور دارو 💊",
+            title: "یادآور دارو ",
             body: `${m.name}${m.dose ? " — " + m.dose : ""}`,
             schedule: { on: { hour, minute }, allowWhileIdle: true },
           };
@@ -55,8 +55,8 @@ function startWebTicker() {
         fired.add(key);
         const body = `${m.name}${m.dose ? " — " + m.dose : ""}`;
         navigator.serviceWorker?.ready
-          .then((reg) => reg.showNotification("یادآور دارو 💊", { body, icon: "/icon-192.png", lang: "fa", dir: "rtl" }))
-          .catch(() => new Notification("یادآور دارو 💊", { body }));
+          .then((reg) => reg.showNotification("یادآور دارو ", { body, icon: "/icon-192.png", lang: "fa", dir: "rtl" }))
+          .catch(() => new Notification("یادآور دارو ", { body }));
       }
     }
   }, 30_000);

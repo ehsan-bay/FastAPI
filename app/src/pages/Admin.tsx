@@ -30,7 +30,7 @@ export default function Admin() {
   }
   return (
     <Page title="پنل مدیریت" wide>
-      <Tabs value={tab} onChange={setTab} items={[["report", "📊 گزارش"], ["doctors", "🩺 پزشکان"], ["payments", "💳 پرداخت‌ها"], ["users", "👥 کاربران"], ["settings", "⚙️ تنظیمات"]]} />
+      <Tabs value={tab} onChange={setTab} items={[["report", "گزارش"], ["doctors", "پزشکان"], ["payments", "پرداخت‌ها"], ["users", "کاربران"], ["settings", "تنظیمات"]]} />
       {tab === "report" && <Report />}
       {tab === "doctors" && <Doctors />}
       {tab === "payments" && <Payments />}
@@ -92,8 +92,8 @@ function QrCard({ doctor, onClose }: { doctor: Doctor; onClose: () => void }) {
     if (!w) return;
     w.document.write(`<!doctype html><html dir="rtl" lang="fa"><head><meta charset="utf-8"><title>${doctor.name}</title>
       <style>body{font-family:Vazirmatn,Tahoma,sans-serif;display:grid;place-items:center;min-height:95vh;margin:0}
-      .c{border:3px solid #0f9d76;border-radius:24px;padding:28px 36px;text-align:center;width:320px}
-      h1{margin:8px 0 2px;font-size:24px}p{margin:0;color:#555}img{width:260px;margin:18px 0 8px}.s{font-size:14px;color:#0f9d76;font-weight:bold}</style>
+      .c{border:3px solid #27408b;border-radius:24px;padding:28px 36px;text-align:center;width:320px}
+      h1{margin:8px 0 2px;font-size:24px}p{margin:0;color:#555}img{width:260px;margin:18px 0 8px}.s{font-size:14px;color:#b23a48;font-weight:bold}</style>
       </head><body><div class="c"><div class="s">پرداخت ویزیت با سلامت‌یار</div><h1>${doctor.name}</h1><p>${doctor.specialty}</p>
       <img src="${img}" alt=""><p>QR را با دوربین گوشی یا اپ سلامت‌یار اسکن کنید</p></div>
       <script>window.onload=()=>{window.print()}</script></body></html>`);
@@ -107,8 +107,8 @@ function QrCard({ doctor, onClose }: { doctor: Doctor; onClose: () => void }) {
         <p className="muted" style={{ margin: 0 }}>{doctor.specialty}</p>
         {img ? <img src={img} alt="QR" style={{ width: "100%", maxWidth: 260, margin: "12px auto", display: "block" }} /> : <Spinner />}
         <div className="row gap">
-          <button className="btn primary grow" onClick={print} disabled={!img}>🖨️ چاپ کارت</button>
-          <a className="btn grow" href={img} download={`QR-${doctor.name}.png`}>⬇️ دانلود</a>
+          <button className="btn primary grow" onClick={print} disabled={!img}>چاپ کارت</button>
+          <a className="btn grow" href={img} download={`QR-${doctor.name}.png`}>دانلود</a>
           <button className="btn" onClick={onClose}>بستن</button>
         </div>
       </div>
@@ -160,7 +160,7 @@ function Doctors() {
 
   return (
     <>
-      <Card title={edit ? `ویرایش ${edit.name}` : "➕ افزودن پزشک"}>
+      <Card title={edit ? `ویرایش ${edit.name}` : "افزودن پزشک"}>
         <form className="grid3 form-grid" onSubmit={save}>
           <input required placeholder="نام (مثلاً دکتر ...)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           <input placeholder="تخصص" value={form.specialty} onChange={(e) => setForm({ ...form, specialty: e.target.value })} />
@@ -191,13 +191,13 @@ function Doctors() {
               </tbody>
             </table>
             <div className="row gap wrap">
-              <button className="btn small" onClick={() => startEdit(d)}>✏️ ویرایش</button>
-              <button className="btn small" disabled={d.balance <= 0} onClick={() => settle(d)}>💰 تسویه</button>
+              <button className="btn small" onClick={() => startEdit(d)}>ویرایش</button>
+              <button className="btn small" disabled={d.balance <= 0} onClick={() => settle(d)}>تسویه</button>
               <button className="btn small" onClick={() => run(() => api(`/api/admin/doctors/${d.id}`, { method: "PATCH", body: { active: !d.active } }))}>
                 {d.active ? "غیرفعال کردن" : "فعال کردن"}
               </button>
               <button className="btn small ghost" onClick={() => window.confirm("QR فعلی باطل و QR جدید ساخته شود؟ کارت‌های چاپ‌شده قبلی دیگر کار نمی‌کنند.") && run(() => api(`/api/admin/doctors/${d.id}/new-qr`, { body: {} }))}>
-                🔄 QR جدید
+                QR جدید
               </button>
             </div>
           </Card>
@@ -253,7 +253,7 @@ function Payments() {
       {pays.data && (
         <div className="row between wrap gap">
           <span><b>{num(pays.data.count)}</b> پرداخت · جمع <b>{toman(pays.data.total)}</b></span>
-          <button className="btn small" onClick={exportCsv} disabled={!pays.data.items.length}>⬇️ خروجی Excel (CSV)</button>
+          <button className="btn small" onClick={exportCsv} disabled={!pays.data.items.length}>خروجی Excel (CSV)</button>
         </div>
       )}
       {pays.loading && <Spinner />}
@@ -277,7 +277,7 @@ function Payments() {
                     {p.method === "ipg" && p.status === "paid" && p.verified === false && <span className="badge medium" title="بدون Verify سمت سرور">تأییدنشده</span>}
                     {p.message && p.status !== "paid" && <div className="muted small">{p.message}</div>}
                     {p.method === "ipg" && p.status === "pending" && p.gateway_ref && (
-                      <button className="btn small ghost" onClick={() => api(`/api/admin/payments/${p.id}/recheck`, { body: {} }).then(() => pays.reload())}>🔄 استعلام مجدد</button>
+                      <button className="btn small ghost" onClick={() => api(`/api/admin/payments/${p.id}/recheck`, { body: {} }).then(() => pays.reload())}>استعلام مجدد</button>
                     )}
                   </td>
                   <td className="ltr small">{p.ref}{p.gateway_ref && <div className="muted">{p.gateway_ref}</div>}</td>
@@ -339,7 +339,7 @@ function Users() {
                   <td className="small">{dateTime(u.created_at)}</td>
                   <td>
                     <div className="row gap wrap">
-                      <button className="btn small" onClick={() => adjust(u)}>👛 شارژ / کسر</button>
+                      <button className="btn small" onClick={() => adjust(u)}>شارژ / کسر</button>
                       <button className="btn small ghost" onClick={() => window.confirm(u.is_admin ? "دسترسی مدیریت برداشته شود؟" : "این کاربر مدیر شود؟") && run(() => api(`/api/admin/users/${u.id}/role`, { body: { is_admin: !u.is_admin } }))}>
                         {u.is_admin ? "حذف مدیر" : "مدیر کردن"}
                       </button>
@@ -374,7 +374,7 @@ function SettingsTab() {
       await api("/api/admin/settings", { method: "PUT", body: {
         default_fee: parseAmount(form.default_fee), initial_wallet: parseAmount(form.initial_wallet),
         max_payment: parseAmount(form.max_payment), apply_fee_to_all: applyAll } });
-      setMsg("ذخیره شد ✅");
+      setMsg("ذخیره شد");
       s.reload();
     } catch (err) {
       setError((err as Error).message);
@@ -418,7 +418,7 @@ function IpgSettings({ data, onSaved }: { data: Settings | null; onSaved: () => 
     setError("");
     try {
       await api("/api/admin/settings", { method: "PUT", body: { ...f, ipg_amount_multiplier: Number(f.ipg_amount_multiplier) || 10 } });
-      setMsg("ذخیره شد ✅");
+      setMsg("ذخیره شد");
       onSaved();
     } catch (err) {
       setError((err as Error).message);
@@ -427,7 +427,7 @@ function IpgSettings({ data, onSaved }: { data: Settings | null; onSaved: () => 
 
   const cb = { width: "auto", minHeight: 0 } as const;
   return (
-    <Card title="💳 درگاه پرداخت بانکی (IPG)">
+    <Card title="درگاه پرداخت بانکی (IPG)">
       <form className="col" onSubmit={save}>
         <label className="row gap"><input type="checkbox" style={cb} checked={f.ipg_enabled} onChange={check("ipg_enabled")} /> <b>درگاه بانکی فعال باشد</b></label>
         <div className="grid2 form-grid">

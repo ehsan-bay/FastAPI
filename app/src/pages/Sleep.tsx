@@ -116,7 +116,7 @@ export default function Sleep() {
             <p className="small muted">آخرین رویداد: {labelFa(stats.events[stats.events.length - 1].label)}</p>
           )}
           <button className="btn danger" style={{ width: "100%", marginTop: 12 }} onClick={stop} disabled={state === "saving"}>
-            {state === "saving" ? "در حال ذخیره…" : "☀️ بیدار شدم — پایان"}
+            {state === "saving" ? "در حال ذخیره…" : "بیدار شدم — پایان"}
           </button>
         </Card>
       )}
@@ -125,7 +125,7 @@ export default function Sleep() {
       {last && (
         <Card title={`امتیاز خواب: ${num(last.score)} از ۱۰۰`}>
           <p className="small">مدت خواب: {num(last.hours)} ساعت</p>
-          {last.tips.length ? last.tips.map((t) => <div key={t} className="alert warn small" style={{ marginTop: 6 }}>{t}</div>) : <div className="alert ok">خواب خوبی داشتی! 🌟</div>}
+          {last.tips.length ? last.tips.map((t) => <div key={t} className="alert warn small" style={{ marginTop: 6 }}>{t}</div>) : <div className="alert ok">خواب خوبی داشتی! </div>}
         </Card>
       )}
       <Card title="۳۰ شب اخیر">

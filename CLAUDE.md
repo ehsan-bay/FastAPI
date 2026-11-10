@@ -154,6 +154,14 @@ Full stack: `cp .env.example .env` (set secrets), then `docker compose up -d --b
     `this.config` = default CapConfig with `serverUrl` replaced by reflection (minify is off). JS: `lib/serverConfig.ts`,
     `components/NativeServerForm.tsx` (Settings + Login, only when `Capacitor.isPluginAvailable("ServerConfig")`, so old APKs hide it),
     `public/offline.html` can change/reset the server too (via `Capacitor.nativePromise`). Java compiled only in CI (no Android SDK here); CI run 42 (c5c4bf6) green, APK `Salamatyar-1.0.42`.
+39. **New identity and design ("paper & lapis")** on request (new logo, theme, layout, font; must not look like a typical AI app).
+    Logo: own pomegranate mark (`app/public/logo.svg`, `icon.svg`; PNGs, Android mipmaps/adaptive foreground/splash regenerated,
+    launcher background #FBF3E8). Font: Estedad variable (`@fontsource-variable/estedad`; Vazirmatn package kept for docs builds).
+    Palette: paper #F6F2EA, ink #22201C, primary lapis #27408B, brand pomegranate #B23A48, saffron accents; warm dark mode.
+    No gradients/glass/glow; flat cards with thin borders, underline tabs, solid bottom bar. Nav: خانه، تغذیه، [ثبت +]، داروها، بیشتر;
+    the center button opens a quick-log sheet (voice, food photo, BP/sugar, meds, mood, heart rate). Home = "امروز" task list
+    (next dose with «خوردم», BP today, meals + calorie bar), status tiles, tools grid, family/doctor list. Emojis removed except mood faces.
+    Doctor report uses Estedad + new colors. Catalog/tech-doc screenshots still show the previous design.
 
 ### 2026-11-02 — Session 1
 1. Brainstormed health-app ideas with small AI models; the user asked to build **all of them in one app**.

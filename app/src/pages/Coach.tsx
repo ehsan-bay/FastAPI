@@ -99,20 +99,20 @@ export default function Coach() {
               </button>
             ))}
           </div>
-          <p className="muted small">💡 {EXERCISES[exercise].hint} پردازش کاملاً روی گوشی انجام می‌شود و تصویری ارسال نمی‌شود.</p>
+          <p className="muted small">{EXERCISES[exercise].hint} پردازش کاملاً روی گوشی انجام می‌شود و تصویری ارسال نمی‌شود.</p>
           <div className="row gap">
             <button className="btn primary grow" onClick={start} disabled={loading}>
-              {loading ? "در حال آماده‌سازی…" : "▶️ شروع"}
+              {loading ? "در حال آماده‌سازی…" : "▶شروع"}
             </button>
             <button className="btn" onClick={() => setFacing(facing === "user" ? "environment" : "user")}>
-              {facing === "user" ? "🤳 جلو" : "📷 پشت"}
+              {facing === "user" ? "جلو" : "پشت"}
             </button>
           </div>
         </Card>
       )}
       {loading && <Spinner text="بارگذاری مدل تشخیص بدن…" />}
       <ErrorBox error={error} />
-      {saved && <div className="alert ok">✅ {saved}</div>}
+      {saved && <div className="alert ok">{saved}</div>}
 
       <div className={`video-wrap ${facing === "environment" ? "rear" : ""}`} style={{ display: running ? "block" : "none" }}>
         <video ref={video} playsInline muted />
@@ -126,7 +126,7 @@ export default function Coach() {
         </div>
       </div>
       {running && (
-        <button className="btn danger" onClick={finish}>⏹️ پایان و ذخیره</button>
+        <button className="btn danger" onClick={finish}>پایان و ذخیره</button>
       )}
 
       <Card title="سابقه ۳۰ روز اخیر">

@@ -33,8 +33,8 @@ export default function Login() {
   return (
     <div className="auth-page">
       <Card className="auth-card">
-        <img src="/icon.svg" alt="" className="logo" />
-        <h1 className="center">سلامت‌یار هوشمند</h1>
+        <img src="/logo.svg" alt="" className="logo" />
+        <h1 className="center wordmark">سلامت‌<span>یار</span></h1>
         <p className="muted center small" style={{ marginBottom: 14 }}>همراه هوشمند سلامت شما؛ تغذیه، فشار و قند، دارو، خواب و سلامت روان</p>
         <Tabs value={mode} onChange={setMode} items={[["login", "ورود"], ["register", "ثبت‌نام"]]} />
         <form className="col" style={{ marginTop: 14 }} onSubmit={submit}>

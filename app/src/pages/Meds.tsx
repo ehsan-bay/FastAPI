@@ -77,7 +77,7 @@ export default function Meds() {
   };
 
   return (
-    <Page title="داروها" subtitle="یادآور مصرف و خواندن با صدا" back>
+    <Page title="داروها" subtitle="یادآور مصرف و خواندن با صدا">
       {adherence.data?.percent !== null && adherence.data && (
         <Card>
           <div className="row gap">
