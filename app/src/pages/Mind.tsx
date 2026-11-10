@@ -13,7 +13,7 @@ const MOODS = ["😢", "🙁", "😐", "🙂", "😄"];
 export default function Mind() {
   const [tab, setTab] = useState<"journal" | "chat" | "breathe">("journal");
   return (
-    <Page title="سلامت روان" subtitle="یادداشت، گفتگو و آرام‌سازی" back>
+    <Page title="سلامت روان" subtitle="یادداشت، گفتگو و آرام‌سازی">
       <Tabs value={tab} onChange={setTab} items={[["journal", "یادداشت"], ["chat", "گفتگو"], ["breathe", "تنفس"]]} />
       {tab === "journal" && <Journal />}
       {tab === "chat" && <Chat />}

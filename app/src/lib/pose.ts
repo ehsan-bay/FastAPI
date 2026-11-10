@@ -129,7 +129,7 @@ export class RepCounter {
     } else if (this.stage === "down" && m > upAt) {
       this.stage = "up";
       this.reps += 1;
-      if (!feedback) feedback = "عالی! ";
+      if (!feedback) feedback = "عالی! 👏";
     }
     if (!feedback && this.stage === "down") feedback = "خوبه، حالا برگرد بالا";
     if (!feedback) feedback = this.exercise === "situp" ? "بالا بیا" : "پایین برو";

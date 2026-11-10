@@ -13,10 +13,10 @@ export default function ServerForm({ onSaved }: { onSaved?: () => void }) {
       const r = await fetch(`${clean}/api/health`);
       if (!r.ok) throw new Error();
       setServerUrl(clean);
-      setStatus("متصل شد");
+      setStatus("✅ متصل شد");
       onSaved?.();
     } catch {
-      setStatus("سرور در دسترس نیست. آدرس را بررسی کنید (مثلاً https://example.onrender.com)");
+      setStatus("❌ سرور در دسترس نیست. آدرس را بررسی کنید (مثلاً https://example.onrender.com)");
     }
   };
 

@@ -130,12 +130,12 @@ def render(session: Session, user: User, days: int, tz: int) -> str:
         loc = lambda v: _local(v.created_at, tz)
         sec.append("<h2>فشار خون</h2>" + _chart([("سیستولیک", [(loc(v), v.value) for v in bp], "#c9302c"),
                                                 ("دیاستولیک", [(loc(v), v.value2 or 0) for v in bp], "#2563eb")], 40, 200,
-                                               [(90, 130, "#e6eaf6"), (60, 80, "#e6eaf6")]))
+                                               [(90, 130, "#e8f6ee"), (60, 80, "#e8f6ee")]))
         sec.append(_table(["زمان", "فشار", "وضعیت"], [(jdate(loc(v), True), f"{_n(v.value)}/{_n(v.value2)}", v) for v in reversed(bp)][:40]))
     # --- glucose
     if glu:
         loc = lambda v: _local(v.created_at, tz)
-        sec.append("<h2>قند خون</h2>" + _chart([("قند", [(loc(v), v.value) for v in glu], "#b45309")], 40, 350, [(70, 140, "#e6eaf6")]))
+        sec.append("<h2>قند خون</h2>" + _chart([("قند", [(loc(v), v.value) for v in glu], "#b45309")], 40, 350, [(70, 140, "#e8f6ee")]))
         if a1c.get("available"):
             sec.append(f'<p>HbA1c تخمینی: <b>{_n(a1c["value"], 1)}٪</b> ({a1c["message"]}) — بر پایه {_n(a1c["readings"])} اندازه‌گیری در {_n(a1c["days"])} روز. جایگزین آزمایش HbA1c نیست.</p>')
         sec.append(_table(["زمان", "قند (mg/dL)", "وضعیت"], [(jdate(loc(v), True), _n(v.value), v) for v in reversed(glu)][:40]))
@@ -195,23 +195,24 @@ def _page(title: str, body: str, print_button: bool = False) -> str:
     return f"""<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>{title} — سلامت‌یار</title><style>
-@font-face{{font-family:Estedad;src:url(/fonts/estedad.woff2) format("woff2");font-weight:100 900}}
+@font-face{{font-family:Vazirmatn;src:url(/fonts/vazirmatn-400.woff2) format("woff2");font-weight:400}}
+@font-face{{font-family:Vazirmatn;src:url(/fonts/vazirmatn-700.woff2) format("woff2");font-weight:700}}
 @page{{size:A4;margin:14mm}}
-body{{font-family:Estedad,Tahoma,sans-serif;color:#22201c;margin:0;background:#f6f2ea;font-size:14px;line-height:1.7}}
+body{{font-family:Vazirmatn,Tahoma,sans-serif;color:#10201b;margin:0;background:#f3f6f5;font-size:14px;line-height:1.7}}
 main{{max-width:820px;margin:0 auto;background:#fff;padding:28px 32px}}
-.head{{display:flex;justify-content:space-between;gap:16px;border-bottom:3px solid #27408b;padding-bottom:10px;margin-bottom:14px}}
-h1{{font-size:22px;margin:0;color:#27408b}} h2{{font-size:16px;margin:22px 0 8px;color:#27408b}}
+.head{{display:flex;justify-content:space-between;gap:16px;border-bottom:3px solid #0e8f6d;padding-bottom:10px;margin-bottom:14px}}
+h1{{font-size:22px;margin:0;color:#0b6e55}} h2{{font-size:16px;margin:22px 0 8px;color:#0b6e55}}
 .head p{{margin:2px 0 0;font-weight:700}} .meta{{font-size:12px;color:#5b6f68;text-align:left}}
 .tiles{{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}}
 .tile{{border:1px solid #dfe8e4;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column}}
 .tile span{{font-size:11px;color:#5b6f68}} .tile b{{font-size:18px}} .tile small{{font-size:11px;color:#7b8b85}}
 table{{width:100%;border-collapse:collapse;font-size:12.5px}} th,td{{text-align:right;padding:5px 6px;border-bottom:1px solid #e7eeeb}}
-th{{background:#f3eee5;color:#33443f}} tr.danger td{{color:#c9302c;font-weight:700}} tr.warn td{{color:#9a5b00}}
+th{{background:#f2f7f5;color:#33443f}} tr.danger td{{color:#c9302c;font-weight:700}} tr.warn td{{color:#9a5b00}}
 .chart{{width:100%;height:auto;background:#fff}}
-.box{{padding:10px 12px;border-radius:10px;background:#f3eee5;margin:12px 0}} .box.danger{{background:#fde7e5;color:#a42521}} .box.warn{{background:#fff3d6}}
+.box{{padding:10px 12px;border-radius:10px;background:#eef6f3;margin:12px 0}} .box.danger{{background:#fde7e5;color:#a42521}} .box.warn{{background:#fff3d6}}
 .disc{{font-size:11px;color:#6a7b75;margin-top:22px;border-top:1px solid #e3e9e7;padding-top:8px}}
-.bar{{position:sticky;top:0;display:flex;gap:12px;align-items:center;padding:10px 32px;background:#27408b;color:#fff;font-size:12px;max-width:820px;margin:0 auto;box-sizing:border-box}}
-.bar .grow{{flex:1}} .bar button{{font:inherit;font-weight:700;border:0;border-radius:8px;padding:8px 14px;background:#fff;color:#27408b;cursor:pointer}}
+.bar{{position:sticky;top:0;display:flex;gap:12px;align-items:center;padding:10px 32px;background:#0e8f6d;color:#fff;font-size:12px;max-width:820px;margin:0 auto;box-sizing:border-box}}
+.bar .grow{{flex:1}} .bar button{{font:inherit;font-weight:700;border:0;border-radius:8px;padding:8px 14px;background:#fff;color:#0b6e55;cursor:pointer}}
 @media (max-width:640px){{.tiles{{grid-template-columns:repeat(2,1fr)}} main{{padding:18px}} .head{{flex-direction:column}} .meta{{text-align:right}}}}
 @media print{{body{{background:#fff}} main{{padding:0;max-width:none}} .no-print{{display:none}} h2{{break-after:avoid}} tr{{break-inside:avoid}}}}
 </style></head><body>{btn}<main>{body}</main></body></html>"""

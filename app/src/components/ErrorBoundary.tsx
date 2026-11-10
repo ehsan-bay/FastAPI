@@ -12,7 +12,7 @@ export default class ErrorBoundary extends Component<{ children: ReactNode }, { 
     return (
       <div className="auth-page">
         <div className="card auth-card center">
-          <h2>مشکلی پیش آمد </h2>
+          <h2>مشکلی پیش آمد 😕</h2>
           <p className="muted small ltr">{this.state.error.message}</p>
           <button className="btn primary" onClick={() => window.location.assign("/")}>بازگشت به خانه</button>
         </div>

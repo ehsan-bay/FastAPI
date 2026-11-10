@@ -22,9 +22,9 @@ export default function Wallet() {
       <Card className="wallet-card">
         <div className="small" style={{ opacity: 0.85 }}>موجودی کیف پول</div>
         <div className="big">{toman(rep.data?.wallet_balance ?? wallet.data?.balance)}</div>
-        <Link to="/scan" className="btn" style={{ marginTop: 10, background: "#fff", color: "var(--primary)", borderColor: "#fff" }}>پرداخت ویزیت با اسکن QR</Link>
+        <Link to="/scan" className="btn" style={{ marginTop: 10, background: "#fff", color: "#052e25" }}>📷 پرداخت ویزیت با اسکن QR</Link>
       </Card>
-      <Tabs value={tab} onChange={setTab} items={[["report", "گزارش پرداخت‌ها"], ["txns", "تراکنش‌های کیف پول"]]} />
+      <Tabs value={tab} onChange={setTab} items={[["report", "📊 گزارش پرداخت‌ها"], ["txns", "🧾 تراکنش‌های کیف پول"]]} />
 
       {tab === "report" && (
         <>
